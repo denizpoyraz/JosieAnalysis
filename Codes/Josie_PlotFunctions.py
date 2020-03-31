@@ -13,7 +13,7 @@ from matplotlib.offsetbox import AnchoredText
 
 
 def errorPlot_ARDif_withtext(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, ytitle, labelist, O3valuelist, dfnoduplist,
-                          plotname, logbool):
+                          plotname, logbool, textbool):
     '''
 
     :param xlist: a list of x values
@@ -29,7 +29,8 @@ def errorPlot_ARDif_withtext(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, 
     :param dfnoduplist: a list of df_noduplicated(sim), in order to know number of simulations
     :param plotname: how you want to save your plot
     :param logbool: True if you want logarithmic scale
-    :return: plot
+    :param textbool: True if you want an additional text
+    :return: just plots
     '''
 
     d = len(xlist)
@@ -66,7 +67,7 @@ def errorPlot_ARDif_withtext(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, 
                     capsize=1,
                     capthick=0.5)
 
-        tl[i] = ax.text(0.05, texty[i], textl[i], color=colorl[i], transform=ax.transAxes)
+        if textbool: tl[i] = ax.text(0.05, texty[i], textl[i], color=colorl[i], transform=ax.transAxes)
 
     # ax.tick_params(axis='both', which='both', direction='in')
     # ax.yaxis.set_ticks_position('both')

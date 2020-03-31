@@ -114,13 +114,13 @@ dfnplist = [profEN0505.drop_duplicates(['Sim', 'Team']), profEN1010.drop_duplica
 
 
 errorPlot_ARDif_withtext(axlist, ax_errorlist, Y, [-3, 3], [1000,5],  '',  axtitle, ytitle, alabellist, o3list, dfnplist,
-                           'TESTtest_ADif_Pair_CalibrationFunction_0910_withcut', True)
+                           'TESTtest_ADif_Pair_CalibrationFunction_0910_withcut', True, True)
 
 rxlist = [rEN0505, rEN1010, rSP1010, rSP0505]
 rxerrlist = [rENerr0505, rENerr1010, rSPerr1010, rSPerr0505 ]
 rxtitle = 'Sonde - OPM  Difference (%)'
 errorPlot_ARDif_withtext(rxlist, rxerrlist, Y, [-40, 40], [1000,5],  '',  rxtitle, ytitle, alabellist, o3list, dfnplist,
-                           'TESTtest_RDif_Pair_CalibrationFunction_0910_withcut', True)
+                           'TESTtest_RDif_Pair_CalibrationFunction_0910_withcut', True, True)
 
 
 
