@@ -12,8 +12,25 @@ from matplotlib.ticker import AutoMinorLocator
 from matplotlib.offsetbox import AnchoredText
 
 
-def errorPlot_withtext(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, ytitle, labelist, O3valuelist, dfnoduplist,
+def errorPlot_ARDif_withtext(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, ytitle, labelist, O3valuelist, dfnoduplist,
                           plotname, logbool):
+    '''
+
+    :param xlist: a list of x values
+    :param xerrorlist: a list of x error values
+    :param Y:
+    :param xra: x range
+    :param yra: y range
+    :param maintitle:
+    :param xtitle:
+    :param ytitle:
+    :param labelist: a list of the labels
+    :param O3valuelist: specific total O3 fractions
+    :param dfnoduplist: a list of df_noduplicated(sim), in order to know number of simulations
+    :param plotname: how you want to save your plot
+    :param logbool: True if you want logarithmic scale
+    :return: plot
+    '''
 
     d = len(xlist)
     n = [0] * d
@@ -23,7 +40,6 @@ def errorPlot_withtext(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, ytitle
     colorl = ['black', 'red', 'blue', 'green']
 
     ## y locations of the extra text which is drawn for the total O3 values
-
     texty = [0.23, 0.16, 0.09, 0.02]
 
     plt.close('all')
@@ -67,6 +83,8 @@ def errorPlot_withtext(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, ytitle
 #####################################################
 #####################################################
 #####################################################
+
+###  the rest of the plot functions need to be updated
 
 
 def Plot_Profile_PlotsTime(ind, teaml, prof_X, prof_Xerr, OPM_X, OPM_Xerr, Y, xra, yra, xtit, ytit, mtitle, plotname,
