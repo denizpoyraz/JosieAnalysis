@@ -11,6 +11,107 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator
 from matplotlib.offsetbox import AnchoredText
 
+def Calc_average_profile_Pair(dataframe, xcolumn):
+    dft = dataframe
+
+    ## this functions needs to be updated in a proper way!!
+
+
+    #
+    # yref = [1000, 950, 900, 850, 800, 750, 700, 650, 600, 550, 500, 450, 400, 350, 325, 300, 275, 250, 225, 200, 175,
+    #         150, 135, 120, 105, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 28, 26, 24, 22, 20, 18, 16, 14,
+    #         12, 10, 8, 6]
+
+
+    yref = [1000, 850, 700,  550, 400, 350, 300, 200, 150, 100, 75,  50, 35, 25, 20, 15,
+            12, 10, 8, 6]
+
+    if xcolumn == 'ADif_PO3S':
+        dft.PFcor = dataframe.ADif_PO3S
+    if xcolumn == 'RDif_PO3S':
+        dft['PFcor'] = dataframe['RDif_PO3S'].astype('float')
+    if xcolumn == 'PO3':
+        dft.PFcor = dataframe.PO3
+    if xcolumn == 'PO3_OPM':
+        dft.PFcor = dataframe.PO3_OPM
+    if xcolumn == 'PO3_deconv_jma':
+        dft.PFcor = dataframe.PO3_deconv_jma
+    if xcolumn == 'PO3_deconv':
+        dft.PFcor = dataframe.PO3_deconv
+    if xcolumn == 'PO3_deconv_jma':
+        dft.PFcor = dataframe.PO3_deconv_jma
+    if xcolumn == 'PO3_deconv_sm6':
+        dft.PFcor = dataframe.PO3_deconv_sm6
+    if xcolumn == 'PO3_deconv_sm10':
+        dft.PFcor = dataframe.PO3_deconv_sm10
+    if xcolumn == 'PO3_deconv_jma_sm6':
+        dft.PFcor = dataframe.PO3_deconv_jma_sm6
+    if xcolumn == 'PO3_deconv_jma_sm10':
+        dft.PFcor = dataframe.PO3_deconv_jma_sm10
+
+    n = len(yref) - 1
+    Xgrid = [-9999.0] * n
+    Xsigma = [-9999.0] * n
+    Ygrid = [-9999.0] * n
+
+    for i in range(n):
+        dftmp1 = pd.DataFrame()
+        dfgrid = pd.DataFrame()
+
+        grid_min = yref[i + 1]
+        grid_max = yref[i]
+        Ygrid[i] = (grid_min + grid_max) / 2.0
+
+        filta = dft.Pair >= grid_min
+        filtb = dft.Pair < grid_max
+        filter1 = filta & filtb
+        dftmp1['X'] = dft[filter1].PFcor
+
+        filtnull = dftmp1.X > -9999.0
+        # filtfin = np.isnan(dftmp1.X)
+        # filtfin = not(filtfin)
+        # filterall = filtnull & filtfin
+        filterall = filtnull
+        dfgrid['X'] = dftmp1[filterall].X
+        tmp = np.array(dfgrid.X.tolist())
+        # dfgrid = dfgrid.dropna()  ## problems with nan
+        Xgrid[i] = np.nanmean(dfgrid.X)
+        Xsigma[i] = np.nanstd(dfgrid.X)
+
+        # print('i', Xgrid[i])
+
+    # print('Xgrid', Xgrid)
+    return Xgrid, Xsigma, Ygrid
+
+def Calc_ADif(profO3X, profOPMX, profO3Xerr, dimension):
+    A1verr = [-9999.9] * dimension
+    A1v = [-9999.9] * dimension
+
+    for i in range(dimension):
+        A1v[i] = (profO3X[i] - profOPMX[i])
+        A1verr[i] = (profO3Xerr[i])
+
+    # print(A1v)
+    return A1v, A1verr
+
+def Calc_RDif(profO3X, profOPMX, profO3Xerr, dimension):
+    R1v = [-9999.9] * dimension
+    R1verr = [-9999.9] * dimension
+    A1v = [-9999.9] * dimension
+
+    for i in range(dimension):
+        A1v[i] = (profO3X[i] - profOPMX[i])
+        R1v[i] = 100 * (profO3X[i] - profOPMX[i]) / profOPMX[i]
+        # R1v[i] = 100 * (profO3X[i] - profOPMX[i]) / profO3X[i]
+
+        R1verr[i] = 100 * (profO3Xerr[i] / profOPMX[i])
+
+    # print(A1v)
+    return R1v, R1verr
+
+###################################3
+####################################
+########## the rest need to be organized #######################3
 
 # function to calculate the mean of a column ignoring the -99 values
 def meanfunction(dff, Xf):
@@ -103,86 +204,7 @@ def Calc_average_profile(dataframe, ybin, xcolumn):
     return Xgrid, Xsigma, Ygrid
 
 
-def Calc_average_profile_Pair(dataframe, xcolumn):
-    dft = dataframe
-    #
-    # yref = [1000, 950, 900, 850, 800, 750, 700, 650, 600, 550, 500, 450, 400, 350, 325, 300, 275, 250, 225, 200, 175,
-    #         150, 135, 120, 105, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 28, 26, 24, 22, 20, 18, 16, 14,
-    #         12, 10, 8, 6]
 
-
-    yref = [1000, 850, 700,  550, 400, 350, 300, 200, 150, 100, 75,  50, 35, 25, 20, 15,
-            12, 10, 8, 6]
-
-
-    if xcolumn == 'ADif_PO3S':
-        dft.PFcor = dataframe.ADif_PO3S
-    if xcolumn == 'RDif_PO3S':
-        dft['PFcor'] = dataframe['RDif_PO3S'].astype('float')
-    if xcolumn == 'PO3':
-        dft.PFcor = dataframe.PO3
-    if xcolumn == 'PO3_OPM':
-        dft.PFcor = dataframe.PO3_OPM
-    if xcolumn == 'PO3_corr1':
-        dft.PFcor = dataframe.PO3_corr1
-    if xcolumn == 'PO3_corr2':
-        dft.PFcor = dataframe.PO3_corr2
-    if xcolumn == 'PO3_corr':
-        dft.PFcor = dataframe.PO3_corr
-    if xcolumn == 'PO3_corrSlope':
-        dft.PFcor = dataframe.PO3_corrSlope
-    if xcolumn == 'PO3_corrSlope_wi':
-        dft.PFcor = dataframe.PO3_corrSlope_wi
-    if xcolumn == 'PO3_corrADif':
-        dft.PFcor = dataframe.PO3_corrADif
-    if xcolumn == 'PO3_corrRDif':
-        dft.PFcor = dataframe.PO3_corrRDif
-    if xcolumn == 'adif':
-        dft.PFcor = dataframe.adif
-    if xcolumn == 'rdif':
-        dft.PFcor = dataframe.rdif
-    if xcolumn == 'PO3_deconv':
-        dft.PFcor = dataframe.PO3_deconv
-    if xcolumn == 'PO3_deconv_jma':
-        dft.PFcor = dataframe.PO3_deconv_jma
-    if xcolumn == 'PO3_deconv_pe':
-        dft.PFcor = dataframe.PO3_deconv_pe
-    if xcolumn == 'OPM_PO3_jma':
-        dft.PFcor = dataframe.OPM_PO3_jma
-
-    n = len(yref) - 1
-    Xgrid = [-9999.0] * n
-    Xsigma = [-9999.0] * n
-    Ygrid = [-9999.0] * n
-
-    for i in range(n):
-        dftmp1 = pd.DataFrame()
-        dfgrid = pd.DataFrame()
-
-        grid_min = yref[i + 1]
-        grid_max = yref[i]
-        Ygrid[i] = (grid_min + grid_max) / 2.0
-
-        filta = dft.Pair >= grid_min
-        filtb = dft.Pair < grid_max
-        filter1 = filta & filtb
-        dftmp1['X'] = dft[filter1].PFcor
-
-        filtnull = dftmp1.X > -9999.0
-        # filtfin = np.isnan(dftmp1.X)
-        # filtfin = not(filtfin)
-        # filterall = filtnull & filtfin
-        filterall = filtnull
-        dfgrid['X'] = dftmp1[filterall].X
-        tmp = np.array(dfgrid.X.tolist())
-        # dfgrid = dfgrid.dropna()  ## problems with nan
-        Xgrid[i] = np.nanmean(dfgrid.X)
-        Xsigma[i] = np.nanstd(dfgrid.X)
-
-        # print('i', Xgrid[i])
-
-    # print('Xgrid', Xgrid)
-    return Xgrid, Xsigma, Ygrid
 
 def Calc_average_profile_Pair_median(dataframe, xcolumn):
     dft = dataframe
@@ -344,32 +366,9 @@ def Calc_average_profile_OPM(dataframe, ybin, xcolumn):
 
 # Calculate the relative difference between sonde and OPM
 
-def Calc_RDif(profO3X, profOPMX, profO3Xerr, dimension):
-    R1v = [-9999.9] * dimension
-    R1verr = [-9999.9] * dimension
-    A1v = [-9999.9] * dimension
-
-    for i in range(dimension):
-        A1v[i] = (profO3X[i] - profOPMX[i])
-        R1v[i] = 100 * (profO3X[i] - profOPMX[i]) / profOPMX[i]
-        # R1v[i] = 100 * (profO3X[i] - profOPMX[i]) / profO3X[i]
-
-        R1verr[i] = 100 * (profO3Xerr[i] / profOPMX[i])
-
-    # print(A1v)
-    return R1v, R1verr
 
 
-def Calc_ADif(profO3X, profOPMX, profO3Xerr, dimension):
-    A1verr = [-9999.9] * dimension
-    A1v = [-9999.9] * dimension
 
-    for i in range(dimension):
-        A1v[i] = (profO3X[i] - profOPMX[i])
-        A1verr[i] = (profO3Xerr[i])
-
-    # print(A1v)
-    return A1v, A1verr
 
 
 # def Differnece_Averaged(df, )

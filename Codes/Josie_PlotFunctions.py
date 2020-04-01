@@ -13,7 +13,7 @@ from matplotlib.offsetbox import AnchoredText
 
 
 def errorPlot_ARDif_withtext(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, ytitle, labelist, O3valuelist, dfnoduplist,
-                          plotname, logbool, textbool):
+                          plotname, path, logbool, textbool):
     '''
 
     :param xlist: a list of x values
@@ -28,6 +28,7 @@ def errorPlot_ARDif_withtext(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, 
     :param O3valuelist: specific total O3 fractions
     :param dfnoduplist: a list of df_noduplicated(sim), in order to know number of simulations
     :param plotname: how you want to save your plot
+    :param path: folder name in Plots folder
     :param logbool: True if you want logarithmic scale
     :param textbool: True if you want an additional text
     :return: just plots
@@ -77,11 +78,76 @@ def errorPlot_ARDif_withtext(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, 
     # ax.xaxis.set_minor_locator(AutoMinorLocator(10))
     # ax.legend(loc='lower right', frameon=True, fontsize='small')
 
-    plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Difference_Plots_0910/' + plotname + '.pdf')
-    plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Difference_Plots_0910/' + plotname + '.eps')
+    ax.legend(loc='lower right', frameon=True, fontsize='small')
+
+    plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/' + path + '/' + plotname + '.png')
+    plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/' + path + '/' + plotname + '.eps')
 
     plt.close()
 #####################################################
+
+
+
+def errorPlot_general(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, ytitle, labelist, colorlist, plotname, path, logbool):
+    '''
+
+    :param xlist:
+    :param xerrorlist:
+    :param Y:
+    :param xra:
+    :param yra:
+    :param maintitle:
+    :param xtitle:
+    :param ytitle:
+    :param labelist:
+    :param plotname:
+    :param logbool:
+    :return: just plots
+    '''
+
+
+    d = len(xlist)
+    n = [0] * d
+    labell = [''] * d
+    # colorl = ['black', 'red', 'blue', 'green']
+
+    ## y locations of the extra text which is drawn for the total O3 values
+    texty = [0.23, 0.16, 0.09, 0.02]
+
+    plt.close('all')
+    fig, ax = plt.subplots()
+    plt.xlim(xra)
+    plt.ylim(yra)
+    plt.title(maintitle)
+    plt.xlabel(xtitle)
+    plt.ylabel(ytitle)
+    plt.grid(True)
+
+    # plt.yticks(np.arange(0, 7001, 1000))
+
+    # reference line
+    ax.axvline(x=0, color='grey', linestyle='--')
+    if logbool: ax.set_yscale('log')
+
+    for i in range(d):
+        labell[i] = labelist[i]
+
+        ax.errorbar(xlist[i], Y, xerr=xerrorlist[i], label=labell[i], color=colorlist[i], linewidth=1, elinewidth=0.5,
+                    capsize=1,
+                    capthick=0.5)
+
+    ax.legend(loc='lower right', frameon=True, fontsize='x-small')
+
+
+    plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/' + path + '/' + plotname + '.png')
+    plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/' + path + '/' + plotname + '.eps')
+
+    plt.close()
+#####################################################
+
+
+
+
 #####################################################
 #####################################################
 

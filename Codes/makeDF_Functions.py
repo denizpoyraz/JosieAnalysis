@@ -261,3 +261,4 @@ def calculate_O3frac17(df, simlist):
         df.loc[filt8, 'ADif'] = Adif8
         df.loc[filt8, 'RDif'] = Rdif8
         df.loc[filt8, 'frac'] = frac8
+

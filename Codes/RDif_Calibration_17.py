@@ -1,4 +1,4 @@
-## 0910 branch
+## 2017 branch
 
 #!/usr/bin/env python
 # coding: utf-8
@@ -9,67 +9,24 @@ import matplotlib.pyplot as plt
 from Josie_Functions import  Calc_average_profile_Pair, Calc_RDif, Calc_ADif, Calc_average_profile
 from Josie_PlotFunctions import  errorPlot_ARDif_withtext, errorPlot_general
 
-folderpath = 'Dif_0910'
+folderpath = 'Dif_2017'
 
-df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv.csv", low_memory=False)
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv.csv", low_memory=False)
+df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv.csv", low_memory=False)
 
 df = df.drop(df[(df.PO3 < 0)].index)
 df = df.drop(df[(df.PO3_OPM < 0)].index)
 
-# dfcleaned = df = df[df.ADX == 0]
 
-## cuts for Josie0910 data
-# # v2 cuts, use this and v3 standard more conservative cuts not valid for 140, 162, 163, 166  v2
-df=df[df.Tsim > 900]
-df=df[df.Tsim <= 8100]
-df = df.drop(df[(2000 < df.Tsim) & (df.Tsim < 2500) & (df.Sim != 140) & (df.Sim != 162) & (df.Sim != 163) & (
-                df.Sim != 166)].index)
-df = df.drop(df[(df.Tsim > 4000) & (df.Tsim < 4500) & (df.Sim != 140) & (df.Sim != 162) & (df.Sim != 163) & (
-                df.Sim != 166)].index)
-df = df.drop(df[(df.Tsim > 6000) & (df.Tsim < 6500) & (df.Sim != 140) & (df.Sim != 162) & (df.Sim != 163) & (
-                df.Sim != 166)].index)
+df = df.drop(df[((df.Sim == 171) | (df.Sim == 172) | (df.Sim == 180) | (df.Sim == 185))].index)
+df = df.drop(df[(df.Sim == 179) & (df.Team == 4) & (df.Tsim > 4000)].index)
+df = df.drop(df[(df.Sim == 172) & (df.Tsim < 500)].index)
+df = df.drop(df[(df.Sim == 172) & (df.Team == 1) & (df.Tsim > 5000) & (df.Tsim < 5800)].index)
+df = df.drop(df[(df.Sim == 178) & (df.Team == 3) & (df.Tsim > 1700) & (df.Tsim < 2100)].index)
+df = df.drop(df[(df.Sim == 178) & (df.Team == 3) & (df.Tsim > 2500) & (df.Tsim < 3000)].index)
 
-df = df.drop(df[(df.Sim == 141) & (df.Team == 3)].index)
-df = df.drop(df[(df.Sim == 143) & (df.Team == 2) & (df.Tsim > 7950) & (df.Tsim < 8100)].index)
-df = df.drop(df[(df.Sim == 147) & (df.Team == 3)].index)
-df = df.drop(df[(df.Sim == 158) & (df.Team == 2)].index)
-df = df.drop(df[(df.Sim == 167) & (df.Team == 4)].index)
-
-df = df.drop(df[(df.Sim == 158) & (df.Tsim > 7300) & (df.Tsim < 7700)].index)
-df = df.drop(df[(df.Sim == 159) & (df.Tsim > 7800) & (df.Tsim < 8000)].index)
-df = df.drop(df[(df.Sim == 161) & (df.Tsim > 6800) & (df.Tsim < 7200)].index)
-
-    # # additional cuts for specific simulations  v3
-df = df.drop(df[(df.Sim == 140) & (df.Tsim < 1000)].index)
-df = df.drop(df[(df.Sim == 140) & (df.Tsim > 2450) & (df.Tsim < 2800)].index)
-df = df.drop(df[(df.Sim == 140) & (df.Tsim > 4400) & (df.Tsim < 4800)].index)
-df = df.drop(df[(df.Sim == 140) & (df.Tsim > 6400) & (df.Tsim < 6800)].index)
-
-df = df.drop(df[(df.Sim == 162) & (df.Tsim > 2100) & (df.Tsim < 2550)].index)
-df = df.drop(df[(df.Sim == 162) & (df.Tsim > 4100) & (df.Tsim < 4600)].index)
-df = df.drop(df[(df.Sim == 162) & (df.Tsim > 5450) & (df.Tsim < 5800)].index)
-df = df.drop(df[(df.Sim == 162) & (df.Tsim > 6100) & (df.Tsim < 6550)].index)
-
-df = df.drop(df[(df.Sim == 163) & (df.Tsim > 2100) & (df.Tsim < 2550)].index)
-df = df.drop(df[(df.Sim == 163) & (df.Tsim > 4100) & (df.Tsim < 4600)].index)
-df = df.drop(df[(df.Sim == 163) & (df.Tsim > 5450) & (df.Tsim < 5800)].index)
-df = df.drop(df[(df.Sim == 163) & (df.Tsim > 6100) & (df.Tsim < 6550)].index)
-
-df = df.drop(df[(df.Sim == 166) & (df.Tsim > 2200) & (df.Tsim < 2650)].index)
-df = df.drop(df[(df.Sim == 166) & (df.Tsim > 4200) & (df.Tsim < 4700)].index)
-df = df.drop(df[(df.Sim == 166) & (df.Tsim > 6200) & (df.Tsim < 6650)].index)
-df = df.drop(df[(df.Sim == 166) & (df.Tsim > 7550) & (df.Tsim < 7750)].index)
-df = df.drop(df[(df.Sim == 166) & (df.Team == 1) & (df.Tsim > 4400) & (df.Tsim < 5400)].index)
-
-# # ## v3 cuts
-#
-df = df.drop(df[(df.Sim == 159) & (df.Team == 1)].index)
-df = df.drop(df[(df.Sim == 158) & (df.Team == 1)].index)
-df = df.drop(df[(df.Sim == 163) & (df.Team == 4)].index)
-df = df.drop(df[(df.Sim == 159) & (df.Team == 4)].index)
-
-
+df = df.drop(df[((df.Sim == 175))].index)
+df = df.drop(df[((df.Tsim > 7000))].index)
 
 dfcleaned = df
 
@@ -79,7 +36,7 @@ resol = 200
 ytitle = 'Pressure (hPa)'
 ytitlet = 'Time (sec.)'
 
-# attention for 17 and 0910
+# attention for 17 and 2017
 
 
 
@@ -204,19 +161,19 @@ rxlist_dc = [rEN0505_dc, rEN1010_dc, rSP1010_dc, rSP0505_dc]
 rxerrlist_dc = [rENerr0505_dc, rENerr1010_dc, rSPerr1010_dc, rSPerr0505_dc ]
 
 
-errorPlot_ARDif_withtext(axlist, ax_errorlist, Y, [-3, 3], [1000,5],  '0910 Data',  axtitle, ytitle, alabellist, o3list, dfnplist,
-                           'Standard_ADif_Pair_CalibrationFunction_0910_withcut', folderpath ,  True, False)
+errorPlot_ARDif_withtext(axlist, ax_errorlist, Y, [-3, 3], [1000,5],  '2017 Data',  axtitle, ytitle, alabellist, o3list, dfnplist,
+                           'Standard_ADif_Pair_CalibrationFunction_2017_withcut', folderpath ,  True, False)
 
-errorPlot_ARDif_withtext(rxlist, rxerrlist, Y, [-40, 40], [1000,5],  '0910 Data',  rxtitle, ytitle, alabellist, o3list, dfnplist,
-                           'Standard_RDif_Pair_CalibrationFunction_0910_withcut', folderpath, True, False)
+errorPlot_ARDif_withtext(rxlist, rxerrlist, Y, [-40, 40], [1000,5],  '2017 Data',  rxtitle, ytitle, alabellist, o3list, dfnplist,
+                           'Standard_RDif_Pair_CalibrationFunction_2017_withcut', folderpath, True, False)
 
 ###
 
-errorPlot_ARDif_withtext(axlist_dc, ax_errorlist_dc, Y, [-3, 3], [1000,5],  '0910 Data Conv-Deconv (PO3 JMA corr.)',  axtitle, ytitle, alabellist, o3list, dfnplist,
-                           'Convoluted_ADif_Pair_CalibrationFunction_0910_withcut_JMAcorrection', folderpath ,  True, False)
+errorPlot_ARDif_withtext(axlist_dc, ax_errorlist_dc, Y, [-3, 3], [1000,5],  '2017 Data Conv-Deconv (PO3 JMA corr.)',  axtitle, ytitle, alabellist, o3list, dfnplist,
+                           'Convoluted_ADif_Pair_CalibrationFunction_2017_withcut_JMAcorrection', folderpath ,  True, False)
 
-errorPlot_ARDif_withtext(rxlist_dc, rxerrlist_dc, Y, [-40, 40], [1000,5],  '0910 Data Conv-Deconv (PO3 JMA corr.)',  rxtitle, ytitle, alabellist, o3list, dfnplist,
-                           'Convoluted_RDif_Pair_CalibrationFunction_0910_withcut_JMAcorrection', folderpath, True, False)
+errorPlot_ARDif_withtext(rxlist_dc, rxerrlist_dc, Y, [-40, 40], [1000,5],  '2017 Data Conv-Deconv (PO3 JMA corr.)',  rxtitle, ytitle, alabellist, o3list, dfnplist,
+                           'Convoluted_RDif_Pair_CalibrationFunction_2017_withcut_JMAcorrection', folderpath, True, False)
 
 ## check plot only for en0505 to see effcet of jms, sm etc
 # new_colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
@@ -232,10 +189,10 @@ rchecklist_err = [rENerr0505, rENerr0505_dc,rENerr0505_dc_sm,  rENerr0505_dcjma,
 
 checklabel = ['PO3', 'PO3 deconv', 'PO3 deconv smoothed ', 'PO3 deconv jma', 'PO3 deconv jma smoothed']
 
-errorPlot_general(achecklist, achecklist_err, Y, [-3,3], [1000,5], '0910 data- ENSCI 0.5%-0.%B', axtitle, ytitle,
+errorPlot_general(achecklist, achecklist_err, Y, [-3,3], [1000,5], '2017 data- ENSCI 0.5%-0.%B', axtitle, ytitle,
                   checklabel, colorlist, 'ADif_Check_en0505_withcut', folderpath, 1)
 
-errorPlot_general(rchecklist, rchecklist_err, Y, [-40,40], [1000,5], '0910 data ENSCI 0.5%-0.%B', rxtitle, ytitle,
+errorPlot_general(rchecklist, rchecklist_err, Y, [-40,40], [1000,5], '2017 data ENSCI 0.5%-0.%B', rxtitle, ytitle,
                   checklabel, colorlist, 'RDif_Check_en0505_withcut', folderpath, 1)
 
 # errorPlot_general(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, ytitle, labelist, plotname, path, logbool):
