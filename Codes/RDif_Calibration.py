@@ -185,37 +185,37 @@ rEN0505_dcjma_sm6, rENerr0505_dcjma_sm6 = Calc_RDif(avgprofEN0505_O3S_X_dcjma_sm
 ### standard plotting 4 sonde types ###
 axlist = [aEN0505, aEN1010, aSP0505, aSP1010 ]
 ax_errorlist = [aENerr0505, aENerr1010, aSPerr0505, aSPerr1010 ]
-
 axtitle = 'Sonde - OPM  Difference (mPa)'
-alabellist = ['EN 0.5%-0.5B','EN 1.0%-1.0B', 'SP 1.0%-1.0B', 'SP 0.5%-0.5B']
+
+labellist = ['EN 0.5%-0.5B','EN 1.0%-1.0B', 'SP 0.5%-0.5B', 'SP 1.0%-1.0B']
 o3list = [totO3_EN0505, totO3_EN1010, totO3_SP1010, totO3_SP0505]
 dfnplist = [profEN0505.drop_duplicates(['Sim', 'Team']), profEN1010.drop_duplicates(['Sim', 'Team']), profSP1010_nodup,
     profSP0505_nodup]
 
-rxlist = [rEN0505, rEN1010, rSP1010, rSP0505]
-rxerrlist = [rENerr0505, rENerr1010, rSPerr1010, rSPerr0505 ]
+rxlist = [rEN0505, rEN1010, rSP0505, rSP1010]
+rxerrlist = [rENerr0505, rENerr1010, rSPerr0505, rSPerr1010 ]
 rxtitle = 'Sonde - OPM  Difference (%)'
 
 ## now deconvoluted ones
 axlist_dc = [aEN0505_dc, aEN1010_dc, aSP0505_dc, aSP1010_dc ]
 ax_errorlist_dc = [aENerr0505_dc, aENerr1010_dc, aSPerr0505_dc, aSPerr1010_dc ]
 
-rxlist_dc = [rEN0505_dc, rEN1010_dc, rSP1010_dc, rSP0505_dc]
-rxerrlist_dc = [rENerr0505_dc, rENerr1010_dc, rSPerr1010_dc, rSPerr0505_dc ]
+rxlist_dc = [rEN0505_dc, rEN1010_dc, rSP0505_dc, rSP1010_dc]
+rxerrlist_dc = [rENerr0505_dc, rENerr1010_dc, rSPerr0505_dc, rSPerr1010_dc ]
 
 
-errorPlot_ARDif_withtext(axlist, ax_errorlist, Y, [-3, 3], [1000,5],  '0910 Data',  axtitle, ytitle, alabellist, o3list, dfnplist,
+errorPlot_ARDif_withtext(axlist, ax_errorlist, Y, [-3, 3], [1000,5],  '0910 Data',  axtitle, ytitle, labellist, o3list, dfnplist,
                            'Standard_ADif_Pair_CalibrationFunction_0910_withcut', folderpath ,  True, False)
 
-errorPlot_ARDif_withtext(rxlist, rxerrlist, Y, [-40, 40], [1000,5],  '0910 Data',  rxtitle, ytitle, alabellist, o3list, dfnplist,
+errorPlot_ARDif_withtext(rxlist, rxerrlist, Y, [-40, 40], [1000,5],  '0910 Data',  rxtitle, ytitle, labellist, o3list, dfnplist,
                            'Standard_RDif_Pair_CalibrationFunction_0910_withcut', folderpath, True, False)
 
 ###
 
-errorPlot_ARDif_withtext(axlist_dc, ax_errorlist_dc, Y, [-3, 3], [1000,5],  '0910 Data Conv-Deconv (PO3 JMA corr.)',  axtitle, ytitle, alabellist, o3list, dfnplist,
+errorPlot_ARDif_withtext(axlist_dc, ax_errorlist_dc, Y, [-3, 3], [1000,5],  '0910 Data Conv-Deconv (PO3 JMA corr.)',  axtitle, ytitle, labellist, o3list, dfnplist,
                            'Convoluted_ADif_Pair_CalibrationFunction_0910_withcut_JMAcorrection', folderpath ,  True, False)
 
-errorPlot_ARDif_withtext(rxlist_dc, rxerrlist_dc, Y, [-40, 40], [1000,5],  '0910 Data Conv-Deconv (PO3 JMA corr.)',  rxtitle, ytitle, alabellist, o3list, dfnplist,
+errorPlot_ARDif_withtext(rxlist_dc, rxerrlist_dc, Y, [-40, 40], [1000,5],  '0910 Data Conv-Deconv (PO3 JMA corr.)',  rxtitle, ytitle, labellist, o3list, dfnplist,
                            'Convoluted_RDif_Pair_CalibrationFunction_0910_withcut_JMAcorrection', folderpath, True, False)
 
 ## check plot only for en0505 to see effcet of jms, sm etc
@@ -232,10 +232,9 @@ rchecklist_err = [rENerr0505, rENerr0505_dc,rENerr0505_dc_sm,  rENerr0505_dcjma,
 
 checklabel = ['PO3', 'PO3 deconv', 'PO3 deconv smoothed ', 'PO3 deconv jma', 'PO3 deconv jma smoothed']
 
-errorPlot_general(achecklist, achecklist_err, Y, [-3,3], [1000,5], '0910 data- ENSCI 0.5%-0.%B', axtitle, ytitle,
-                  checklabel, colorlist, 'ADif_Check_en0505_withcut', folderpath, 1)
+# errorPlot_general(achecklist, achecklist_err, Y, [-3,3], [1000,5], '0910 data- ENSCI 0.5%-0.%B', axtitle, ytitle,
+#                   checklabel, colorlist, 'ADif_Check_en0505_withcut', folderpath, 1)
+#
+# errorPlot_general(rchecklist, rchecklist_err, Y, [-40,40], [1000,5], '0910 data ENSCI 0.5%-0.%B', rxtitle, ytitle,
+#                   checklabel, colorlist, 'RDif_Check_en0505_withcut', folderpath, 1)
 
-errorPlot_general(rchecklist, rchecklist_err, Y, [-40,40], [1000,5], '0910 data ENSCI 0.5%-0.%B', rxtitle, ytitle,
-                  checklabel, colorlist, 'RDif_Check_en0505_withcut', folderpath, 1)
-
-# errorPlot_general(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, ytitle, labelist, plotname, path, logbool):

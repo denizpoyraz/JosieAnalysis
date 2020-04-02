@@ -203,6 +203,9 @@ for j in range(len(simlist)):
     if (ensci[j] == 1) & (sol[j] == 1.0) & (buff[j] == 1.0): beta = beta_en1010 * 0.1
     if (ensci[j] == 0) & (sol[j] == 0.5) & (buff[j] == 0.5): beta = beta_sp0505 * 0.1
     if (ensci[j] == 0) & (sol[j] == 1.0) & (buff[j] == 1.0): beta = beta_sp1010 * 0.1
+    if (ensci[j] == 1) & (sol[j] == 1.0) & (buff[j] == 0.1): beta = 0.031
+    if (ensci[j] == 0) & (sol[j] == 1.0) & (buff[j] == 0.1): beta = 0.031
+
 
     if ensci[j] == 0:
         sondestr = 'SPC'
@@ -260,13 +263,13 @@ for j in range(len(simlist)):
                 # print(p, Pval[p + 1], Pval[p ])
                 dft[j].at[k, 'PO3_deconv_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fast_deconv'] / \
                                                 (dft[j].at[k, 'PFcor'] * JMA[p])
-                dft[j].at[k, 'PO3_slow_deconv_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_slow_conv'] / \
+                dft[j].at[k, 'PO3_slow_conv_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_slow_conv'] / \
                                                  (dft[j].at[k, 'PFcor'] * JMA[p])
 
         if (dft[j].at[k, 'Pair'] <= Pval[14]):
             dft[j].at[k, 'PO3_deconv_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fast_deconv'] / \
                                             (dft[j].at[k, 'PFcor'] * JMA[14])
-            dft[j].at[k, 'PO3_slow_deconv_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_slow_conv'] / \
+            dft[j].at[k, 'PO3_slow_conv_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_slow_conv'] / \
                                              (dft[j].at[k, 'PFcor'] * JMA[14])
 
     dft[j]['PO3_deconv'] = 0.043085 * dft[j]['TPint'] * dft[j]['I_fast_deconv'] / dft[j]['PFcor']
@@ -290,4 +293,4 @@ df_dc = pd.concat(list_data, ignore_index=True)
 
 # df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv.csv")
 
-df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv.csv")
+# df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv.csv")

@@ -51,47 +51,56 @@ filtS05 = dfcleaned.Sol == 0.5
 
 filtB10 = dfcleaned.Buf == 1.0
 filtB05 = dfcleaned.Buf == 0.5
+filtB01 = dfcleaned.Buf == 0.1
+
 
 filterEN0505 = (filtEN & filtS05 & filtB05)
 # & (dfcleaned.Sim == 184) & (dfcleaned.Team == 8))
 filterEN1010 = (filtEN & filtS10 & filtB10)
+filterEN1001 = (filtEN & filtS10 & filtB01)
 
 profEN0505 = dfcleaned.loc[filterEN0505]
 profEN1010 = dfcleaned.loc[filterEN1010]
+profEN1001 = dfcleaned.loc[filterEN1001]
 
 profEN0505_nodup = profEN0505.drop_duplicates(['Sim', 'Team'])
 profEN1010_nodup = profEN1010.drop_duplicates(['Sim', 'Team'])
+profEN1001_nodup = profEN1001.drop_duplicates(['Sim', 'Team'])
 
 print(profEN0505_nodup[['Sim','Team']])
 
 totO3_EN0505 = profEN0505_nodup.frac.mean()
 totO3_EN1010 = profEN1010_nodup.frac.mean()
-
+totO3_EN1001 = profEN1001_nodup.frac.mean()
 
 filterSP1010 = (filtSP & filtS10 & filtB10)
 filterSP0505 = (filtSP & filtS05 & filtB05)
+filterSP1001 = (filtSP & filtS10 & filtB01)
 
 profSP1010 = dfcleaned.loc[filterSP1010]
 profSP0505 = dfcleaned.loc[filterSP0505]
+profSP1001 = dfcleaned.loc[filterSP1001]
 
 profSP1010_nodup = profSP1010.drop_duplicates(['Sim', 'Team'])
 profSP0505_nodup = profSP0505.drop_duplicates(['Sim', 'Team'])
+profSP1001_nodup = profSP1001.drop_duplicates(['Sim', 'Team'])
 
 totO3_SP1010 = profSP1010_nodup.frac.mean()
 totO3_SP0505 = profSP0505_nodup.frac.mean()
+totO3_SP1001 = profSP1001_nodup.frac.mean()
 
 
 avgprofEN0505_O3S_X, avgprofEN0505_O3S_Xerr, Y = Calc_average_profile_Pair(profEN0505, 'PO3')
-avgprofEN1010_O3S_X, avgprofEN1010_O3S_Xerr, Y = Calc_average_profile_Pair(profEN1010, 'PO3')
+avgprofEN1001_O3S_X, avgprofEN1001_O3S_Xerr, Y = Calc_average_profile_Pair(profEN1001, 'PO3')
 avgprofSP1010_O3S_X, avgprofSP1010_O3S_Xerr, Y = Calc_average_profile_Pair(profSP1010, 'PO3')
-avgprofSP0505_O3S_X, avgprofSP0505_O3S_Xerr, Y = Calc_average_profile_Pair(profSP0505, 'PO3')
+avgprofSP1001_O3S_X, avgprofSP1001_O3S_Xerr, Y = Calc_average_profile_Pair(profSP1001, 'PO3')
 
 PO3_deconvoluted = 'PO3_deconv_jma'
 
 avgprofEN0505_O3S_X_dc, avgprofEN0505_O3S_Xerr_dc, Y = Calc_average_profile_Pair(profEN0505, PO3_deconvoluted)
-avgprofEN1010_O3S_X_dc, avgprofEN1010_O3S_Xerr_dc, Y = Calc_average_profile_Pair(profEN1010,PO3_deconvoluted)
+avgprofEN1001_O3S_X_dc, avgprofEN1001_O3S_Xerr_dc, Y = Calc_average_profile_Pair(profEN1001,PO3_deconvoluted)
 avgprofSP1010_O3S_X_dc, avgprofSP1010_O3S_Xerr_dc, Y = Calc_average_profile_Pair(profSP1010, PO3_deconvoluted)
-avgprofSP0505_O3S_X_dc, avgprofSP0505_O3S_Xerr_dc, Y = Calc_average_profile_Pair(profSP0505, PO3_deconvoluted)
+avgprofSP1001_O3S_X_dc, avgprofSP1001_O3S_Xerr_dc, Y = Calc_average_profile_Pair(profSP1001, PO3_deconvoluted)
 
 avgprofEN0505_O3S_X_dc_sm, avgprofEN0505_O3S_Xerr_dc_sm, Y = Calc_average_profile_Pair(profEN0505, 'PO3_deconv_sm6')
 avgprofEN0505_O3S_X_dcjma, avgprofEN0505_O3S_Xerr_dcjma, Y = Calc_average_profile_Pair(profEN0505, 'PO3_deconv_jma')
@@ -99,32 +108,32 @@ avgprofEN0505_O3S_X_dcjma_sm6, avgprofEN0505_O3S_Xerr_dcjma_sm6, Y = Calc_averag
 
 
 avgprofEN0505_OPM_X, avgprofEN0505_OPM_Xerr, Y = Calc_average_profile_Pair(profEN0505, 'PO3_OPM')
-avgprofEN1010_OPM_X, avgprofEN1010_OPM_Xerr, Y = Calc_average_profile_Pair(profEN1010, 'PO3_OPM')
+avgprofEN1001_OPM_X, avgprofEN1001_OPM_Xerr, Y = Calc_average_profile_Pair(profEN1001, 'PO3_OPM')
 avgprofSP1010_OPM_X, avgprofSP1010_OPM_Xerr, Y = Calc_average_profile_Pair(profSP1010, 'PO3_OPM')
-avgprofSP0505_OPM_X, avgprofSP0505_OPM_Xerr, Y = Calc_average_profile_Pair(profSP0505, 'PO3_OPM')
+avgprofSP1001_OPM_X, avgprofSP1001_OPM_Xerr, Y = Calc_average_profile_Pair(profSP1001, 'PO3_OPM')
 
 dimension = len(Y)
 
 # Absolute difference calculation for standard PO3
 aEN0505, aENerr0505 = Calc_ADif(avgprofEN0505_O3S_X, avgprofEN0505_OPM_X, avgprofEN0505_O3S_Xerr, dimension)
-aEN1010, aENerr1010 = Calc_ADif(avgprofEN1010_O3S_X, avgprofEN1010_OPM_X, avgprofEN1010_O3S_Xerr, dimension)
-aSP0505, aSPerr0505 = Calc_ADif(avgprofSP0505_O3S_X, avgprofSP0505_OPM_X, avgprofSP0505_O3S_Xerr, dimension)
+aEN1001, aENerr1001= Calc_ADif(avgprofEN1001_O3S_X, avgprofEN1001_OPM_X, avgprofEN1001_O3S_Xerr, dimension)
+aSP1001, aSPerr1001 = Calc_ADif(avgprofSP1001_O3S_X, avgprofSP1001_OPM_X, avgprofSP1001_O3S_Xerr, dimension)
 aSP1010, aSPerr1010 = Calc_ADif(avgprofSP1010_O3S_X, avgprofSP1010_OPM_X, avgprofSP1010_O3S_Xerr, dimension)
 #  Relative difference calculation for standard PO3
 rEN0505, rENerr0505 = Calc_RDif(avgprofEN0505_O3S_X, avgprofEN0505_OPM_X, avgprofEN0505_O3S_Xerr, dimension)
-rEN1010, rENerr1010 = Calc_RDif(avgprofEN1010_O3S_X, avgprofEN1010_OPM_X, avgprofEN1010_O3S_Xerr, dimension)
-rSP0505, rSPerr0505 = Calc_RDif(avgprofSP0505_O3S_X, avgprofSP0505_OPM_X, avgprofSP0505_O3S_Xerr, dimension)
+rEN1001, rENerr1001= Calc_RDif(avgprofEN1001_O3S_X, avgprofEN1001_OPM_X, avgprofEN1001_O3S_Xerr, dimension)
+rSP1001, rSPerr1001 = Calc_RDif(avgprofSP1001_O3S_X, avgprofSP1001_OPM_X, avgprofSP1001_O3S_Xerr, dimension)
 rSP1010, rSPerr1010 = Calc_RDif(avgprofSP1010_O3S_X, avgprofSP1010_OPM_X, avgprofSP1010_O3S_Xerr, dimension)
 
 # Absolute difference calculation for deconvoluted PO3
 aEN0505_dc, aENerr0505_dc = Calc_ADif(avgprofEN0505_O3S_X_dc, avgprofEN0505_OPM_X, avgprofEN0505_O3S_Xerr_dc, dimension)
-aEN1010_dc, aENerr1010_dc = Calc_ADif(avgprofEN1010_O3S_X_dc, avgprofEN1010_OPM_X, avgprofEN1010_O3S_Xerr_dc, dimension)
-aSP0505_dc, aSPerr0505_dc = Calc_ADif(avgprofSP0505_O3S_X_dc, avgprofSP0505_OPM_X, avgprofSP0505_O3S_Xerr_dc, dimension)
+aEN1001_dc, aENerr1001_dc = Calc_ADif(avgprofEN1001_O3S_X_dc, avgprofEN1001_OPM_X, avgprofEN1001_O3S_Xerr_dc, dimension)
+aSP1001_dc, aSPerr1001_dc = Calc_ADif(avgprofSP1001_O3S_X_dc, avgprofSP1001_OPM_X, avgprofSP1001_O3S_Xerr_dc, dimension)
 aSP1010_dc, aSPerr1010_dc = Calc_ADif(avgprofSP1010_O3S_X_dc, avgprofSP1010_OPM_X, avgprofSP1010_O3S_Xerr_dc, dimension)
 #  Relative difference calculation for deconvoluted PO3
 rEN0505_dc, rENerr0505_dc = Calc_RDif(avgprofEN0505_O3S_X_dc, avgprofEN0505_OPM_X, avgprofEN0505_O3S_Xerr_dc, dimension)
-rEN1010_dc, rENerr1010_dc = Calc_RDif(avgprofEN1010_O3S_X_dc, avgprofEN1010_OPM_X, avgprofEN1010_O3S_Xerr_dc, dimension)
-rSP0505_dc, rSPerr0505_dc = Calc_RDif(avgprofSP0505_O3S_X_dc, avgprofSP0505_OPM_X, avgprofSP0505_O3S_Xerr_dc, dimension)
+rEN1001_dc, rENerr1001_dc = Calc_RDif(avgprofEN1001_O3S_X_dc, avgprofEN1001_OPM_X, avgprofEN1001_O3S_Xerr_dc, dimension)
+rSP1001_dc, rSPerr1001_dc = Calc_RDif(avgprofSP1001_O3S_X_dc, avgprofSP1001_OPM_X, avgprofSP1001_O3S_Xerr_dc, dimension)
 rSP1010_dc, rSPerr1010_dc = Calc_RDif(avgprofSP1010_O3S_X_dc, avgprofSP1010_OPM_X, avgprofSP1010_O3S_Xerr_dc, dimension)
 
 ## a check for en0505
@@ -140,25 +149,25 @@ rEN0505_dcjma_sm6, rENerr0505_dcjma_sm6 = Calc_RDif(avgprofEN0505_O3S_X_dcjma_sm
 
 
 ### standard plotting 4 sonde types ###
-axlist = [aEN0505, aEN1010, aSP0505, aSP1010 ]
-ax_errorlist = [aENerr0505, aENerr1010, aSPerr0505, aSPerr1010 ]
+axlist = [aEN0505, aEN1001, aSP1010, aSP1001 ]
+ax_errorlist = [aENerr0505, aENerr1001,  aSPerr1010, aSPerr1001 ]
 
 axtitle = 'Sonde - OPM  Difference (mPa)'
-alabellist = ['EN 0.5%-0.5B','EN 1.0%-1.0B', 'SP 1.0%-1.0B', 'SP 0.5%-0.5B']
-o3list = [totO3_EN0505, totO3_EN1010, totO3_SP1010, totO3_SP0505]
-dfnplist = [profEN0505.drop_duplicates(['Sim', 'Team']), profEN1010.drop_duplicates(['Sim', 'Team']), profSP1010_nodup,
-    profSP0505_nodup]
+alabellist = ['EN 0.5%-0.5B','EN 1.0%-0.1B', 'SP 1.0%-1.0B', 'SP 1.0%-0.1B']
+o3list = [totO3_EN0505, totO3_EN1001, totO3_SP1010, totO3_SP1001]
+dfnplist = [profEN0505.drop_duplicates(['Sim', 'Team']), profEN1001.drop_duplicates(['Sim', 'Team']), profSP1010_nodup,
+    profSP1001_nodup]
 
-rxlist = [rEN0505, rEN1010, rSP1010, rSP0505]
-rxerrlist = [rENerr0505, rENerr1010, rSPerr1010, rSPerr0505 ]
+rxlist = [rEN0505, rEN1001, rSP1010, rSP1001]
+rxerrlist = [rENerr0505, rENerr1001, rSPerr1010, rSPerr1001 ]
 rxtitle = 'Sonde - OPM  Difference (%)'
 
 ## now deconvoluted ones
-axlist_dc = [aEN0505_dc, aEN1010_dc, aSP0505_dc, aSP1010_dc ]
-ax_errorlist_dc = [aENerr0505_dc, aENerr1010_dc, aSPerr0505_dc, aSPerr1010_dc ]
+axlist_dc = [aEN0505_dc, aEN1001_dc,  aSP1010_dc, aSP1001_dc ]
+ax_errorlist_dc = [aENerr0505_dc, aENerr1001_dc,  aSPerr1010_dc, aSPerr1001_dc ]
 
-rxlist_dc = [rEN0505_dc, rEN1010_dc, rSP1010_dc, rSP0505_dc]
-rxerrlist_dc = [rENerr0505_dc, rENerr1010_dc, rSPerr1010_dc, rSPerr0505_dc ]
+rxlist_dc = [rEN0505_dc, rEN1001_dc, rSP1010_dc, rSP1001_dc]
+rxerrlist_dc = [rENerr0505_dc, rENerr1001_dc, rSPerr1010_dc, rSPerr1001_dc ]
 
 
 errorPlot_ARDif_withtext(axlist, ax_errorlist, Y, [-3, 3], [1000,5],  '2017 Data',  axtitle, ytitle, alabellist, o3list, dfnplist,
@@ -189,10 +198,9 @@ rchecklist_err = [rENerr0505, rENerr0505_dc,rENerr0505_dc_sm,  rENerr0505_dcjma,
 
 checklabel = ['PO3', 'PO3 deconv', 'PO3 deconv smoothed ', 'PO3 deconv jma', 'PO3 deconv jma smoothed']
 
-errorPlot_general(achecklist, achecklist_err, Y, [-3,3], [1000,5], '2017 data- ENSCI 0.5%-0.%B', axtitle, ytitle,
-                  checklabel, colorlist, 'ADif_Check_en0505_withcut', folderpath, 1)
+# errorPlot_general(achecklist, achecklist_err, Y, [-3,3], [1000,5], '2017 data- ENSCI 0.5%-0.%B', axtitle, ytitle,
+#                   checklabel, colorlist, 'ADif_Check_en0505_withcut', folderpath, 1)
+#
+# errorPlot_general(rchecklist, rchecklist_err, Y, [-40,40], [1000,5], '2017 data ENSCI 0.5%-0.%B', rxtitle, ytitle,
+#                   checklabel, colorlist, 'RDif_Check_en0505_withcut', folderpath, 1)
 
-errorPlot_general(rchecklist, rchecklist_err, Y, [-40,40], [1000,5], '2017 data ENSCI 0.5%-0.%B', rxtitle, ytitle,
-                  checklabel, colorlist, 'RDif_Check_en0505_withcut', folderpath, 1)
-
-# errorPlot_general(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, ytitle, labelist, plotname, path, logbool):
