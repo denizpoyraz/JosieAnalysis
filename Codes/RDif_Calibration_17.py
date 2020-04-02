@@ -184,6 +184,44 @@ errorPlot_ARDif_withtext(axlist_dc, ax_errorlist_dc, Y, [-3, 3], [1000,5],  '201
 errorPlot_ARDif_withtext(rxlist_dc, rxerrlist_dc, Y, [-40, 40], [1000,5],  '2017 Data Conv-Deconv (PO3 JMA corr.)',  rxtitle, ytitle, alabellist, o3list, dfnplist,
                            'Convoluted_RDif_Pair_CalibrationFunction_2017_withcut_JMAcorrection', folderpath, True, False)
 
+###  now make  a plot where you draw standard and dc ones in the same plot
+
+plt.close('all')
+fig, ax = plt.subplots()
+plt.xlim([-20,20])
+plt.ylim([1000, 5])
+plt.title('2017 Data')
+plt.xlabel(rxtitle)
+plt.ylabel(ytitle)
+plt.grid(True)
+
+# plt.yticks(np.arange(0, 7001, 1000))
+
+# reference line
+ax.axvline(x=0, color='grey', linestyle='--')
+ax.set_yscale('log')
+colorl = ['black', 'red', 'blue', 'green']
+
+labell = [' '] * 4
+labell_dc = [' '] * 4
+
+for i in range(4):
+    n = len(dfnplist[i])
+    labell[i] = alabellist[i] + ' ( n =' + str(n) + ')'
+    # labell_dc[i] = alabellist[i] + ' Conv. ( n =' + str(n) + ')'
+
+    ax.errorbar(rxlist[i], Y, xerr=rxerrlist[i], label=labell[i], color=colorl[i], linewidth=1, elinewidth=0.5,
+                capsize=1, capthick=0.5)
+    ax.errorbar(rxlist_dc[i], Y, xerr=rxerrlist_dc[i], color=colorl[i], linewidth=1, elinewidth=0.5,
+                capsize=1, capthick=0.5, linestyle="--")
+
+ax.legend(loc='lower right', frameon=True, fontsize='small')
+
+plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/' + folderpath + '/' + 'Comparison' + '.png')
+plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/' + folderpath + '/' + 'Comparison' + '.eps')
+
+plt.close()
+
 ## check plot only for en0505 to see effcet of jms, sm etc
 # new_colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
 
