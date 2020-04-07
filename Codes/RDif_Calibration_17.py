@@ -90,27 +90,27 @@ totO3_SP0505 = profSP0505_nodup.frac.mean()
 totO3_SP1001 = profSP1001_nodup.frac.mean()
 
 
-avgprofEN0505_O3S_X, avgprofEN0505_O3S_Xerr, Y = Calc_average_profile_Pair(profEN0505, 'PO3')
-avgprofEN1001_O3S_X, avgprofEN1001_O3S_Xerr, Y = Calc_average_profile_Pair(profEN1001, 'PO3')
-avgprofSP1010_O3S_X, avgprofSP1010_O3S_Xerr, Y = Calc_average_profile_Pair(profSP1010, 'PO3')
-avgprofSP1001_O3S_X, avgprofSP1001_O3S_Xerr, Y = Calc_average_profile_Pair(profSP1001, 'PO3')
+avgprofEN0505_O3S_X, avgprofEN0505_O3S_Xerr, Y = Calc_average_profile_Pair(profEN0505, profEN0505.PO3)
+avgprofEN1001_O3S_X, avgprofEN1001_O3S_Xerr, Y = Calc_average_profile_Pair(profEN1001, profEN0505.PO3)
+avgprofSP1010_O3S_X, avgprofSP1010_O3S_Xerr, Y = Calc_average_profile_Pair(profSP1010, profEN0505.PO3)
+avgprofSP1001_O3S_X, avgprofSP1001_O3S_Xerr, Y = Calc_average_profile_Pair(profSP1001, profEN0505.PO3)
 
 PO3_deconvoluted = 'PO3_deconv_jma'
 
-avgprofEN0505_O3S_X_dc, avgprofEN0505_O3S_Xerr_dc, Y = Calc_average_profile_Pair(profEN0505, PO3_deconvoluted)
-avgprofEN1001_O3S_X_dc, avgprofEN1001_O3S_Xerr_dc, Y = Calc_average_profile_Pair(profEN1001,PO3_deconvoluted)
-avgprofSP1010_O3S_X_dc, avgprofSP1010_O3S_Xerr_dc, Y = Calc_average_profile_Pair(profSP1010, PO3_deconvoluted)
-avgprofSP1001_O3S_X_dc, avgprofSP1001_O3S_Xerr_dc, Y = Calc_average_profile_Pair(profSP1001, PO3_deconvoluted)
+avgprofEN0505_O3S_X_dc, avgprofEN0505_O3S_Xerr_dc, Y = Calc_average_profile_Pair(profEN0505, profEN0505.PO3_deconv_jma)
+avgprofEN1001_O3S_X_dc, avgprofEN1001_O3S_Xerr_dc, Y = Calc_average_profile_Pair(profEN1001, profEN1001.PO3_deconv_jma)
+avgprofSP1010_O3S_X_dc, avgprofSP1010_O3S_Xerr_dc, Y = Calc_average_profile_Pair(profSP1010, profSP1010.PO3_deconv_jma)
+avgprofSP1001_O3S_X_dc, avgprofSP1001_O3S_Xerr_dc, Y = Calc_average_profile_Pair(profSP1001, profSP1001.PO3_deconv_jma)
 
-avgprofEN0505_O3S_X_dc_sm, avgprofEN0505_O3S_Xerr_dc_sm, Y = Calc_average_profile_Pair(profEN0505, 'PO3_deconv_sm6')
-avgprofEN0505_O3S_X_dcjma, avgprofEN0505_O3S_Xerr_dcjma, Y = Calc_average_profile_Pair(profEN0505, 'PO3_deconv_jma')
-avgprofEN0505_O3S_X_dcjma_sm6, avgprofEN0505_O3S_Xerr_dcjma_sm6, Y = Calc_average_profile_Pair(profEN0505, 'PO3_deconv_jma_sm6')
+avgprofEN0505_O3S_X_dc_sm, avgprofEN0505_O3S_Xerr_dc_sm, Y = Calc_average_profile_Pair(profEN0505, profEN0505.PO3_deconv_sm6)
+avgprofEN0505_O3S_X_dcjma, avgprofEN0505_O3S_Xerr_dcjma, Y = Calc_average_profile_Pair(profEN0505, profEN0505.PO3_deconv_jma)
+avgprofEN0505_O3S_X_dcjma_sm6, avgprofEN0505_O3S_Xerr_dcjma_sm6, Y = Calc_average_profile_Pair(profEN0505, profEN0505.PO3_deconv_jma_sm6)
 
 
-avgprofEN0505_OPM_X, avgprofEN0505_OPM_Xerr, Y = Calc_average_profile_Pair(profEN0505, 'PO3_OPM')
-avgprofEN1001_OPM_X, avgprofEN1001_OPM_Xerr, Y = Calc_average_profile_Pair(profEN1001, 'PO3_OPM')
-avgprofSP1010_OPM_X, avgprofSP1010_OPM_Xerr, Y = Calc_average_profile_Pair(profSP1010, 'PO3_OPM')
-avgprofSP1001_OPM_X, avgprofSP1001_OPM_Xerr, Y = Calc_average_profile_Pair(profSP1001, 'PO3_OPM')
+avgprofEN0505_OPM_X, avgprofEN0505_OPM_Xerr, Y = Calc_average_profile_Pair(profEN0505, profEN0505.PO3_OPM)
+avgprofEN1001_OPM_X, avgprofEN1001_OPM_Xerr, Y = Calc_average_profile_Pair(profEN1001, profEN1001.PO3_OPM)
+avgprofSP1010_OPM_X, avgprofSP1010_OPM_Xerr, Y = Calc_average_profile_Pair(profSP1010, profSP1010.PO3_OPM)
+avgprofSP1001_OPM_X, avgprofSP1001_OPM_Xerr, Y = Calc_average_profile_Pair(profSP1001, profSP1001.PO3_OPM)
 
 dimension = len(Y)
 
@@ -208,7 +208,6 @@ labell_dc = [' '] * 4
 for i in range(4):
     n = len(dfnplist[i])
     labell[i] = alabellist[i] + ' ( n =' + str(n) + ')'
-    # labell_dc[i] = alabellist[i] + ' Conv. ( n =' + str(n) + ')'
 
     ax.errorbar(rxlist[i], Y, xerr=rxerrlist[i], label=labell[i], color=colorl[i], linewidth=1, elinewidth=0.5,
                 capsize=1, capthick=0.5)
