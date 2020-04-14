@@ -1,14 +1,16 @@
 import pandas as pd
 import numpy as np
 
-df1 = pd.read_csv('/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2009_Data_withcut.csv')
-df2 = pd.read_csv('/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2010_Data_withcut.csv')
+df1 = pd.read_csv('/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie1996_Data.csv')
+df2 = pd.read_csv('/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie1998_Data.csv')
+df3 = pd.read_csv('/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2000_Data.csv')
+df4 = pd.read_csv('/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2002_Data.csv')
 
-frames = [df1,df2]
+frames = [df1,df2, df3, df4]
 
 dfall = pd.concat(frames)
 
-dfall.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_withcut.csv")
+dfall.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie9602_Data.csv")
 
 
 # df = pd.read_csv('/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie17_data_notimecut.csv')

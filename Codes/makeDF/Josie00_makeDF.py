@@ -12,7 +12,7 @@ dfmeta = pd.read_excel("/home/poyraden/Analysis/JOSIEfiles/JOSIE-96-02/Josie_200
 
 for i in range(len(dfmeta)):
     if(dfmeta.at[i,'SondeTypeNr'] < 2): dfmeta.at[i,'ENSCI'] = 0
-    if(dfmeta.at[i,'SondeTypeNr'] == 0): dfmeta.at[i,'ENSCI'] = 1
+    if(dfmeta.at[i,'SondeTypeNr'] == 2): dfmeta.at[i,'ENSCI'] = 1
     if(dfmeta.at[i,'SST_Nr'] == 1):
         dfmeta.at[i,'Sol'] = 1.0
         dfmeta.at[i,'Buf'] = 1.0
@@ -56,9 +56,10 @@ for filename in filenamespath:
     file = open(filename, 'r', encoding="ISO-8859-1")
     infolist = file.readlines()[0:49]
     print('test', infolist[4].split("'")[1].split("*")[0])
-    sim = float(infolist[4].split("'")[1].split("*")[0])
-    team = float(infolist[8].split("'")[1].split("*")[0])
-    PFcor = float(infolist[18].split("'")[1].split("*")[0])
+    sim = int(infolist[4].split("'")[1].split("*")[0])
+    team = int(infolist[8].split("'")[1].split("*")[0])
+    print(team)
+    PFcor = float(infolist[18].split("'")[1].split("*")[0])/60
     print(sim, team, PFcor)
 
     df = pd.read_csv(filename, engine="python", sep="\s+", skiprows=53, names=columnStr)
@@ -151,12 +152,33 @@ for filename in filenamespath:
 df = pd.concat(list_data,ignore_index=True)
 
 
+print(list(df))
 
+df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2000_Data_allcolumns.csv")
+
+#['Alt_Sim', 'Auxiliary', 'Buf', 'Cur_Motor', 'Data_FIleName', 'ENSCI', 'GAW_Report_Nr_Details', 'IM',
+# 'I_Backg_K86', 'I_Backg_PSC', 'I_ECC_RAW', 'I_OPM', 'I_OPM_jma', 'I_conv_slow', 'JOSIE_Nr', 'OPM_I_jma',
+# 'PFcor', 'PO3', 'PO3_ECC_K86', 'PO3_ECC_PSC', 'PO3_ECC_RAW', 'PO3_OPM', 'Pair', 'Part_Nr', 'Pmp_Cor_K86',
+# 'Pmp_Cor_PSC', 'Pres_ESC', 'R1_Tstart', 'R1_Tstop', 'R2_Tstart', 'R2_Tstop', 'Rec_Nr', 'SST_Nr', 'Sim', 'Sim_Nr',
+# 'Sol', 'SondeTypeNr', 'TOC_ECC_K86', 'TOC_ECC_PSC', 'TOC_ECC_RAW', 'TOC_OPM', 'TPint', 'Team', 'Temp_ESC', 'Temp_Inlet',
+# 'Temp_PmpExt', 'Temp_PmpInt', 'Time_Day', 'Time_Sim', 'Tsim', 'Validity_Nr']
+
+df = df.drop(df[((df.Validity_Nr == 0))].index)
+
+df = df.drop(['Alt_Sim', 'Auxiliary', 'Cur_Motor', 'Data_FIleName','GAW_Report_Nr_Details', 'I_Backg_K86', 'I_Backg_PSC',
+              'I_ECC_RAW', 'PO3_ECC_K86', 'PO3_ECC_PSC', 'PO3_ECC_RAW','Part_Nr', 'Pmp_Cor_K86', 'Pmp_Cor_PSC', 'Pres_ESC',
+              'Rec_Nr','Sim_Nr', 'TOC_ECC_K86', 'TOC_ECC_PSC', 'TOC_ECC_RAW', 'TOC_OPM','Temp_ESC', 'Temp_Inlet','Temp_PmpExt',
+              'Temp_PmpInt', 'Time_Day', 'Time_Sim','Validity_Nr'], axis=1)
+
+
+clist =['JOSIE_Nr','Tsim', 'Sim', 'Team', 'ENSCI', 'Sol', 'Buf', 'Pair','PO3', 'IM','TPint', 'PO3_OPM', 'I_OPM', 'I_OPM_jma',
+            'I_conv_slow', 'PFcor', 'R1_Tstart', 'R1_Tstop', 'R2_Tstart', 'R2_Tstop', 'SST_Nr', 'SondeTypeNr']
+df = df.reindex(columns=clist)
 
 df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2000_Data.csv")
 
+print('new',list(df))
 
-    
 
 
 

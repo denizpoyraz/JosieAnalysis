@@ -12,7 +12,7 @@ dfmeta = pd.read_excel("/home/poyraden/Analysis/JOSIEfiles/JOSIE-96-02/Josie_199
 
 for i in range(len(dfmeta)):
     if(dfmeta.at[i,'SondeTypeNr'] < 2): dfmeta.at[i,'ENSCI'] = 0
-    if(dfmeta.at[i,'SondeTypeNr'] == 0): dfmeta.at[i,'ENSCI'] = 1
+    if(dfmeta.at[i,'SondeTypeNr'] == 2): dfmeta.at[i,'ENSCI'] = 1
     if(dfmeta.at[i,'SST_Nr'] == 1):
         dfmeta.at[i,'Sol'] = 1.0
         dfmeta.at[i,'Buf'] = 1.0
@@ -28,6 +28,7 @@ for i in range(len(dfmeta)):
     if(dfmeta.at[i,'SST_Nr'] == 5):
         dfmeta.at[i,'Sol'] = 2.0
         dfmeta.at[i,'Buf'] = 0.1
+
 
 # all files
 ## use pathlib jspr
@@ -59,7 +60,11 @@ for filename in filenamespath:
     print(sim, team)
     infolist = file.readlines()[0:6]
     IB0 = float(infolist[1].split("=")[0])
-    PFcor = float(infolist[2].split("=")[0])
+    PFcor = float(infolist[2].split("=")[0]) / 60
+    if (team == 2) | (team == 6) | (team == 7):
+        PFcor = PFcor * 0.985
+    if team == 3:
+        PFcor = PFcor * 0.975
     O3S = float(infolist[3].split("=")[0])
     OPM = float(infolist[4].split("=")[0])
     frac = float(infolist[5].split("=")[0])
@@ -152,15 +157,28 @@ for filename in filenamespath:
 
 df = pd.concat(list_data,ignore_index=True)
 
+print(list(df))
+df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie1996_Data_allcolumns.csv")
 
 
+#['Alt_Ist', 'Buf', 'Data_FIleName', 'ENSCI', 'GAW_Report_Nr_Details', 'IB0', 'IM', 'I_OPM', 'I_OPM_jma', 'I_conv_slow',
+# 'JOSIE_Nr', 'O3S', 'O3_Col_OPM', 'O3_Col_corr', 'OPM', 'OPM_I_jma', 'PFcor', 'PO3', 'PO3_OPM', 'PO3_Sonde_Corr',
+# 'PO3_Sonde_TCO3', 'PO3_Sonde_raw', 'PRES_R_Ist', 'Pair', 'Part_Nr', 'R1_Tstart', 'R1_Tstop', 'R2_Tstart', 'R2_Tstop',
+# 'RecNr', 'SST_Nr', 'Sim', 'Sim_Nr', 'Sol', 'SondeTypeNr', 'TEO_1_Ch2', 'TEO_1_Ch3', 'TPint', 'Team', 'Temp_R_Is',
+# 'Temp_TMC_Ist_1', 'Time', 'Tsim', 'Valid', 'frac']
 
+# now remove not common columns and clean validity 0 rows
+df = df.drop(df[((df.Valid == 0))].index)
+
+df = df.drop(['Alt_Ist', 'Data_FIleName','GAW_Report_Nr_Details','O3S', 'O3_Col_OPM', 'O3_Col_corr',
+              'PO3_Sonde_Corr', 'PO3_Sonde_TCO3', 'PO3_Sonde_raw', 'PRES_R_Ist',  'Part_Nr', 'RecNr', 'Sim_Nr',
+              'TEO_1_Ch2', 'TEO_1_Ch3', 'Temp_R_Is','Temp_TMC_Ist_1', 'Time', 'Valid', 'frac', 'OPM', 'IB0'], axis=1)
+
+
+clist =['JOSIE_Nr', 'Tsim', 'Sim', 'Team', 'ENSCI', 'Sol', 'Buf', 'Pair','PO3', 'IM','TPint', 'PO3_OPM', 'I_OPM', 'I_OPM_jma',
+            'I_conv_slow',  'PFcor', 'R1_Tstart', 'R1_Tstop', 'R2_Tstart', 'R2_Tstop', 'SST_Nr', 'SondeTypeNr']
+df = df.reindex(columns=clist)
 df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie1996_Data.csv")
 
-
-    
-
-
-
-
+print('new',list(df))
 

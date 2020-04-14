@@ -12,7 +12,7 @@ dfmeta = pd.read_excel("/home/poyraden/Analysis/JOSIEfiles/JOSIE-96-02/Josie_199
 
 for i in range(len(dfmeta)):
     if(dfmeta.at[i,'SondeTypeNr'] < 2): dfmeta.at[i,'ENSCI'] = 0
-    if(dfmeta.at[i,'SondeTypeNr'] == 0): dfmeta.at[i,'ENSCI'] = 1
+    if(dfmeta.at[i,'SondeTypeNr'] == 2): dfmeta.at[i,'ENSCI'] = 1
     if(dfmeta.at[i,'SST_Nr'] == 1):
         dfmeta.at[i,'Sol'] = 1.0
         dfmeta.at[i,'Buf'] = 1.0
@@ -58,8 +58,8 @@ for filename in filenamespath:
     team = int(matchObj.group(1)[0:2])
     print(team)
     infolist = file.readlines()[0:47]
-    sim = float(infolist[3].split("*")[0])
-    PFcor = float(infolist[10].split("*")[0])
+    sim = int(infolist[3].split("*")[0])
+    PFcor = float(infolist[10].split("*")[0])/60 * 0.975
 
     df = pd.read_csv(filename, engine="python", sep="\s+", skiprows=53, names=columnStr)
     #     ,  encoding = "ISO-8859-1"
@@ -151,14 +151,31 @@ for filename in filenamespath:
 df = pd.concat(list_data,ignore_index=True)
 
 
+print(list(df))
 
+df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie1998_Data_allcolumns.csv")
+
+#['Rec_Nr', 'Time_Day', 'Time_Sim', 'Pres_ESC', 'Temp_ESC', 'Temp_Inlet', 'Alt_Sim', 'PO3_OPM', 'I_ECC_RAW',
+# 'Temp_ECC', 'Cur_Motor', 'PO3_ECC_RAW', 'PO3_ECC_BG1', 'PO3_ECC_BG2', 'PO3_ECC_BG3', 'PO3_ECC_BG4', 'Validity_Nr',
+# 'Sim', 'Team', 'PFcor', 'JOSIE_Nr', 'Sim_Nr', 'R1_Tstart', 'R1_Tstop', 'R2_Tstart', 'R2_Tstop', 'GAW_Report_Nr_Details',
+# 'Part_Nr', 'SondeTypeNr', 'SST_Nr', 'Data_FIleName', 'ENSCI', 'Sol', 'Buf', 'PO3', 'IM', 'TPint', 'Pair', 'Tsim',
+# 'I_OPM', 'I_OPM_jma', 'OPM_I_jma', 'I_conv_slow']
+
+    
+df = df.drop(df[((df.Validity_Nr == 0))].index)
+
+df = df.drop(['Rec_Nr', 'Time_Day', 'Time_Sim', 'Pres_ESC', 'Temp_ESC', 'Temp_Inlet', 'Alt_Sim', 'I_ECC_RAW','Temp_ECC',
+              'Cur_Motor', 'PO3_ECC_RAW', 'PO3_ECC_BG1', 'PO3_ECC_BG2', 'PO3_ECC_BG3', 'PO3_ECC_BG4', 'Validity_Nr',
+              'Sim_Nr', 'GAW_Report_Nr_Details', 'Part_Nr','Data_FIleName'], axis=1)
+
+
+clist =['JOSIE_Nr','Tsim', 'Sim', 'Team', 'ENSCI', 'Sol', 'Buf', 'Pair','PO3', 'IM','TPint', 'PO3_OPM', 'I_OPM', 'I_OPM_jma',
+            'I_conv_slow', 'PFcor', 'R1_Tstart', 'R1_Tstop', 'R2_Tstart', 'R2_Tstop', 'SST_Nr', 'SondeTypeNr']
+df = df.reindex(columns=clist)
 
 df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie1998_Data.csv")
 
-
-    
-
-
+print('new',list(df))
 
 
 
