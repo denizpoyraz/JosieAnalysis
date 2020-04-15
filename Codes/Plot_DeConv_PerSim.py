@@ -3,7 +3,8 @@ import pandas as pd
 import numpy as np
 import pickle
 
-df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv.csv", low_memory=False)
+# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv.csv", low_memory=False)
+df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie9602_Data.csv", low_memory=False)
 
 # df = df[df.ADX == 0]
 ## apply cuts here
@@ -63,13 +64,13 @@ for j in range(len(simlist)):
     # plt.plot(dft[j].Tsim, dft[j].PO3_deconv_jma, label = 'PO3 fast deconv', linestyle = "--")
 
     # plt.plot(dft[j].Tsim, dft[j].PO3_deconv_jma.rolling(window=3).mean(), label = 'PO3 fast deconv. RA(6 secs)', linestyle = "--")
-    plt.plot(dft[j].Tsim, dft[j].PO3_deconv_jma.rolling(window=5).mean(), label = 'PO3 fast deconv. RA(10 secs)', linestyle = "--")
-
-    plt.plot(dft[j].Tsim, dft[j].PO3_OPM, label='OPM',  linestyle = "--")
-    plt.plot(dft[j].Tsim, dft[j].PO3, label='PO3', linestyle = "--")
-    plt.plot(dft[j].Tsim, dft[j].PO3_slow_conv, label='PO3 slow conv. ')
-
-    plt.legend(loc='upper left', fontsize = 'x-small')
+    # plt.plot(dft[j].Tsim, dft[j].PO3_deconv_jma.rolling(window=5).mean(), label = 'PO3 fast deconv. RA(10 secs)', linestyle = "--")
+    #
+    # plt.plot(dft[j].Tsim, dft[j].PO3_OPM, label='OPM',  linestyle = "--")
+    # plt.plot(dft[j].Tsim, dft[j].PO3, label='PO3', linestyle = "--")
+    # plt.plot(dft[j].Tsim, dft[j].PO3_slow_conv, label='PO3 slow conv. ')
+    #
+    # plt.legend(loc='upper left', fontsize = 'x-small')
 
     # plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Deconv_PerSim_2017/PO3_' + title + '.eps')
     # plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Deconv_PerSim_2017/PO3_' + title + '.png')
@@ -81,28 +82,28 @@ for j in range(len(simlist)):
 
     # blue, orange, green, red, purple, brown, pinkish, greyish, yellowish, bluish
 
-    # fig, ax2 = plt.subplots()
-    # ax2.set_ylabel(r'Current ($\mu$A)')
-    # ax2.set_xlabel('Tsim (secs)')
-    # # ax2.set_yscale('log')
+    fig, ax2 = plt.subplots()
+    ax2.set_ylabel(r'Current ($\mu$A)')
+    ax2.set_xlabel('Tsim (secs)')
+    # ax2.set_yscale('log')
     #
     # plt.plot(dft[j].Tsim, dft[j].I_fast_deconv.rolling(window=3).mean(), label='I fast deconv. RA(6 secs)',
     #          linestyle="--")
-    # plt.plot(dft[j].Tsim, dft[j].I_OPM, label='I OPM', linestyle="--")
-    # plt.plot(dft[j].Tsim, dft[j].IM, label='I ECC')
-    # plt.plot(dft[j].Tsim, dft[j].I_slow_conv, label='I slow conv. ', color='#d62728')
-    # plt.title(ptitle)
-    # plt.legend(loc='upper left', fontsize = 'x-small')
-    # # plt.ylim(-0.01,25)
-    # # plt.xlim(0, 9000)
-    # plt.ylim(0, 10)
-    # # plt.xlim(500, 2600)
+    plt.plot(dft[j].Tsim, dft[j].I_OPM, label='I OPM', linestyle="--")
+    plt.plot(dft[j].Tsim, dft[j].IM, label='I ECC')
+    plt.plot(dft[j].Tsim, dft[j].I_conv_slow, label='I slow conv. ', color='#d62728')
+    plt.title(ptitle)
+    plt.legend(loc='upper left', fontsize = 'x-small')
+    # plt.ylim(-0.01,25)
+    # plt.xlim(0, 9000)
+    plt.ylim(0, 10)
+    # plt.xlim(500, 2600)
     #
     # plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Deconv_PerSim_2017/Current_' + title + '.eps')
     # plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Deconv_PerSim_2017/Current_' + title + '.png')
     #
     # pickle.dump(fig, open('/home/poyraden/Analysis/JosieAnalysis/Plots/pickle_plots/Current_' + title+'_2017.pickle', 'wb'))
     #
-    # # # plt.show()
+    plt.show()
     # # plt.close('all)')
     # #

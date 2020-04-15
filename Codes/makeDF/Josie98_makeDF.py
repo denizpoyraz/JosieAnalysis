@@ -107,7 +107,7 @@ for filename in filenamespath:
          0.966705137, 0.956132227, 0.942864263, 0.9260478, 0.903069813, 0.87528384, 0.84516337])
 
     for k in range(len(df)):
-        ## jma corrections for OPM current, OPM_I_jma will be used only for Ua in the convolution of
+        ## jma corrections for OPM current, I_OPM_jma will be used only for Ua in the convolution of
         ## the slow component of the signal
         for p in range(len(JMA) - 1):
             if (df.at[k, 'Pair'] >= Pval[p + 1]) & (df.at[k, 'Pair'] < Pval[p]):
@@ -116,12 +116,11 @@ for filename in filenamespath:
                                           (df.at[k, 'TPint'] * 0.043085)
                 # df.at[k,'PO3_jma'] = 0.043085 * df.at[k, 'TPint']  * (df.at[k, 'IM'] - df.at[k, 'IB1']) / (df.at[k, 'PFcor'] * JMA[p])
         if (df.at[k, 'Pair'] <= Pval[14]):
-            df.at[k, 'OPM_I_jma'] = df.at[k, 'PO3_OPM'] * df.at[k, 'PFcor'] * JMA[14] / \
+            df.at[k, 'I_OPM_jma'] = df.at[k, 'PO3_OPM'] * df.at[k, 'PFcor'] * JMA[14] / \
                                           (df.at[k, 'TPint'] * 0.043085)
-            # df.at[k, 'PO3_jma'] = 0.043085 * df.at[k, 'TPint'] * (df.at[k, 'IM'] - df.at[k, 'IB1']) / (
-            #             df.at[k, 'PFcor'] * JMA[14])
-
-
+        if (df.at[k, 'Pair'] > Pval[0]):
+            df.at[k, 'I_OPM_jma'] = df.at[k, 'PO3_OPM'] * df.at[k, 'PFcor'] * JMA[0] / \
+                                    (df.at[k, 'TPint'] * 0.043085)
 
     size = len(df)
     Ums_i = [0] * size
@@ -159,7 +158,7 @@ df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie1998_Data_allcolum
 # 'Temp_ECC', 'Cur_Motor', 'PO3_ECC_RAW', 'PO3_ECC_BG1', 'PO3_ECC_BG2', 'PO3_ECC_BG3', 'PO3_ECC_BG4', 'Validity_Nr',
 # 'Sim', 'Team', 'PFcor', 'JOSIE_Nr', 'Sim_Nr', 'R1_Tstart', 'R1_Tstop', 'R2_Tstart', 'R2_Tstop', 'GAW_Report_Nr_Details',
 # 'Part_Nr', 'SondeTypeNr', 'SST_Nr', 'Data_FIleName', 'ENSCI', 'Sol', 'Buf', 'PO3', 'IM', 'TPint', 'Pair', 'Tsim',
-# 'I_OPM', 'I_OPM_jma', 'OPM_I_jma', 'I_conv_slow']
+# 'I_OPM', 'I_OPM_jma', 'I_OPM_jma', 'I_conv_slow']
 
     
 df = df.drop(df[((df.Validity_Nr == 0))].index)

@@ -108,7 +108,7 @@ for filename in filenamespath:
          0.966705137, 0.956132227, 0.942864263, 0.9260478, 0.903069813, 0.87528384, 0.84516337])
 
     for k in range(len(df)):
-        ## jma corrections for OPM current, OPM_I_jma will be used only for Ua in the convolution of
+        ## jma corrections for OPM current, I_OPM_jma will be used only for Ua in the convolution of
         ## the slow component of the signal
         for p in range(len(JMA) - 1):
             if (df.at[k, 'Pair'] >= Pval[p + 1]) & (df.at[k, 'Pair'] < Pval[p]):
@@ -117,11 +117,11 @@ for filename in filenamespath:
                                           (df.at[k, 'TPint'] * 0.043085)
                 # df.at[k,'PO3_jma'] = 0.043085 * df.at[k, 'TPint']  * (df.at[k, 'IM'] - df.at[k, 'IB1']) / (df.at[k, 'PFcor'] * JMA[p])
         if (df.at[k, 'Pair'] <= Pval[14]):
-            df.at[k, 'OPM_I_jma'] = df.at[k, 'PO3_OPM'] * df.at[k, 'PFcor'] * JMA[14] / \
+            df.at[k, 'I_OPM_jma'] = df.at[k, 'PO3_OPM'] * df.at[k, 'PFcor'] * JMA[14] / \
                                           (df.at[k, 'TPint'] * 0.043085)
-            # df.at[k, 'PO3_jma'] = 0.043085 * df.at[k, 'TPint'] * (df.at[k, 'IM'] - df.at[k, 'IB1']) / (
-            #             df.at[k, 'PFcor'] * JMA[14])
-
+        if (df.at[k, 'Pair'] > Pval[0]):
+            df.at[k, 'I_OPM_jma'] = df.at[k, 'PO3_OPM'] * df.at[k, 'PFcor'] * JMA[0] / \
+                                    (df.at[k, 'TPint'] * 0.043085)
 
 
     size = len(df)
@@ -157,7 +157,7 @@ print(list(df))
 df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2000_Data_allcolumns.csv")
 
 #['Alt_Sim', 'Auxiliary', 'Buf', 'Cur_Motor', 'Data_FIleName', 'ENSCI', 'GAW_Report_Nr_Details', 'IM',
-# 'I_Backg_K86', 'I_Backg_PSC', 'I_ECC_RAW', 'I_OPM', 'I_OPM_jma', 'I_conv_slow', 'JOSIE_Nr', 'OPM_I_jma',
+# 'I_Backg_K86', 'I_Backg_PSC', 'I_ECC_RAW', 'I_OPM', 'I_OPM_jma', 'I_conv_slow', 'JOSIE_Nr', 'I_OPM_jma',
 # 'PFcor', 'PO3', 'PO3_ECC_K86', 'PO3_ECC_PSC', 'PO3_ECC_RAW', 'PO3_OPM', 'Pair', 'Part_Nr', 'Pmp_Cor_K86',
 # 'Pmp_Cor_PSC', 'Pres_ESC', 'R1_Tstart', 'R1_Tstop', 'R2_Tstart', 'R2_Tstop', 'Rec_Nr', 'SST_Nr', 'Sim', 'Sim_Nr',
 # 'Sol', 'SondeTypeNr', 'TOC_ECC_K86', 'TOC_ECC_PSC', 'TOC_ECC_RAW', 'TOC_OPM', 'TPint', 'Team', 'Temp_ESC', 'Temp_Inlet',

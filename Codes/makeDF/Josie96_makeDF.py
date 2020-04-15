@@ -112,22 +112,21 @@ for filename in filenamespath:
     JMA = np.array(
         [0.999705941, 0.997216654, 0.995162562, 0.992733959, 0.989710199, 0.985943645, 0.981029252, 0.974634364,
          0.966705137, 0.956132227, 0.942864263, 0.9260478, 0.903069813, 0.87528384, 0.84516337])
-
+    print('test test', Pval[0], Pval[14])
     for k in range(len(df)):
-        ## jma corrections for OPM current, OPM_I_jma will be used only for Ua in the convolution of
+        ## jma corrections for OPM current, I_OPM_jma will be used only for Ua in the convolution of
         ## the slow component of the signal
         for p in range(len(JMA) - 1):
             if (df.at[k, 'Pair'] >= Pval[p + 1]) & (df.at[k, 'Pair'] < Pval[p]):
                 # print(p, Pval[p + 1], Pval[p ])
                 df.at[k, 'I_OPM_jma'] = df.at[k, 'PO3_OPM'] * df.at[k, 'PFcor'] * JMA[p] / \
                                           (df.at[k, 'TPint'] * 0.043085)
-                # df.at[k,'PO3_jma'] = 0.043085 * df.at[k, 'TPint']  * (df.at[k, 'IM'] - df.at[k, 'IB1']) / (df.at[k, 'PFcor'] * JMA[p])
-        if (df.at[k, 'Pair'] <= Pval[14]):
-            df.at[k, 'OPM_I_jma'] = df.at[k, 'PO3_OPM'] * df.at[k, 'PFcor'] * JMA[14] / \
-                                          (df.at[k, 'TPint'] * 0.043085)
-            # df.at[k, 'PO3_jma'] = 0.043085 * df.at[k, 'TPint'] * (df.at[k, 'IM'] - df.at[k, 'IB1']) / (
-            #             df.at[k, 'PFcor'] * JMA[14])
+        if (df.at[k, 'Pair'] < Pval[14]):
+            df.at[k, 'I_OPM_jma'] = df.at[k, 'PO3_OPM'] * df.at[k, 'PFcor'] * JMA[14] / (df.at[k, 'TPint'] * 0.043085)
+            print(' one ',k, df.at[k, 'Pair'], df.at[k, 'I_OPM'],  df.at[k, 'I_OPM_jma'])
 
+        if (df.at[k, 'Pair'] > Pval[0]):
+            df.at[k, 'I_OPM_jma'] = df.at[k, 'PO3_OPM'] * df.at[k, 'PFcor'] * JMA[0] / (df.at[k, 'TPint'] * 0.043085)
 
 
     size = len(df)
@@ -162,7 +161,7 @@ df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie1996_Data_allcolum
 
 
 #['Alt_Ist', 'Buf', 'Data_FIleName', 'ENSCI', 'GAW_Report_Nr_Details', 'IB0', 'IM', 'I_OPM', 'I_OPM_jma', 'I_conv_slow',
-# 'JOSIE_Nr', 'O3S', 'O3_Col_OPM', 'O3_Col_corr', 'OPM', 'OPM_I_jma', 'PFcor', 'PO3', 'PO3_OPM', 'PO3_Sonde_Corr',
+# 'JOSIE_Nr', 'O3S', 'O3_Col_OPM', 'O3_Col_corr', 'OPM', 'I_OPM_jma', 'PFcor', 'PO3', 'PO3_OPM', 'PO3_Sonde_Corr',
 # 'PO3_Sonde_TCO3', 'PO3_Sonde_raw', 'PRES_R_Ist', 'Pair', 'Part_Nr', 'R1_Tstart', 'R1_Tstop', 'R2_Tstart', 'R2_Tstop',
 # 'RecNr', 'SST_Nr', 'Sim', 'Sim_Nr', 'Sol', 'SondeTypeNr', 'TEO_1_Ch2', 'TEO_1_Ch3', 'TPint', 'Team', 'Temp_R_Is',
 # 'Temp_TMC_Ist_1', 'Time', 'Tsim', 'Valid', 'frac']

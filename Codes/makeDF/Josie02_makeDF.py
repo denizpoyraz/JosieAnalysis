@@ -106,7 +106,7 @@ for filename in filenamespath:
          0.966705137, 0.956132227, 0.942864263, 0.9260478, 0.903069813, 0.87528384, 0.84516337])
 
     for k in range(len(df)):
-        ## jma corrections for OPM current, OPM_I_jma will be used only for Ua in the convolution of
+        ## jma corrections for OPM current, I_OPM_jma will be used only for Ua in the convolution of
         ## the slow component of the signal
         for p in range(len(JMA) - 1):
             if (df.at[k, 'Pair'] >= Pval[p + 1]) & (df.at[k, 'Pair'] < Pval[p]):
@@ -115,11 +115,11 @@ for filename in filenamespath:
                                           (df.at[k, 'TPint'] * 0.043085)
                 # df.at[k,'PO3_jma'] = 0.043085 * df.at[k, 'TPint']  * (df.at[k, 'IM'] - df.at[k, 'IB1']) / (df.at[k, 'PFcor'] * JMA[p])
         if (df.at[k, 'Pair'] <= Pval[14]):
-            df.at[k, 'OPM_I_jma'] = df.at[k, 'PO3_OPM'] * df.at[k, 'PFcor'] * JMA[14] / \
+            df.at[k, 'I_OPM_jma'] = df.at[k, 'PO3_OPM'] * df.at[k, 'PFcor'] * JMA[14] / \
                                           (df.at[k, 'TPint'] * 0.043085)
-            # df.at[k, 'PO3_jma'] = 0.043085 * df.at[k, 'TPint'] * (df.at[k, 'IM'] - df.at[k, 'IB1']) / (
-            #             df.at[k, 'PFcor'] * JMA[14])
-
+        if (df.at[k, 'Pair'] > Pval[0]):
+            df.at[k, 'I_OPM_jma'] = df.at[k, 'PO3_OPM'] * df.at[k, 'PFcor'] * JMA[0] / \
+                                    (df.at[k, 'TPint'] * 0.043085)
 
 
     size = len(df)
