@@ -92,6 +92,8 @@ for filename in allFiles:
 
     df['PO3_stp'] = df['PO3'] * (df['Tair'] / 273.15)
     df['PO3_OPM_stp'] = df['PO3_OPM'] * (df['Tair'] / 273.15)
+    df['RDif_PO3'] = 100 * (df['PO3'] - df['PO3_OPM'])/(df['PO3_OPM'])
+
 
     ## convert OPM pressure to current
     df['I_OPM'] = (df['PO3_OPM'] * df['PFcor']) / (df['TPint'] * 0.043085)
@@ -177,20 +179,20 @@ for s in simlist:
 
 #  ## aply the cuts here for O3 calculation
 #
-df = df.drop(df[((df.Sim == 171) | (df.Sim == 172) | (df.Sim == 180) | (df.Sim == 185))].index)
-df = df.drop(df[(df.Sim == 179) & (df.Team == 4) & (df.Tsim > 4000)].index)
-df = df.drop(df[(df.Sim == 172) & (df.Tsim < 500)].index)
-df = df.drop(df[(df.Sim == 172) & (df.Team == 1) & (df.Tsim > 5000) & (df.Tsim < 5800)].index)
-df = df.drop(df[(df.Sim == 178) & (df.Team == 3) & (df.Tsim > 1700) & (df.Tsim < 2100)].index)
-df = df.drop(df[(df.Sim == 178) & (df.Team == 3) & (df.Tsim > 2500) & (df.Tsim < 3000)].index)
-
-df = df.drop(df[((df.Sim == 175))].index)
-df = df.drop(df[((df.Tsim > 7000))].index)
+# df = df.drop(df[((df.Sim == 171) | (df.Sim == 172) | (df.Sim == 180) | (df.Sim == 185))].index)
+# df = df.drop(df[(df.Sim == 179) & (df.Team == 4) & (df.Tsim > 4000)].index)
+# df = df.drop(df[(df.Sim == 172) & (df.Tsim < 500)].index)
+# df = df.drop(df[(df.Sim == 172) & (df.Team == 1) & (df.Tsim > 5000) & (df.Tsim < 5800)].index)
+# df = df.drop(df[(df.Sim == 178) & (df.Team == 3) & (df.Tsim > 1700) & (df.Tsim < 2100)].index)
+# df = df.drop(df[(df.Sim == 178) & (df.Team == 3) & (df.Tsim > 2500) & (df.Tsim < 3000)].index)
+#
+# df = df.drop(df[((df.Sim == 175))].index)
+# df = df.drop(df[((df.Tsim > 7000))].index)
 
 calculate_O3frac17(df, simlist)
 
 
-df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_Data_withcut.csv")
+df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_Data_nocut.csv")
 
 # In[ ]:
 

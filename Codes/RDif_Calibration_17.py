@@ -6,16 +6,17 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from Josie_Functions import  Calc_average_profile_pressure, Calc_average_profile_time, Calc_Dif
+from Josie_Functions import  Calc_average_profile_pressure, Calc_average_profile_time, Calc_Dif, \
+Calc_average_profileCurrent_time, Calc_average_profileCurrent_pressure
 from Josie_PlotFunctions import  errorPlot_ARDif_withtext, errorPlot_general
 
-folderpath = 'Dif_2017_NewVersion_mean'
+folderpath = 'Dif_2017_err'
 
-# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv.csv", low_memory=False)
+# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_Data_nocut.csv", low_memory=False)
 df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv.csv", low_memory=False)
 
-df = df.drop(df[(df.PO3 < 0)].index)
-df = df.drop(df[(df.PO3_OPM < 0)].index)
+df = df.drop(df[(df.PO3 <= 0)].index)
+df = df.drop(df[(df.PO3_OPM <= 0)].index)
 
 
 # df = df.drop(df[((df.Sim == 171) | (df.Sim == 172) | (df.Sim == 180) | (df.Sim == 185))].index)
@@ -43,7 +44,6 @@ df = df.drop(df[((df.Tsim > 7000))].index)
 
 dfcleaned = df
 
-resol = 200
 # dimension for Rdif: ymax/resolution
 
 ytitle = 'Pressure (hPa)'
@@ -117,6 +117,7 @@ avgprof_OPM_X, avgprof_OPM_Xerr, Y = Calc_average_profile_pressure([profEN0505, 
                                                                    'PO3_OPM')
 
 dimension = len(Y)
+
 
 adif, adiferr, rdif, rdiferr = Calc_Dif(avgprof_O3S_X, avgprof_OPM_X, avgprof_O3S_Xerr, dimension)
 adif_dc, adiferr_dc, rdif_dc, rdiferr_dc = Calc_Dif(avgprof_O3S_X_dc, avgprof_OPM_X, avgprof_O3S_Xerr_dc, dimension)
@@ -241,15 +242,13 @@ errorPlot_ARDif_withtext(rdifT_dc, rdifTerr_dc, Yt, [-40, 40], [0, 9000],  '2017
 ##################################################################################
 
 
-##  asaf pressure
-
-avgprof_O3S_cur, avgprof_O3S_curerr, Ycur = Calc_average_profile_pressure([profEN0505, profEN1001, profSP1010, profSP1001],
+avgprof_O3S_cur, avgprof_O3S_curerr, Ycur = Calc_average_profileCurrent_pressure([profEN0505, profEN1001, profSP1010, profSP1001],
                                                                    'IM')
-avgprof_O3S_curSlow, avgprof_O3S_curSlowerr, Yslow = Calc_average_profile_pressure([profEN0505, profEN1001, profSP1010, profSP1001],
+avgprof_O3S_curSlow, avgprof_O3S_curSlowerr, Yslow = Calc_average_profileCurrent_pressure([profEN0505, profEN1001, profSP1010, profSP1001],
                                                                    'I_slow_conv')
-avgprof_O3S_cur_dc, avgprof_O3S_curerr_dc, Y = Calc_average_profile_pressure([profEN0505, profEN1001, profSP1010, profSP1001],
+avgprof_O3S_cur_dc, avgprof_O3S_curerr_dc, Y = Calc_average_profileCurrent_pressure([profEN0505, profEN1001, profSP1010, profSP1001],
                                                                          'I_fast_deconv')
-avgprof_OPM_cur, avgprof_OPM_curerr, Y = Calc_average_profile_pressure([profEN0505, profEN1001, profSP1010, profSP1001],
+avgprof_OPM_cur, avgprof_OPM_curerr, Y = Calc_average_profileCurrent_pressure([profEN0505, profEN1001, profSP1010, profSP1001],
                                                                    'I_OPM_jma')
 
 dimension = len(Y)
@@ -283,13 +282,13 @@ errorPlot_ARDif_withtext(rdifcur_dc, rdifcurerr_dc, Y, [-40, 40], [1000,5],  '20
 ##  asaf time
 
 ## order of the lists [en0505, en1010, sp0505, sp1010]
-avgprof_O3S_curT, avgprof_O3S_curTerr, Yt = Calc_average_profile_time([profEN0505, profEN1001, profSP1010, profSP1001],
+avgprof_O3S_curT, avgprof_O3S_curTerr, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1001, profSP1010, profSP1001],
                                                                    'IM', resolution, tmin, tmax)
-avgprof_O3S_curSlowT, avgprof_O3S_curSlowTerr, Yt = Calc_average_profile_time([profEN0505, profEN1001, profSP1010, profSP1001],
+avgprof_O3S_curSlowT, avgprof_O3S_curSlowTerr, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1001, profSP1010, profSP1001],
                                                                    'I_slow_conv', resolution, tmin, tmax)
-avgprof_O3S_curT_dc, avgprof_O3S_curTerr_dc, Yt = Calc_average_profile_time([profEN0505, profEN1001, profSP1010, profSP1001],
+avgprof_O3S_curT_dc, avgprof_O3S_curTerr_dc, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1001, profSP1010, profSP1001],
                                                                          'I_fast_deconv', resolution, tmin, tmax)
-avgprof_OPM_curT, avgprof_OPM_curTerr, Yt = Calc_average_profile_time([profEN0505, profEN1001, profSP1010, profSP1001],
+avgprof_OPM_curT, avgprof_OPM_curTerr, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1001, profSP1010, profSP1001],
                                                                    'I_OPM_jma', resolution, tmin, tmax )
 
 dimension = len(Yt)

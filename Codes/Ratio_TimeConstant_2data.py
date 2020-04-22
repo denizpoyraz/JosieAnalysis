@@ -95,9 +95,6 @@ def ratiofunction_beta_9602(df, sim, team, categorystr):
     r1mean = np.zeros(len(sim));
     r2mean = np.zeros(len(sim));
 
-    r1std = np.zeros(len(sim));
-    r2std = np.zeros(len(sim));
-
     r1median = np.zeros(len(sim));
     r2median = np.zeros(len(sim));
 
@@ -116,8 +113,8 @@ def ratiofunction_beta_9602(df, sim, team, categorystr):
 
         rt1 = (df0[j].iloc[0]['R1_Tstop'])
         rt2 = (df0[j].iloc[0]['R2_Tstop'])
-        t1 = (df0[j].Tsim < rt1 ) & (df0[j].Tsim >= rt1 - 15)
-        t2 = (df0[j].Tsim < rt2 ) & (df0[j].Tsim >= rt2 - 15)
+        t1 = (df0[j].Tsim < rt1 ) & (df0[j].Tsim >= rt1 - 50)
+        t2 = (df0[j].Tsim < rt2 ) & (df0[j].Tsim >= rt2 - 50)
         #
         df1[j] = df0[j][t1]
         df2[j] = df0[j][t2]
@@ -133,7 +130,7 @@ def ratiofunction_beta_9602(df, sim, team, categorystr):
         r2median[j] = np.nanmedian(r2[j])
 
         # print(j,  c, sc,)
-        # print(j, sim[j], team[j], rt1, rt2, r1[j], r2mean[j] )
+        print(j, sim[j], team[j], rt1, rt2, r1mean[j], r2mean[j] )
 
     # print('in the function')
     # print('r1mean', r1mean)
