@@ -10,7 +10,7 @@ from Josie_Functions import  Calc_average_profile_pressure, Calc_average_profile
 Calc_average_profileCurrent_time, Calc_average_profileCurrent_pressure
 from Josie_PlotFunctions import  errorPlot_ARDif_withtext, errorPlot_general
 
-folderpath = 'Dif_2017_err'
+folderpath = 'Dif_2017_2304'
 
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_Data_nocut.csv", low_memory=False)
 df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv.csv", low_memory=False)
@@ -42,7 +42,9 @@ df = df.drop(df[((df.Tsim > 7000))].index)
 # df = df.drop(df[(df.Sim == 180) & (df.Team == 3)].index)
 ##
 
-dfcleaned = df
+
+df['CurMinBkg'] = df['IM'] - df['Header_IB1']
+df['I_fast_deconvMinBkg'] = df['I_fast_deconv'] - df['Header_IB1']
 
 # dimension for Rdif: ymax/resolution
 
@@ -52,24 +54,24 @@ ytitlet = 'Time (sec.)'
 ###############################################
 # Filters for Sonde, Solution, Buff er selection
 # 1, 0.1 ENSCI vs SPC
-filtEN = dfcleaned.ENSCI == 1
-filtSP = dfcleaned.ENSCI == 0
+filtEN = df.ENSCI == 1
+filtSP = df.ENSCI == 0
 
-filtS10 = dfcleaned.Sol == 1
-filtS05 = dfcleaned.Sol == 0.5
+filtS10 = df.Sol == 1
+filtS05 = df.Sol == 0.5
 
-filtB10 = dfcleaned.Buf == 1.0
-filtB05 = dfcleaned.Buf == 0.5
-filtB01 = dfcleaned.Buf == 0.1
+filtB10 = df.Buf == 1.0
+filtB05 = df.Buf == 0.5
+filtB01 = df.Buf == 0.1
 
 filterEN0505 = (filtEN & filtS05 & filtB05)
-# & (dfcleaned.Sim == 184) & (dfcleaned.Team == 8))
+# & (df.Sim == 184) & (df.Team == 8))
 filterEN1010 = (filtEN & filtS10 & filtB10)
 filterEN1001 = (filtEN & filtS10 & filtB01)
 
-profEN0505 = dfcleaned.loc[filterEN0505]
-profEN1010 = dfcleaned.loc[filterEN1010]
-profEN1001 = dfcleaned.loc[filterEN1001]
+profEN0505 = df.loc[filterEN0505]
+profEN1010 = df.loc[filterEN1010]
+profEN1001 = df.loc[filterEN1001]
 
 profEN0505_nodup = profEN0505.drop_duplicates(['Sim', 'Team'])
 profEN1010_nodup = profEN1010.drop_duplicates(['Sim', 'Team'])
@@ -85,9 +87,9 @@ filterSP1010 = (filtSP & filtS10 & filtB10)
 filterSP0505 = (filtSP & filtS05 & filtB05)
 filterSP1001 = (filtSP & filtS10 & filtB01)
 
-profSP1010 = dfcleaned.loc[filterSP1010]
-profSP0505 = dfcleaned.loc[filterSP0505]
-profSP1001 = dfcleaned.loc[filterSP1001]
+profSP1010 = df.loc[filterSP1010]
+profSP0505 = df.loc[filterSP0505]
+profSP1001 = df.loc[filterSP1001]
 
 profSP1010_nodup = profSP1010.drop_duplicates(['Sim', 'Team'])
 profSP0505_nodup = profSP0505.drop_duplicates(['Sim', 'Team'])
@@ -96,6 +98,146 @@ profSP1001_nodup = profSP1001.drop_duplicates(['Sim', 'Team'])
 totO3_SP1010 = profSP1010_nodup.frac.mean()
 totO3_SP0505 = profSP0505_nodup.frac.mean()
 totO3_SP1001 = profSP1001_nodup.frac.mean()
+
+
+
+##################################################################################
+################      CURRENT IM PLOTS        #################################
+##################################################################################
+### Plotting
+axtitle = 'Sonde - OPM  Difference (mPa)'
+rxtitle = 'Sonde - OPM  Difference (%)'
+
+labellist = ['EN 0.5%-0.5B','EN 1.0%-0.1B', 'SP 1.0%-1.0B', 'SP 1.0%-0.1B']
+o3list = [totO3_EN0505, totO3_EN1001, totO3_SP1010,  totO3_SP1001]
+dfnplist = [profEN0505.drop_duplicates(['Sim', 'Team']), profEN1001.drop_duplicates(['Sim', 'Team']),profSP1010_nodup, profSP1001_nodup]
+
+avgprof_O3S_cur, avgprof_O3S_curerr, Ycur = Calc_average_profileCurrent_pressure([profEN0505, profEN1001, profSP1010, profSP1001],
+                                                                   'IM')
+avgprof_O3S_curSlow, avgprof_O3S_curSlowerr, Yslow = Calc_average_profileCurrent_pressure([profEN0505, profEN1001, profSP1010, profSP1001],
+                                                                   'I_slow_conv')
+avgprof_O3S_cur_dc, avgprof_O3S_curerr_dc, Y = Calc_average_profileCurrent_pressure([profEN0505, profEN1001, profSP1010, profSP1001],
+                                                                         'I_fast_deconv')
+avgprof_OPM_cur, avgprof_OPM_curerr, Y = Calc_average_profileCurrent_pressure([profEN0505, profEN1001, profSP1010, profSP1001],
+                                                                   'I_OPM')
+
+dimension = len(Y)
+
+adifcur, adifcurerr, rdifcur, rdifcurerr = Calc_Dif(avgprof_O3S_cur, avgprof_OPM_cur, avgprof_O3S_curerr, dimension)
+adifcur_dc, adifcurerr_dc, rdifcur_dc, rdifcurerr_dc = Calc_Dif(avgprof_O3S_cur_dc, avgprof_OPM_cur, avgprof_O3S_curerr_dc, dimension)
+
+
+### Plotting
+axtitlecur = r'Sonde - OPM  Difference ($\mu$A)'
+rxtitle = 'Sonde - OPM  Difference (%)'
+
+
+errorPlot_ARDif_withtext(adifcur, adifcurerr, Y, [-3, 3], [1000,5],  '2017 Data (Current)',  axtitlecur, ytitle, labellist, o3list, dfnplist,
+                           'Current_ADif_Pair_2017', folderpath ,  True, False)
+
+errorPlot_ARDif_withtext(rdifcur, rdifcurerr, Y, [-40, 40], [1000,5],  '2017 Data (Current)',  rxtitle, ytitle, labellist, o3list, dfnplist,
+                           'Current_RDif_Pair_2017', folderpath, True, False)
+
+## convoluted ones
+
+errorPlot_ARDif_withtext(adifcur_dc, adifcurerr_dc, Y, [-3, 3], [1000,5],  '2017 Data Conv-Deconv (Current)',  axtitlecur, ytitle,
+                         labellist, o3list, dfnplist,
+                           'Current_ADif_Pair_Convoluted_2017', folderpath ,  True, False)
+
+errorPlot_ARDif_withtext(rdifcur_dc, rdifcurerr_dc, Y, [-40, 40], [1000,5],  '2017 Data Conv-Deconv (Current)',  rxtitle, ytitle,
+                         labellist, o3list, dfnplist,
+                           'Current_RDif_Pair_Convoluted_2017', folderpath, True, False)
+
+
+##  asaf time
+
+resolution = 200
+tmin = 200
+tmax = 8000
+
+## order of the lists [en0505, en1010, sp0505, sp1010]
+avgprof_O3S_curT, avgprof_O3S_curTerr, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1001, profSP1010, profSP1001],
+                                                                   'IM', resolution, tmin, tmax)
+avgprof_O3S_curSlowT, avgprof_O3S_curSlowTerr, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1001, profSP1010, profSP1001],
+                                                                   'I_slow_conv', resolution, tmin, tmax)
+avgprof_O3S_curT_dc, avgprof_O3S_curTerr_dc, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1001, profSP1010, profSP1001],
+                                                                         'I_fast_deconv', resolution, tmin, tmax)
+avgprof_OPM_curT, avgprof_OPM_curTerr, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1001, profSP1010, profSP1001],
+                                                                   'I_OPM', resolution, tmin, tmax )
+
+dimension = len(Yt)
+
+adifcurT, adifcurTerr, rdifcurT, rdifcurTerr = Calc_Dif(avgprof_O3S_curT, avgprof_OPM_curT, avgprof_O3S_curTerr, dimension)
+adifcurT_dc, adifcurTerr_dc, rdifcurT_dc, rdifcurTerr_dc = Calc_Dif(avgprof_O3S_curT_dc, avgprof_OPM_curT, avgprof_O3S_curTerr_dc, dimension)
+
+
+### Plotting
+axtitle = '(Sonde - IB1) - OPM  Difference (mPa)'
+rxtitle = '(Sonde - IB1) - OPM  Difference (%)'
+
+
+errorPlot_ARDif_withtext(adifcurT, adifcurTerr, Yt, [-3, 3], [0, 9000],  '2017 Data (Current)',  axtitlecur, ytitlet, labellist, o3list, dfnplist,
+                           'Current_ADif_TSim_2017_', folderpath ,  False, False)
+
+errorPlot_ARDif_withtext(rdifcurT, rdifcurTerr, Yt, [-40, 40], [0, 9000],  '2017 Data (Current)',  rxtitle, ytitlet, labellist, o3list, dfnplist,
+                           'Current_RDif_TSim_2017', folderpath, False, False)
+
+## convoluted ones
+
+errorPlot_ARDif_withtext(adifcurT_dc, adifcurTerr_dc, Yt, [-3, 3], [0, 9000],  '2017 Data Conv-Deconv (Current) ',  axtitlecur, ytitlet,
+                         labellist, o3list, dfnplist,
+                           'Current_ADif_TSim_Convoluted_2017', folderpath ,  False, False)
+
+errorPlot_ARDif_withtext(rdifcurT_dc, rdifcurTerr_dc, Yt, [-40, 40], [0, 9000],  '2017 Data Conv-Deconv (Current)',  rxtitle, ytitlet,
+                         labellist, o3list, dfnplist,
+                           'Current_RDif_TSim_Convoluted_2017', folderpath, False, False)
+
+#####  final plot for relative contribution of I_slow to the total current asaf of pressure
+
+print('check', len(avgprof_O3S_curSlow[0]), len(avgprof_O3S_cur[0]))
+print(len(Ycur), len(Yslow))
+dimension = len(Yslow)
+
+print('avgprof_O3S_curSlow', avgprof_O3S_curSlow[0])
+print('avgprof_O3S_cur', avgprof_O3S_cur[0])
+
+adifcurSlow = [ (i - j)/i for i in avgprof_O3S_cur[0] for j in avgprof_O3S_curSlow[0] ]
+
+print('one adifcurSlow', adifcurSlow[0])
+
+adifcurSlow, adifcurSlowerr, rdifcurSlow, rdifcurSlowerr = Calc_Dif(avgprof_O3S_curSlow, avgprof_O3S_cur, avgprof_O3S_curSlowerr, dimension)
+
+print('adifcurSlow', adifcurSlow[0])
+print('rdifcurSlow', rdifcurSlow[0])
+
+for k in range(4):
+    for s in range(len(rdifcurSlow[k])):
+        rdifcurSlow[k][s] = avgprof_O3S_curSlow[k][s]/ avgprof_O3S_cur[k][s] * 100
+
+print('rdifcurSlow two', rdifcurSlow[0])
+
+errorPlot_ARDif_withtext(adifcurSlow, adifcurSlowerr, Yslow, [-3, 3], [1000,5],  '2017 Data',  axtitle, ytitle, labellist, o3list, dfnplist,
+                           'I_Slow_Contribution_ADif_Pair_2017', folderpath ,  True, False)
+
+errorPlot_ARDif_withtext(rdifcurSlow, rdifcurSlowerr, Yslow, [-20, 20], [1000,5],  '2017 Data',  r'I$_{slow}$conv./I$_{ECC}$ (%)', ytitle, labellist, o3list, dfnplist,
+                           'I_Slow_Contribution_RDif_Pair_2017', folderpath, True, False)
+
+#####  final plot for relative contribution of I_slow to the total current asaf of time
+dimension = len(Yt)
+
+
+# adifcurSlowT, adifcurSlowTerr, rdifcurSlowT, rdifcurSlowTerr = Calc_Dif(avgprof_O3S_curSlowT, avgprof_O3S_curT, avgprof_O3S_curSlowTerr, dimension)
+#
+# for kk in range(4):
+#     for ss in range(len(rdifcurSlow[kk])):
+#         rdifcurSlowT[kk][ss] = avgprof_O3S_curSlowT[kk][ss]/ avgprof_O3S_curT[kk][ss] * 100
+#
+# errorPlot_ARDif_withtext(adifcurSlowT, adifcurSlowTerr, Yt, [-3, 3], [0, 9000],  '2017 Data',  axtitle, ytitlet, labellist, o3list, dfnplist,
+#                            'I_Slow_Contribution_ADif_TSim_2017', folderpath ,  False, False)
+#
+# errorPlot_ARDif_withtext(rdifcurSlowT, rdifcurSlowTerr, Yt, [-20, 20], [0, 9000],  '2017 Data',    r'I$_{slow}$conv./I$_{ECC}$ (%)', ytitlet, labellist, o3list, dfnplist,
+#                            'I_Slow_Contribution_RDif_TSim_2017', folderpath, False, False)
+
 
 ##################################################################################
 ################     Pressure PO3 PLOTS        #################################
@@ -236,130 +378,3 @@ errorPlot_ARDif_withtext(adifT_dc, adifTerr_dc, Yt, [-3, 3], [0, 9000],  '2017 D
 errorPlot_ARDif_withtext(rdifT_dc, rdifTerr_dc, Yt, [-40, 40], [0, 9000],  '2017 Data Conv-Deconv (PO3 JMA corr.)',  rxtitle, ytitlet,
                          labellist, o3list, dfnplist,
                            'RDif_TSim_Convoluted_2017', folderpath, False, False)
-
-##################################################################################
-################      CURRENT IM PLOTS        #################################
-##################################################################################
-
-
-avgprof_O3S_cur, avgprof_O3S_curerr, Ycur = Calc_average_profileCurrent_pressure([profEN0505, profEN1001, profSP1010, profSP1001],
-                                                                   'IM')
-avgprof_O3S_curSlow, avgprof_O3S_curSlowerr, Yslow = Calc_average_profileCurrent_pressure([profEN0505, profEN1001, profSP1010, profSP1001],
-                                                                   'I_slow_conv')
-avgprof_O3S_cur_dc, avgprof_O3S_curerr_dc, Y = Calc_average_profileCurrent_pressure([profEN0505, profEN1001, profSP1010, profSP1001],
-                                                                         'I_fast_deconv')
-avgprof_OPM_cur, avgprof_OPM_curerr, Y = Calc_average_profileCurrent_pressure([profEN0505, profEN1001, profSP1010, profSP1001],
-                                                                   'I_OPM_jma')
-
-dimension = len(Y)
-
-adifcur, adifcurerr, rdifcur, rdifcurerr = Calc_Dif(avgprof_O3S_cur, avgprof_OPM_cur, avgprof_O3S_curerr, dimension)
-adifcur_dc, adifcurerr_dc, rdifcur_dc, rdifcurerr_dc = Calc_Dif(avgprof_O3S_cur_dc, avgprof_OPM_cur, avgprof_O3S_curerr_dc, dimension)
-
-
-### Plotting
-axtitlecur = r'Sonde - OPM  Difference ($\mu$A)'
-rxtitle = 'Sonde - OPM  Difference (%)'
-
-
-errorPlot_ARDif_withtext(adifcur, adifcurerr, Y, [-3, 3], [1000,5],  '2017 Data (Current)',  axtitlecur, ytitle, labellist, o3list, dfnplist,
-                           'Current_ADif_Pair_2017', folderpath ,  True, False)
-
-errorPlot_ARDif_withtext(rdifcur, rdifcurerr, Y, [-40, 40], [1000,5],  '2017 Data (Current)',  rxtitle, ytitle, labellist, o3list, dfnplist,
-                           'Current_RDif_Pair_2017', folderpath, True, False)
-
-## convoluted ones
-
-errorPlot_ARDif_withtext(adifcur_dc, adifcurerr_dc, Y, [-3, 3], [1000,5],  '2017 Data Conv-Deconv (Current)',  axtitlecur, ytitle,
-                         labellist, o3list, dfnplist,
-                           'Current_ADif_Pair_Convoluted_2017', folderpath ,  True, False)
-
-errorPlot_ARDif_withtext(rdifcur_dc, rdifcurerr_dc, Y, [-40, 40], [1000,5],  '2017 Data Conv-Deconv (Current)',  rxtitle, ytitle,
-                         labellist, o3list, dfnplist,
-                           'Current_RDif_Pair_Convoluted_2017', folderpath, True, False)
-
-
-##  asaf time
-
-## order of the lists [en0505, en1010, sp0505, sp1010]
-avgprof_O3S_curT, avgprof_O3S_curTerr, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1001, profSP1010, profSP1001],
-                                                                   'IM', resolution, tmin, tmax)
-avgprof_O3S_curSlowT, avgprof_O3S_curSlowTerr, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1001, profSP1010, profSP1001],
-                                                                   'I_slow_conv', resolution, tmin, tmax)
-avgprof_O3S_curT_dc, avgprof_O3S_curTerr_dc, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1001, profSP1010, profSP1001],
-                                                                         'I_fast_deconv', resolution, tmin, tmax)
-avgprof_OPM_curT, avgprof_OPM_curTerr, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1001, profSP1010, profSP1001],
-                                                                   'I_OPM_jma', resolution, tmin, tmax )
-
-dimension = len(Yt)
-
-adifcurT, adifcurTerr, rdifcurT, rdifcurTerr = Calc_Dif(avgprof_O3S_curT, avgprof_OPM_curT, avgprof_O3S_curTerr, dimension)
-adifcurT_dc, adifcurTerr_dc, rdifcurT_dc, rdifcurTerr_dc = Calc_Dif(avgprof_O3S_curT_dc, avgprof_OPM_curT, avgprof_O3S_curTerr_dc, dimension)
-
-
-### Plotting
-axtitle = 'Sonde - OPM  Difference (mPa)'
-rxtitle = 'Sonde - OPM  Difference (%)'
-
-
-errorPlot_ARDif_withtext(adifcurT, adifcurTerr, Yt, [-3, 3], [0, 9000],  '2017 Data (Current)',  axtitlecur, ytitlet, labellist, o3list, dfnplist,
-                           'Current_ADif_TSim_2017_', folderpath ,  False, False)
-
-errorPlot_ARDif_withtext(rdifcurT, rdifcurTerr, Yt, [-40, 40], [0, 9000],  '2017 Data (Current)',  rxtitle, ytitlet, labellist, o3list, dfnplist,
-                           'Current_RDif_TSim_2017', folderpath, False, False)
-
-## convoluted ones
-
-errorPlot_ARDif_withtext(adifcurT_dc, adifcurTerr_dc, Yt, [-3, 3], [0, 9000],  '2017 Data Conv-Deconv (Current) ',  axtitlecur, ytitlet,
-                         labellist, o3list, dfnplist,
-                           'Current_ADif_TSim_Convoluted_2017', folderpath ,  False, False)
-
-errorPlot_ARDif_withtext(rdifcurT_dc, rdifcurTerr_dc, Yt, [-40, 40], [0, 9000],  '2017 Data Conv-Deconv (Current)',  rxtitle, ytitlet,
-                         labellist, o3list, dfnplist,
-                           'Current_RDif_TSim_Convoluted_2017', folderpath, False, False)
-
-#####  final plot for relative contribution of I_slow to the total current asaf of pressure
-
-print('check', len(avgprof_O3S_curSlow[0]), len(avgprof_O3S_cur[0]))
-print(len(Ycur), len(Yslow))
-dimension = len(Yslow)
-
-print('avgprof_O3S_curSlow', avgprof_O3S_curSlow[0])
-print('avgprof_O3S_cur', avgprof_O3S_cur[0])
-
-adifcurSlow = [ (i - j)/i for i in avgprof_O3S_cur[0] for j in avgprof_O3S_curSlow[0] ]
-
-print('one adifcurSlow', adifcurSlow[0])
-
-adifcurSlow, adifcurSlowerr, rdifcurSlow, rdifcurSlowerr = Calc_Dif(avgprof_O3S_curSlow, avgprof_O3S_cur, avgprof_O3S_curSlowerr, dimension)
-
-print('adifcurSlow', adifcurSlow[0])
-print('rdifcurSlow', rdifcurSlow[0])
-
-for k in range(4):
-    for s in range(len(rdifcurSlow[k])):
-        rdifcurSlow[k][s] = avgprof_O3S_curSlow[k][s]/ avgprof_O3S_cur[k][s] * 100
-
-print('rdifcurSlow two', rdifcurSlow[0])
-
-errorPlot_ARDif_withtext(adifcurSlow, adifcurSlowerr, Yslow, [-3, 3], [1000,5],  '2017 Data',  axtitle, ytitle, labellist, o3list, dfnplist,
-                           'I_Slow_Contribution_ADif_Pair_2017', folderpath ,  True, False)
-
-errorPlot_ARDif_withtext(rdifcurSlow, rdifcurSlowerr, Yslow, [-20, 20], [1000,5],  '2017 Data',  r'I$_{slow}$conv./I$_{ECC}$ (%)', ytitle, labellist, o3list, dfnplist,
-                           'I_Slow_Contribution_RDif_Pair_2017', folderpath, True, False)
-
-#####  final plot for relative contribution of I_slow to the total current asaf of time
-dimension = len(Yt)
-
-
-adifcurSlowT, adifcurSlowTerr, rdifcurSlowT, rdifcurSlowTerr = Calc_Dif(avgprof_O3S_curSlowT, avgprof_O3S_curT, avgprof_O3S_curSlowTerr, dimension)
-
-for kk in range(4):
-    for ss in range(len(rdifcurSlow[kk])):
-        rdifcurSlowT[kk][ss] = avgprof_O3S_curSlowT[kk][ss]/ avgprof_O3S_curT[kk][ss] * 100
-
-errorPlot_ARDif_withtext(adifcurSlowT, adifcurSlowTerr, Yt, [-3, 3], [0, 9000],  '2017 Data',  axtitle, ytitlet, labellist, o3list, dfnplist,
-                           'I_Slow_Contribution_ADif_TSim_2017', folderpath ,  False, False)
-
-errorPlot_ARDif_withtext(rdifcurSlowT, rdifcurSlowTerr, Yt, [-20, 20], [0, 9000],  '2017 Data',    r'I$_{slow}$conv./I$_{ECC}$ (%)', ytitlet, labellist, o3list, dfnplist,
-                           'I_Slow_Contribution_RDif_TSim_2017', folderpath, False, False)

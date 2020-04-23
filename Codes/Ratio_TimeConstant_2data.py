@@ -3,145 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-def ratiofunction_beta(df, sim, team, categorystr):
-    r1 = [0] * len(sim);
-    r2 = [0] * len(sim);
-    r3 = [0] * len(sim);
-    r4 = [0] * len(sim)
-
-    r1mean = np.zeros(len(sim));
-    r2mean = np.zeros(len(sim));
-    r3mean = np.zeros(len(sim));
-    r4mean = np.zeros(len(sim))
-    r1std = np.zeros(len(sim));
-    r2std = np.zeros(len(sim));
-    r3std = np.zeros(len(sim));
-    r4std = np.zeros(len(sim))
-    r1median = np.zeros(len(sim));
-    r2median = np.zeros(len(sim));
-    r3median = np.zeros(len(sim));
-    r4median = np.zeros(len(sim))
-    df0 = {}
-    df1 = {}
-    df2 = {}
-    df3 = {}
-    df4 = {}
-
-    for j in range(len(sim)):
-        # print('simarray', sim[j])
-        title = str(sim[j]) + '-' + str(team[j])
-
-        r1_down = 2350;
-        r1_up = 2400;
-        r2_down = 4350;
-        r2_up = 4400;
-        r3_down = 6350;
-        r3_up = 6400;
-        r4_down = 8350;
-        r4_up = 8400
-
-        t1 = (df.Tsim >= r1_down) & (df.Tsim < r1_up)
-        t2 = (df.Tsim >= r2_down) & (df.Tsim < r2_up)
-        t3 = (df.Tsim >= r3_down) & (df.Tsim < r3_up)
-        t4 = (df.Tsim >= r4_down) & (df.Tsim < r4_up)
-
-        df1[j] = df[(df.Sim == sim[j]) & (df.Team == team[j]) & t1]
-        df2[j] = df[(df.Sim == sim[j]) & (df.Team == team[j]) & t2]
-        df3[j] = df[(df.Sim == sim[j]) & (df.Team == team[j]) & t3]
-        df4[j] = df[(df.Sim == sim[j]) & (df.Team == team[j]) & t4]
-
-        r1[j] = np.array((df1[j].IM / (0.10 * df1[j].I_conv_slow)).tolist())
-        r2[j] = np.array((df2[j].IM / (0.10 * df2[j].I_conv_slow)).tolist())
-        r3[j] = np.array((df3[j].IM / (0.10 * df3[j].I_conv_slow)).tolist())
-        r4[j] = np.array((df4[j].IM / (0.10 * df4[j].I_conv_slow)).tolist())
-
-        # print(j, np.mean(r1[j]))
-
-        r1mean[j] = np.mean(r1[j])
-        r1std[j] = np.std(r1[j])
-        r2mean[j] = np.mean(r2[j])
-        r2std[j] = np.std(r2[j])
-        r3mean[j] = np.mean(r3[j])
-        r3std[j] = np.std(r3[j])
-        r4mean[j] = np.mean(r4[j])
-        r4std[j] = np.std(r4[j])
-
-        r1median[j] = np.median(r1[j])
-        r2median[j] = np.median(r2[j])
-        r3median[j] = np.median(r3[j])
-        r4median[j] = np.median(r4[j])
-
-    # print('in the function')
-    # print('r1mean', r1mean)
-    # print('r1median', r1median)
-    #
-    # print('r2mean', r2mean)
-    # print('r3mean', r3mean)
-    # print('r4mean', r4mean)
-    # print('r4median', r4median)
-
-    rmean = [r1mean, r2mean, r3mean, r4mean]
-    rstd = [r1std, r2std, r3std, r4std]
-    rmedian = [r1median, r2median, r3median, r4median]
-
-    return rmean, rstd, rmedian
-
-
-######
-def ratiofunction_beta_9602(df, sim, team, categorystr):
-    r1 = [0] * len(sim);
-    r2 = [0] * len(sim);
-
-    r1mean = np.zeros(len(sim));
-    r2mean = np.zeros(len(sim));
-
-    r1median = np.zeros(len(sim));
-    r2median = np.zeros(len(sim));
-
-    df0 = {}
-    df1 = {}
-    df2 = {}
-
-    print('len sim', len(sim))
-
-    for j in range(len(sim)):
-        # print('simarray', sim[j])
-        title = str(sim[j]) + '-' + str(team[j])
-
-        df0[j] = df[(df.Sim == sim[j]) & (df.Team == team[j])]
-        df0[j].reset_index(inplace=True)
-
-        rt1 = (df0[j].iloc[0]['R1_Tstop'])
-        rt2 = (df0[j].iloc[0]['R2_Tstop'])
-        t1 = (df0[j].Tsim < rt1 ) & (df0[j].Tsim >= rt1 - 50)
-        t2 = (df0[j].Tsim < rt2 ) & (df0[j].Tsim >= rt2 - 50)
-        #
-        df1[j] = df0[j][t1]
-        df2[j] = df0[j][t2]
-        # c = df1[j].IM .tolist()
-        # sc = ( df1[j].I_conv_slow.tolist())
-
-        r1[j] =  np.array((df1[j].IM / (0.10 * df1[j].I_conv_slow)).tolist())
-        r2[j] =  np.array((df2[j].IM / (0.10 * df2[j].I_conv_slow)).tolist())
-        #
-        r1mean[j] = np.nanmean(r1[j])
-        r2mean[j] = np.nanmean(r2[j])
-        r1median[j] = np.nanmedian(r1[j])
-        r2median[j] = np.nanmedian(r2[j])
-
-        # print(j,  c, sc,)
-        print(j, sim[j], team[j], rt1, rt2, r1mean[j], r2mean[j] )
-
-    # print('in the function')
-    # print('r1mean', r1mean)
-    # print('r2mean', r2mean)
-
-    rmean = [r1mean, r2mean]
-    rmedian = [r1median, r2median]
-
-    return rmean, rmedian
-
-####
 
 def filter(df):
 
@@ -233,13 +94,14 @@ rmean_sp0505_9602, rmedian_sp0505_9602 = ratiofunction_beta_9602(df2, sim_9602[2
 rmean_sp1010_9602, rmedian_sp1010_9602 = ratiofunction_beta_9602(df2, sim_9602[3], team_9602[3], 'SP1010')
 
 
-# print('rmean_en0505_9602', rmean_en0505_9602)
-# print('rmean_en0505_0910', rmean_en0505_0910)
 
 rmean_en0505 = np.concatenate((rmean_en0505_9602, rmean_en0505_0910),  axis=None)
 rmean_en1010 = np.concatenate((rmean_en1010_9602, rmean_en1010_0910),  axis=None)
 rmean_sp0505 = np.concatenate((rmean_sp0505_9602, rmean_sp0505_0910),  axis=None)
 rmean_sp1010 = np.concatenate((rmean_sp1010_9602, rmean_sp1010_0910),  axis=None)
+
+print('0910')
+print(np.nanmedian(rmedian_en0505_0910), np.nanmedian(rmedian_en1010_0910), np.nanmedian(rmedian_sp0505_0910), np.nanmedian(rmedian_sp1010_0910))
 
 print('en0505  en1010 sp0505 sp1010')
 print(np.nanmedian(rmean_en0505), np.nanmedian(rmean_en1010), np.nanmedian(rmean_sp0505), np.nanmedian(rmean_sp1010))

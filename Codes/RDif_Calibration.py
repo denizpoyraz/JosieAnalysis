@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from Josie_Functions import  Calc_average_profile_pressure, Calc_average_profile_time, Calc_Dif, Calc_average_profileCurrent_pressure, Calc_average_profileCurrent_time
 from Josie_PlotFunctions import  errorPlot_ARDif_withtext, errorPlot_general
 
-folderpath = 'Dif_0910_err'
+folderpath = 'Dif_0910_2304'
 
 df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv.csv", low_memory=False)
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv.csv", low_memory=False)
@@ -83,7 +83,8 @@ df = df.drop(df[(df.Sim == 166) & (df.Tsim > 6200) & (df.Tsim < 6650)].index)
 df = df.drop(df[(df.Sim == 166) & (df.Tsim > 7550) & (df.Tsim < 7750)].index)
 df = df.drop(df[(df.Sim == 166) & (df.Team == 1) & (df.Tsim > 4400) & (df.Tsim < 5400)].index)
 
-dfcleaned = df
+df['CurMinBkg'] = df['IM'] - df['Header_IB1']
+df['I_fast_deconvMinBkg'] = df['I_fast_deconv'] - df['Header_IB1']
 
 ytitle = 'Pressure (hPa)'
 ytitlet = 'Time (sec.)'
@@ -92,20 +93,20 @@ ytitlet = 'Time (sec.)'
 ###############################################
 # Filters for Sonde, Solution, Buff er selection
 # 1, 0.1 ENSCI vs SPC
-filtEN = dfcleaned.ENSCI == 1
-filtSP = dfcleaned.ENSCI == 0
+filtEN = df.ENSCI == 1
+filtSP = df.ENSCI == 0
 
-filtS10 = dfcleaned.Sol == 1
-filtS05 = dfcleaned.Sol == 0.5
+filtS10 = df.Sol == 1
+filtS05 = df.Sol == 0.5
 
-filtB10 = dfcleaned.Buf == 1.0
-filtB05 = dfcleaned.Buf == 0.5
+filtB10 = df.Buf == 1.0
+filtB05 = df.Buf == 0.5
 
 filterEN0505 = (filtEN & filtS05 & filtB05)
 filterEN1010 = (filtEN & filtS10 & filtB10)
 
-profEN0505 = dfcleaned.loc[filterEN0505]
-profEN1010 = dfcleaned.loc[filterEN1010]
+profEN0505 = df.loc[filterEN0505]
+profEN1010 = df.loc[filterEN1010]
 
 profEN0505_nodup = profEN0505.drop_duplicates(['Sim', 'Team'])
 profEN1010_nodup = profEN1010.drop_duplicates(['Sim', 'Team'])
@@ -119,8 +120,8 @@ totO3_EN1010 = profEN1010_nodup.frac.mean()
 filterSP1010 = (filtSP & filtS10 & filtB10)
 filterSP0505 = (filtSP & filtS05 & filtB05)
 
-profSP1010 = dfcleaned.loc[filterSP1010]
-profSP0505 = dfcleaned.loc[filterSP0505]
+profSP1010 = df.loc[filterSP1010]
+profSP0505 = df.loc[filterSP0505]
 
 profSP1010_nodup = profSP1010.drop_duplicates(['Sim', 'Team'])
 profSP0505_nodup = profSP0505.drop_duplicates(['Sim', 'Team'])
@@ -280,13 +281,13 @@ errorPlot_ARDif_withtext(rdifT_dc, rdifTerr_dc, Yt, [-40, 40], [0, 9000],  '0910
 ##  asaf pressure
 
 avgprof_O3S_cur, avgprof_O3S_curerr, Ycur = Calc_average_profileCurrent_pressure([profEN0505, profEN1010, profSP0505, profSP1010],
-                                                                   'IM')
+                                                                   'CurMinBkg')
 avgprof_O3S_curSlow, avgprof_O3S_curSlowerr, Yslow = Calc_average_profileCurrent_pressure([profEN0505, profEN1010, profSP0505, profSP1010],
                                                                    'I_slow_conv')
 avgprof_O3S_cur_dc, avgprof_O3S_curerr_dc, Y = Calc_average_profileCurrent_pressure([profEN0505, profEN1010, profSP0505, profSP1010],
-                                                                         'I_fast_deconv')
+                                                                         'I_fast_deconvMinBkg')
 avgprof_OPM_cur, avgprof_OPM_curerr, Y = Calc_average_profileCurrent_pressure([profEN0505, profEN1010, profSP0505, profSP1010],
-                                                                   'I_OPM_jma')
+                                                                   'I_OPM')
 
 dimension = len(Y)
 
@@ -300,33 +301,33 @@ rxtitle = 'Sonde - OPM  Difference (%)'
 
 
 errorPlot_ARDif_withtext(adifcur, adifcurerr, Y, [-3, 3], [1000,5],  '0910 Data (Current)',  axtitlecur, ytitle, labellist, o3list, dfnplist,
-                           'Current_ADif_Pair_0910', folderpath ,  True, False)
+                           'CurrentMinBkg_ADif_Pair_0910', folderpath ,  True, False)
 
 errorPlot_ARDif_withtext(rdifcur, rdifcurerr, Y, [-40, 40], [1000,5],  '0910 Data (Current)',  rxtitle, ytitle, labellist, o3list, dfnplist,
-                           'Current_RDif_Pair_0910', folderpath, True, False)
+                           'CurrentMinBkg_RDif_Pair_0910', folderpath, True, False)
 
 ## convoluted ones
 
 errorPlot_ARDif_withtext(adifcur_dc, adifcurerr_dc, Y, [-3, 3], [1000,5],  '0910 Data Conv-Deconv (Current)',  axtitlecur, ytitle,
                          labellist, o3list, dfnplist,
-                           'Current_ADif_Pair_Convoluted_0910', folderpath ,  True, False)
+                           'CurrentMinBkg_ADif_Pair_Convoluted_0910', folderpath ,  True, False)
 
 errorPlot_ARDif_withtext(rdifcur_dc, rdifcurerr_dc, Y, [-40, 40], [1000,5],  '0910 Data Conv-Deconv (Current)',  rxtitle, ytitle,
                          labellist, o3list, dfnplist,
-                           'Current_RDif_Pair_Convoluted_0910', folderpath, True, False)
+                           'CurrentMinBkg_RDif_Pair_Convoluted_0910', folderpath, True, False)
 
 
 ##  asaf time
 
 ## order of the lists [en0505, en1010, sp0505, sp1010]
 avgprof_O3S_curT, avgprof_O3S_curTerr, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1010, profSP0505, profSP1010],
-                                                                   'IM', resolution, tmin, tmax)
+                                                                   'CurMinBkg', resolution, tmin, tmax)
 avgprof_O3S_curSlowT, avgprof_O3S_curSlowTerr, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1010, profSP0505, profSP1010],
                                                                    'I_slow_conv', resolution, tmin, tmax)
 avgprof_O3S_curT_dc, avgprof_O3S_curTerr_dc, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1010, profSP0505, profSP1010],
-                                                                         'I_fast_deconv', resolution, tmin, tmax)
+                                                                         'I_fast_deconvMinBkg', resolution, tmin, tmax)
 avgprof_OPM_curT, avgprof_OPM_curTerr, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1010, profSP0505, profSP1010],
-                                                                   'I_OPM_jma', resolution, tmin, tmax )
+                                                                   'I_OPM', resolution, tmin, tmax )
 
 dimension = len(Yt)
 
@@ -339,63 +340,63 @@ axtitle = 'Sonde - OPM  Difference (mPa)'
 rxtitle = 'Sonde - OPM  Difference (%)'
 
 errorPlot_ARDif_withtext(adifcurT, adifcurTerr, Yt, [-3, 3], [0, 9000],  '0910 Data (Current)',  axtitlecur, ytitlet, labellist, o3list, dfnplist,
-                           'Current_ADif_TSim_0910_', folderpath ,  False, False)
+                           'CurrentMinBkg_ADif_TSim_0910_', folderpath ,  False, False)
 
 errorPlot_ARDif_withtext(rdifcurT, rdifcurTerr, Yt, [-40, 40], [0, 9000],  '0910 Data (Current)',  rxtitle, ytitlet, labellist, o3list, dfnplist,
-                           'Current_RDif_TSim_0910', folderpath, False, False)
+                           'CurrentMinBkg_RDif_TSim_0910', folderpath, False, False)
 
 ## convoluted ones
 
 errorPlot_ARDif_withtext(adifcurT_dc, adifcurTerr_dc, Yt, [-3, 3], [0, 9000],  '0910 Data Conv-Deconv (Current) ',  axtitlecur, ytitlet,
                          labellist, o3list, dfnplist,
-                           'Current_ADif_TSim_Convoluted_0910', folderpath ,  False, False)
+                           'CurrentMinBkg_ADif_TSim_Convoluted_0910', folderpath ,  False, False)
 
 errorPlot_ARDif_withtext(rdifcurT_dc, rdifcurTerr_dc, Yt, [-40, 40], [0, 9000],  '0910 Data Conv-Deconv (Current)',  rxtitle, ytitlet,
                          labellist, o3list, dfnplist,
-                           'Current_RDif_TSim_Convoluted_0910', folderpath, False, False)
+                           'CurrentMinBkg_RDif_TSim_Convoluted_0910', folderpath, False, False)
 
 #####  final plot for relative contribution of I_slow to the total current asaf of pressure
-
-print('check', len(avgprof_O3S_curSlow[0]), len(avgprof_O3S_cur[0]))
-print(len(Ycur), len(Yslow))
-dimension = len(Yslow)
-
-print('avgprof_O3S_curSlow', avgprof_O3S_curSlow[0])
-print('avgprof_O3S_cur', avgprof_O3S_cur[0])
-
-adifcurSlow = [ (i - j)/i for i in avgprof_O3S_cur[0] for j in avgprof_O3S_curSlow[0] ]
-
-print('one adifcurSlow', adifcurSlow[0])
-
-adifcurSlow, adifcurSlowerr, rdifcurSlow, rdifcurSlowerr = Calc_Dif(avgprof_O3S_curSlow, avgprof_O3S_cur, avgprof_O3S_curSlowerr, dimension)
-
-print('adifcurSlow', adifcurSlow[0])
-print('rdifcurSlow', rdifcurSlow[0])
-
-for k in range(4):
-    for s in range(len(rdifcurSlow[k])):
-        rdifcurSlow[k][s] = avgprof_O3S_curSlow[k][s]/ avgprof_O3S_cur[k][s] * 100
-
-print('rdifcurSlow two', rdifcurSlow[0])
-
-errorPlot_ARDif_withtext(adifcurSlow, adifcurSlowerr, Yslow, [-3, 3], [1000,5],  '0910 Data',  axtitle, ytitle, labellist, o3list, dfnplist,
-                           'I_Slow_Contribution_ADif_Pair_0910', folderpath ,  True, False)
-
-errorPlot_ARDif_withtext(rdifcurSlow, rdifcurSlowerr, Yslow, [-20, 20], [1000,5],  '0910 Data',  r'I$_{slow}$conv./I$_{ECC}$ (%)', ytitle, labellist, o3list, dfnplist,
-                           'I_Slow_Contribution_RDif_Pair_0910', folderpath, True, False)
-
-#####  final plot for relative contribution of I_slow to the total current asaf of time
-dimension = len(Yt)
-
-
-adifcurSlowT, adifcurSlowTerr, rdifcurSlowT, rdifcurSlowTerr = Calc_Dif(avgprof_O3S_curSlowT, avgprof_O3S_curT, avgprof_O3S_curSlowTerr, dimension)
-
-for kk in range(4):
-    for ss in range(len(rdifcurSlow[kk])):
-        rdifcurSlowT[kk][ss] = avgprof_O3S_curSlowT[kk][ss]/ avgprof_O3S_curT[kk][ss] * 100
-
-errorPlot_ARDif_withtext(adifcurSlowT, adifcurSlowTerr, Yt, [-3, 3], [0, 9000],  '0910 Data',  axtitle, ytitlet, labellist, o3list, dfnplist,
-                           'I_Slow_Contribution_ADif_TSim_0910', folderpath ,  False, False)
-
-errorPlot_ARDif_withtext(rdifcurSlowT, rdifcurSlowTerr, Yt, [-20, 20], [0, 9000],  '0910 Data',    r'I$_{slow}$conv./I$_{ECC}$ (%)', ytitlet, labellist, o3list, dfnplist,
-                           'I_Slow_Contribution_RDif_TSim_0910', folderpath, False, False)
+#
+# print('check', len(avgprof_O3S_curSlow[0]), len(avgprof_O3S_cur[0]))
+# print(len(Ycur), len(Yslow))
+# dimension = len(Yslow)
+#
+# print('avgprof_O3S_curSlow', avgprof_O3S_curSlow[0])
+# print('avgprof_O3S_cur', avgprof_O3S_cur[0])
+#
+# adifcurSlow = [ (i - j)/i for i in avgprof_O3S_cur[0] for j in avgprof_O3S_curSlow[0] ]
+#
+# print('one adifcurSlow', adifcurSlow[0])
+#
+# adifcurSlow, adifcurSlowerr, rdifcurSlow, rdifcurSlowerr = Calc_Dif(avgprof_O3S_curSlow, avgprof_O3S_cur, avgprof_O3S_curSlowerr, dimension)
+#
+# print('adifcurSlow', adifcurSlow[0])
+# print('rdifcurSlow', rdifcurSlow[0])
+#
+# for k in range(4):
+#     for s in range(len(rdifcurSlow[k])):
+#         rdifcurSlow[k][s] = avgprof_O3S_curSlow[k][s]/ avgprof_O3S_cur[k][s] * 100
+#
+# print('rdifcurSlow two', rdifcurSlow[0])
+#
+# errorPlot_ARDif_withtext(adifcurSlow, adifcurSlowerr, Yslow, [-3, 3], [1000,5],  '0910 Data',  axtitle, ytitle, labellist, o3list, dfnplist,
+#                            'I_Slow_Contribution_ADif_Pair_0910', folderpath ,  True, False)
+#
+# errorPlot_ARDif_withtext(rdifcurSlow, rdifcurSlowerr, Yslow, [-20, 20], [1000,5],  '0910 Data',  r'I$_{slow}$conv./I$_{ECC}$ (%)', ytitle, labellist, o3list, dfnplist,
+#                            'I_Slow_Contribution_RDif_Pair_0910', folderpath, True, False)
+#
+# #####  final plot for relative contribution of I_slow to the total current asaf of time
+# dimension = len(Yt)
+#
+#
+# adifcurSlowT, adifcurSlowTerr, rdifcurSlowT, rdifcurSlowTerr = Calc_Dif(avgprof_O3S_curSlowT, avgprof_O3S_curT, avgprof_O3S_curSlowTerr, dimension)
+#
+# for kk in range(4):
+#     for ss in range(len(rdifcurSlow[kk])):
+#         rdifcurSlowT[kk][ss] = avgprof_O3S_curSlowT[kk][ss]/ avgprof_O3S_curT[kk][ss] * 100
+#
+# errorPlot_ARDif_withtext(adifcurSlowT, adifcurSlowTerr, Yt, [-3, 3], [0, 9000],  '0910 Data',  axtitle, ytitlet, labellist, o3list, dfnplist,
+#                            'I_Slow_Contribution_ADif_TSim_0910', folderpath ,  False, False)
+#
+# errorPlot_ARDif_withtext(rdifcurSlowT, rdifcurSlowTerr, Yt, [-20, 20], [0, 9000],  '0910 Data',    r'I$_{slow}$conv./I$_{ECC}$ (%)', ytitlet, labellist, o3list, dfnplist,
+#                            'I_Slow_Contribution_RDif_TSim_0910', folderpath, False, False)
