@@ -8,6 +8,7 @@ from Beta_Functions import ratiofunction_beta, ratiofunction_beta_9602
 #######################################################################################################################
 
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut.csv", low_memory=False)
+# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie9602_Data.csv", low_memory=False)
 df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie9602_Data.csv", low_memory=False)
 
 # df = df.drop(df[(df.Sim == 140)].index)
@@ -64,10 +65,10 @@ team_sp1010 = profSP1010_nodup.Team.tolist()
 # rmean_sp1010, rstd_sp1010, rmedian_sp1010, rqerr_sp1010 = ratiofunction_beta(df, sim_sp1010, team_sp1010, 'SP1010')
 
 ## for 9602
-rmean_en0505, rstd_en0505,  rmedian_en0505, rqerr_en0505 = ratiofunction_beta_9602(df, sim_en0505, team_en0505, 'EN0505')
-rmean_en1010, rstd_en1010, rmedian_en1010, rqerr_en1010 = ratiofunction_beta_9602(df, sim_en1010, team_en1010, 'EN1010')
+# rmean_en0505, rstd_en0505,  rmedian_en0505, rqerr_en0505 = ratiofunction_beta_9602(df, sim_en0505, team_en0505, 'EN0505')
+# rmean_en1010, rstd_en1010, rmedian_en1010, rqerr_en1010 = ratiofunction_beta_9602(df, sim_en1010, team_en1010, 'EN1010')
 rmean_sp0505, rstd_sp0505, rmedian_sp0505, rqerr_sp0505 = ratiofunction_beta_9602(df, sim_sp0505, team_sp0505, 'SP0505')
-rmean_sp1010, rstd_sp1010, rmedian_sp1010, rqerr_sp1010 = ratiofunction_beta_9602(df, sim_sp1010, team_sp1010, 'SP1010')
+# rmean_sp1010, rstd_sp1010, rmedian_sp1010, rqerr_sp1010 = ratiofunction_beta_9602(df, sim_sp1010, team_sp1010, 'SP1010')
 
 
 # print('rmean_en0505', rmean_en0505)

@@ -148,17 +148,17 @@ def Calc_average_profileCurrent_pressure(dataframelist, xcolumn):
             filtb = dft.Pair < grid_max
             filter1 = filta & filtb
             dftmp1['X'] = dft[filter1].PFcor
-            dftmp1['I_OPM'] = dft[filter1]['I_OPM']
+            dftmp1['I_OPM_jma'] = dft[filter1]['I_OPM_jma']
 
             filtnull = dftmp1.X > -9999.0
             dfgrid['X'] = dftmp1[filtnull].X
-            dfgrid['I_OPM'] = dftmp1[filtnull].I_OPM
+            dfgrid['I_OPM_jma'] = dftmp1[filtnull].I_OPM_jma
 
             Xgrid[j][i] = np.nanmean(dfgrid.X)
             Xsigma[j][i] = np.nanstd(dfgrid.X)
 
-            Agrid[j][i] = np.nanmean(dfgrid.X - dfgrid['I_OPM'])
-            Asigma[j][i] = np.nanstd(dfgrid.X - dfgrid['I_OPM'])
+            Agrid[j][i] = np.nanmean(dfgrid.X - dfgrid['I_OPM_jma'])
+            Asigma[j][i] = np.nanstd(dfgrid.X - dfgrid['I_OPM_jma'])
 
             # print('j', j, 'i',i, Xgrid[j][i])
 
@@ -198,17 +198,17 @@ def Calc_average_profileCurrent_time(dataframelist, xcolumn, ybin, tmin, tmax ):
             filtb = dft.Tsim < grid_max
             filter1 = filta & filtb
             dftmp1['X'] = dft[filter1].PFcor
-            dftmp1['I_OPM'] = dft[filter1]['I_OPM']
+            dftmp1['I_OPM_jma'] = dft[filter1]['I_OPM_jma']
 
             filtnull = dftmp1.X > -9999.0
             dfgrid['X'] = dftmp1[filtnull].X
-            dfgrid['I_OPM'] = dftmp1[filtnull].I_OPM
+            dfgrid['I_OPM_jma'] = dftmp1[filtnull].I_OPM_jma
 
             Xgrid[j][i] = np.nanmean(dfgrid.X)
             Xsigma[j][i] = np.nanstd(dfgrid.X)
 
-            Agrid[j][i] = np.nanmean(dfgrid.X - dfgrid['I_OPM'])
-            Asigma[j][i] = np.nanstd(dfgrid.X - dfgrid['I_OPM'])
+            Agrid[j][i] = np.nanmean(dfgrid.X - dfgrid['I_OPM_jma'])
+            Asigma[j][i] = np.nanstd(dfgrid.X - dfgrid['I_OPM_jma'])
 
     return Xgrid, Asigma, Ygrid
 

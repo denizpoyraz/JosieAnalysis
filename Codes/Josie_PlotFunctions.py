@@ -80,8 +80,10 @@ def errorPlot_ARDif_withtext(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, 
 
     ax.legend(loc='lower right', frameon=True, fontsize='small')
 
-    plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/' + path + '/' + plotname + '.png')
-    plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/' + path + '/' + plotname + '.eps')
+    plt.show()
+
+    # plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/' + path + '/' + plotname + '.png')
+    # plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/' + path + '/' + plotname + '.eps')
 
     plt.close()
 #####################################################

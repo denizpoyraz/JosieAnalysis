@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from Beta_Functions import ratiofunction_beta, ratiofunction_beta_9602
 
 
 def filter(df):
@@ -67,7 +68,7 @@ print(list(df1))
 
 df2 = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie9602_Data.csv", low_memory=False)
 
-df2 = df2.drop(['JOSIE_Nr','SST_Nr', 'SondeTypeNr'], axis=1)
+df2 = df2.drop([ 'SST_Nr', 'SondeTypeNr'], axis=1)
 
 
 # df = df.drop(df[(df.Sim == 140)].index)
@@ -82,17 +83,17 @@ sim_0910, team_0910 = filter(df1)
 sim_9602, team_9602 = filter(df2)
 
 ## for 0910
-rmean_en0505_0910, rstd_en0505, rmedian_en0505_0910 = ratiofunction_beta(df1, sim_0910[0], team_0910[0], 'EN0505')
-rmean_en1010_0910, rstd_en1010, rmedian_en1010_0910 = ratiofunction_beta(df1, sim_0910[1], team_0910[1], 'EN1010')
-rmean_sp0505_0910, rstd_sp0505, rmedian_sp0505_0910 = ratiofunction_beta(df1, sim_0910[2], team_0910[2], 'SP0505')
-rmean_sp1010_0910, rstd_sp1010, rmedian_sp1010_0910 = ratiofunction_beta(df1, sim_0910[3], team_0910[3], 'SP1010')
+rmean_en0505_0910, rstd_en0505, rmedian_en0505_0910, rqerr_en0505 = ratiofunction_beta(df1, sim_0910[0], team_0910[0], 'EN0505')
+rmean_en1010_0910, rstd_en1010, rmedian_en1010_0910, rqerr_en1010 = ratiofunction_beta(df1, sim_0910[1], team_0910[1], 'EN1010')
+rmean_sp0505_0910, rstd_sp0505, rmedian_sp0505_0910, rqerr_sp0505 = ratiofunction_beta(df1, sim_0910[2], team_0910[2], 'SP0505')
+rmean_sp1010_0910, rstd_sp1010, rmedian_sp1010_0910, rqerr_sp1010 = ratiofunction_beta(df1, sim_0910[3], team_0910[3], 'SP1010')
+
 
 ## for 9602
-rmean_en0505_9602, rmedian_en0505_9602 = ratiofunction_beta_9602(df2, sim_9602[0], team_9602[0], 'EN0505')
-rmean_en1010_9602, rmedian_en1010_9602 = ratiofunction_beta_9602(df2, sim_9602[1], team_9602[1], 'EN1010')
-rmean_sp0505_9602, rmedian_sp0505_9602 = ratiofunction_beta_9602(df2, sim_9602[2], team_9602[2], 'SP0505')
-rmean_sp1010_9602, rmedian_sp1010_9602 = ratiofunction_beta_9602(df2, sim_9602[3], team_9602[3], 'SP1010')
-
+rmean_en0505_9602, rstd_en0505_9602, rmedian_en0505_9602, rqerr_en0505_9602 = ratiofunction_beta_9602(df2, sim_9602[0], team_9602[0], 'EN0505')
+rmean_en1010_9602, rstd_en1010_9602, rmedian_en1010_9602, rqerr_en1010_9602 = ratiofunction_beta_9602(df2, sim_9602[1], team_9602[1], 'EN1010')
+rmean_sp0505_9602, rstd_sp0505_9602, rmedian_sp0505_9602, rqerr_sp0505_9602 = ratiofunction_beta_9602(df2, sim_9602[2], team_9602[2], 'SP0505')
+rmean_sp1010_9602, rstd_sp1010_9602, rmedian_sp1010_9602, rqerr_sp1010_9602 = ratiofunction_beta_9602(df2, sim_9602[3], team_9602[3], 'SP1010')
 
 
 rmean_en0505 = np.concatenate((rmean_en0505_9602, rmean_en0505_0910),  axis=None)
@@ -100,8 +101,19 @@ rmean_en1010 = np.concatenate((rmean_en1010_9602, rmean_en1010_0910),  axis=None
 rmean_sp0505 = np.concatenate((rmean_sp0505_9602, rmean_sp0505_0910),  axis=None)
 rmean_sp1010 = np.concatenate((rmean_sp1010_9602, rmean_sp1010_0910),  axis=None)
 
+rmedian_en0505 = np.concatenate((rmedian_en0505_9602, rmedian_en0505_0910),  axis=None)
+rmedian_en1010 = np.concatenate((rmedian_en1010_9602, rmedian_en1010_0910),  axis=None)
+rmedian_sp0505 = np.concatenate((rmedian_sp0505_9602, rmedian_sp0505_0910),  axis=None)
+rmedian_sp1010 = np.concatenate((rmedian_sp1010_9602, rmedian_sp1010_0910),  axis=None)
+
 print('0910')
 print(np.nanmedian(rmedian_en0505_0910), np.nanmedian(rmedian_en1010_0910), np.nanmedian(rmedian_sp0505_0910), np.nanmedian(rmedian_sp1010_0910))
+print('9602')
+print(np.nanmedian(rmedian_en0505_9602), np.nanmedian(rmedian_en1010_9602), np.nanmedian(rmedian_sp0505_9602), np.nanmedian(rmedian_sp1010_9602))
 
-print('en0505  en1010 sp0505 sp1010')
+
+print('mean en0505  en1010 sp0505 sp1010')
 print(np.nanmedian(rmean_en0505), np.nanmedian(rmean_en1010), np.nanmedian(rmean_sp0505), np.nanmedian(rmean_sp1010))
+
+print('median en0505  en1010 sp0505 sp1010')
+print(np.nanmedian(rmedian_en0505), np.nanmedian(rmedian_en1010), np.nanmedian(rmedian_sp0505), np.nanmedian(rmedian_sp1010))

@@ -167,7 +167,9 @@ for j in range(len(simlist)):
     Ifast_deconv = [0] * size
     Ifastminib0 = [0] * size
     Ifastminib0_deconv = [0] * size
-    Ifast_deconv_smb = [0] * size
+    Ifast_deconv_smb6 = [0] * size
+    Ifast_deconv_smb12 = [0] * size
+    Ifast_deconv_smb18 = [0] * size
 
 
     for i in range(1, size - 1):
@@ -180,16 +182,20 @@ for j in range(len(simlist)):
         Islow_conv[i + 1] = Islow[i] - (Islow[i] - Islow_conv[i]) * Xs
 
         Ifast[i + 1] = af * (dft[j].at[i + 1, 'IM'] - Islow_conv[i + 1])
-        Ifastminib0[i + 1] = af * (dft[j].at[i + 1, 'IM'] - Islow_conv[i + 1] - dft[j].at[i + 1, 'IB0'] )
+        # Ifastminib0[i + 1] = af * (dft[j].at[i + 1, 'IM'] - Islow_conv[i + 1] - dft[j].at[i + 1, 'IB0'] )
 
         Ifast_deconv[i + 1] = (Ifast[i + 1] - Ifast[i] * Xf) / (1 - Xf)
-        Ifastminib0_deconv[i + 1] = (Ifastminib0[i + 1] - Ifastminib0[i] * Xf) / (1 - Xf)
+        # Ifastminib0_deconv[i + 1] = (Ifastminib0[i + 1] - Ifastminib0[i] * Xf) / (1 - Xf)
 
 
     dft[j]['I_slow'] = Islow
     dft[j]['I_slow_conv'] = Islow_conv
     dft[j]['I_fast'] = Ifast
-    dft[j]['I_fast_smb'] = dft[j].I_fast.rolling(window=3).mean()
+    dft[j]['I_fast_smb6'] = dft[j].I_fast.rolling(window=3).mean()
+    dft[j]['I_fast_smb12'] = dft[j].I_fast.rolling(window=6).mean()
+    dft[j]['I_fast_smb18'] = dft[j].I_fast.rolling(window=9).mean()
+
+
 
     for ii in range(0, size - 1):
         t1 = dft[j].at[i + 1, 'Tsim']
@@ -197,17 +203,19 @@ for j in range(len(simlist)):
         Xs = np.exp(-(t1 - t2) / tslow)
         Xf = np.exp(-(t1 - t2) / tfast)
 
-        Ifast_deconv_smb[ii + 1] = (dft[j].at[ii + 1, 'I_fast_smb'] - dft[j].at[ii, 'I_fast_smb'] * Xf) / (1 - Xf)
+        Ifast_deconv_smb6[ii + 1] = (dft[j].at[ii + 1, 'I_fast_smb6'] - dft[j].at[ii, 'I_fast_smb6'] * Xf) / (1 - Xf)
+        Ifast_deconv_smb12[ii + 1] = (dft[j].at[ii + 1, 'I_fast_smb12'] - dft[j].at[ii, 'I_fast_smb12'] * Xf) / (1 - Xf)
+        Ifast_deconv_smb18[ii + 1] = (dft[j].at[ii + 1, 'I_fast_smb18'] - dft[j].at[ii, 'I_fast_smb18'] * Xf) / (1 - Xf)
 
 
-
-
-    dft[j]['I_fast_deconv_smb'] = Ifast_deconv_smb
+    dft[j]['I_fast_deconv_smb6'] = Ifast_deconv_smb6
+    dft[j]['I_fast_deconv_smb12'] = Ifast_deconv_smb12
+    dft[j]['I_fast_deconv_smb18'] = Ifast_deconv_smb18
 
     dft[j]['I_fast_deconv'] = Ifast_deconv
 
-    dft[j]['I_fastminib0'] = Ifastminib0
-    dft[j]['I_fastminib0_deconv'] = Ifastminib0_deconv
+    # dft[j]['I_fastminib0'] = Ifastminib0
+    # dft[j]['I_fastminib0_deconv'] = Ifastminib0_deconv
 
 
     for k in range(len(dft[j])):
@@ -217,27 +225,35 @@ for j in range(len(simlist)):
                 # print(p, Pval[p + 1], Pval[p ])
                 dft[j].at[k, 'PO3_deconv_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fast_deconv'] / \
                                                 (dft[j].at[k, 'PFcor'] * JMA[p])
-                dft[j].at[k, 'PO3_deconv_smb_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fast_deconv_smb'] / \
+                dft[j].at[k, 'PO3_deconv_smb6_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fast_deconv_smb6'] / \
                                                 (dft[j].at[k, 'PFcor'] * JMA[p])
-                dft[j].at[k, 'PO3_minib0_deconv_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fastminib0_deconv'] / \
+                dft[j].at[k, 'PO3_deconv_smb12_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fast_deconv_smb12'] / \
                                                 (dft[j].at[k, 'PFcor'] * JMA[p])
+                dft[j].at[k, 'PO3_deconv_smb18_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fast_deconv_smb18'] / \
+                                                (dft[j].at[k, 'PFcor'] * JMA[p])
+                # dft[j].at[k, 'PO3_minib0_deconv_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fastminib0_deconv'] / \
+                #                                 (dft[j].at[k, 'PFcor'] * JMA[p])
                 dft[j].at[k, 'PO3_slow_conv_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_slow_conv'] / \
                                                  (dft[j].at[k, 'PFcor'] * JMA[p])
 
         if (dft[j].at[k, 'Pair'] <= Pval[14]):
             dft[j].at[k, 'PO3_deconv_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fast_deconv'] / \
                                             (dft[j].at[k, 'PFcor'] * JMA[14])
-            dft[j].at[k, 'PO3_deconv_smb_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fast_deconv_smb'] / \
+            dft[j].at[k, 'PO3_deconv_smb6_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fast_deconv_smb6'] / \
                                             (dft[j].at[k, 'PFcor'] * JMA[14])
-            dft[j].at[k, 'PO3_minib0_deconv_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fastminib0_deconv'] / \
+            dft[j].at[k, 'PO3_deconv_smb12_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fast_deconv_smb12'] / \
                                             (dft[j].at[k, 'PFcor'] * JMA[14])
+            dft[j].at[k, 'PO3_deconv_smb18_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fast_deconv_smb18'] / \
+                                            (dft[j].at[k, 'PFcor'] * JMA[14])
+            # dft[j].at[k, 'PO3_minib0_deconv_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fastminib0_deconv'] / \
+            #                                 (dft[j].at[k, 'PFcor'] * JMA[14])
             dft[j].at[k, 'PO3_slow_conv_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_slow_conv'] / \
                                              (dft[j].at[k, 'PFcor'] * JMA[14])
 
     dft[j]['PO3_deconv'] = 0.043085 * dft[j]['TPint'] * dft[j]['I_fast_deconv'] / dft[j]['PFcor']
-    dft[j]['PO3_deconv_smb'] = 0.043085 * dft[j]['TPint'] * dft[j]['I_fast_deconv_smb'] / dft[j]['PFcor']
+    dft[j]['PO3_deconv_smb6'] = 0.043085 * dft[j]['TPint'] * dft[j]['I_fast_deconv_smb6'] / dft[j]['PFcor']
 
-    dft[j]['PO3_minib0_deconv'] = 0.043085 * dft[j]['TPint'] * dft[j]['I_fastminib0_deconv'] / dft[j]['PFcor']
+    # dft[j]['PO3_minib0_deconv'] = 0.043085 * dft[j]['TPint'] * dft[j]['I_fastminib0_deconv'] / dft[j]['PFcor']
 
     dft[j]['PO3_slow_conv'] = 0.043085 * dft[j]['TPint'] * dft[j]['I_slow_conv'] / dft[j]['PFcor']
 
@@ -245,13 +261,13 @@ for j in range(len(simlist)):
     dft[j]['PO3_deconv_sm6'] = dft[j].PO3_deconv.rolling(window=3).mean()
     dft[j]['I_fast_deconv_sm6'] = dft[j].I_fast_deconv.rolling(window=3).mean()
 
-    dft[j]['PO3_deconv_jma_sm10'] = dft[j].PO3_deconv_jma.rolling(window=5).mean()
-    dft[j]['PO3_deconv_sm10'] = dft[j].PO3_deconv.rolling(window=5).mean()
-    dft[j]['I_fast_deconv_sm10'] = dft[j].I_fast_deconv.rolling(window=5).mean()
+    dft[j]['PO3_deconv_jma_sm12'] = dft[j].PO3_deconv_jma.rolling(window=6).mean()
+    dft[j]['PO3_deconv_sm12'] = dft[j].PO3_deconv.rolling(window=6).mean()
+    dft[j]['I_fast_deconv_sm12'] = dft[j].I_fast_deconv.rolling(window=6).mean()
 
-    dft[j]['PO3_deconv_jma_sm14'] = dft[j].PO3_deconv_jma.rolling(window=7).mean()
-    dft[j]['PO3_deconv_sm14'] = dft[j].PO3_deconv.rolling(window=7).mean()
-    dft[j]['I_fast_deconv_sm14'] = dft[j].I_fast_deconv.rolling(window=7).mean()
+    dft[j]['PO3_deconv_jma_sm18'] = dft[j].PO3_deconv_jma.rolling(window=9).mean()
+    dft[j]['PO3_deconv_sm18'] = dft[j].PO3_deconv.rolling(window=9).mean()
+    dft[j]['I_fast_deconv_sm18'] = dft[j].I_fast_deconv.rolling(window=9).mean()
 
     list_data.append(dft[j])
 
