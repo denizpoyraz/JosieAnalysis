@@ -9,10 +9,10 @@ import matplotlib.pyplot as plt
 from Josie_Functions import  Calc_average_profile_pressure, Calc_average_profile_time, Calc_Dif, Calc_average_profileCurrent_pressure, Calc_average_profileCurrent_time
 from Josie_PlotFunctions import  errorPlot_ARDif_withtext, errorPlot_general
 
-folderpath = 'Dif_0910_testaman'
+folderpath = 'Dif_0910_beta2ib0'
 
-df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv.csv", low_memory=False)
-# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv.csv", low_memory=False)
+df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_beta2ib0.csv", low_memory=False)
+# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv.csv", low_memory=False)
 
 df = df.drop(df[(df.PO3 < 0)].index)
 df = df.drop(df[(df.PO3_OPM < 0)].index)
@@ -30,7 +30,7 @@ print(len(test))
 
 
 ## cuts for Josie0910 data
-# # v2 cuts, use this and v3 standard more conservative cuts not valid for 140, 162, 163, 166  v2
+# # v2 cuts, use this and v3 standard more conservative cuts not valid for 140, 1122, 163, 166  v2
 df=df[df.Tsim > 900]
 df=df[df.Tsim <= 8100]
 df = df.drop(df[(2000 < df.Tsim) & (df.Tsim < 2500) & (df.Sim != 140) & (df.Sim != 162) & (df.Sim != 163) & (
@@ -188,8 +188,12 @@ adif_dcjma_smb12, adiferr_dcjma_smb12, rdif_dcjma_smb12, rdiferr_dcjma_smb12 = C
                                                                                 avgprof_O3S_Xerr_dcjma_smb12, dimension)
 
 ### Plotting
-axtitle = 'Sonde - OPM  Difference (mPa)'
-rxtitle = 'Sonde - OPM  Difference (%)'
+axtitle_nojma = 'Sonde - OPM  Difference (mPa)'
+axtitle = 'Sonde[JMA] - OPM  Difference (mPa)'
+
+rxtitle_nojma = 'Sonde - OPM  Difference (%)'
+rxtitle = 'Sonde[JMA] - OPM  Difference (%)'
+
 
 labellist = ['EN 0.5%-0.5B','EN 1.0%-1.0B', 'SP 0.5%-0.5B', 'SP 1.0%-1.0B']
 o3list = [totO3_EN0505, totO3_EN1010,  totO3_SP0505, totO3_SP1010]
@@ -197,18 +201,18 @@ dfnplist = [profEN0505.drop_duplicates(['Sim', 'Team']), profEN1010.drop_duplica
             profSP1010_nodup]
 
 #standard
-errorPlot_ARDif_withtext(adif, adiferr, Y, [-3, 3], [1000,5],  '0910 Data',  axtitle, ytitle, labellist, o3list, dfnplist,
+errorPlot_ARDif_withtext(adif, adiferr, Y, [-3, 3], [1000,5],  '0910 Data',  axtitle_nojma, ytitle, labellist, o3list, dfnplist,
                            'ADif_Pair_0910', folderpath ,  True, False)
 
-errorPlot_ARDif_withtext(rdif, rdiferr, Y, [-40, 40], [1000,5],  '0910 Data',  rxtitle, ytitle, labellist, o3list, dfnplist,
+errorPlot_ARDif_withtext(rdif, rdiferr, Y, [-40, 40], [1000,5],  '0910 Data',  rxtitle_nojma, ytitle, labellist, o3list, dfnplist,
                            'RDif_Pair_0910', folderpath, True, False)
 
 ## convoluted ones
 
-errorPlot_ARDif_withtext(adif_dc, adiferr_dc, Y, [-3, 3], [1000,5],  '0910 Data Conv-Deconv ',  axtitle, ytitle, labellist, o3list, dfnplist,
+errorPlot_ARDif_withtext(adif_dc, adiferr_dc, Y, [-3, 3], [1000,5],  '0910 Data Conv-Deconv ',  axtitle_nojma, ytitle, labellist, o3list, dfnplist,
                            'ADif_Pair_Convoluted_0910', folderpath ,  True, False)
 
-errorPlot_ARDif_withtext(rdif_dc, rdiferr_dc, Y, [-40, 40], [1000,5],  '0910 Data Conv-Deconv ',  rxtitle, ytitle, labellist, o3list, dfnplist,
+errorPlot_ARDif_withtext(rdif_dc, rdiferr_dc, Y, [-40, 40], [1000,5],  '0910 Data Conv-Deconv ',  rxtitle_nojma, ytitle, labellist, o3list, dfnplist,
                            'RDif_Pair_Convoluted_0910', folderpath, True, False)
 ## convoluted jma
 errorPlot_ARDif_withtext(adif_dcjma, adiferr_dcjma, Y, [-3, 3], [1000,5],  '0910 Data Conv-Deconv (PO3 JMA corr.)',  axtitle, ytitle, labellist, o3list, dfnplist,
@@ -302,58 +306,57 @@ errorPlot_ARDif_withtext(rdif_dcjma_smb12, rdiferr_dcjma_smb12, Y, [-40, 40], [1
 # ################################
 # ## now do the same asaf of time
 # ################################
-# resolution = 400
-# tmin = 200
-# tmax = 8000
+resolution = 400
+tmin = 200
+tmax = 8000
 # ## order of the lists [en0505, en1010, sp0505, sp1010]
-# avgprof_O3S_T, avgprof_O3S_Terr, Yt = Calc_average_profile_time([profEN0505, profEN1010, profSP0505, profSP1010],
-#                                                                    'PO3', resolution, tmin, tmax)
-# avgprof_O3S_T_dc, avgprof_O3S_Terr_dc, Yt = Calc_average_profile_time([profEN0505, profEN1010, profSP0505, profSP1010],
-#                                                                          'PO3_deconv', resolution, tmin, tmax)
-# avgprof_O3S_T_dc_sm6, avgprof_O3S_Terr_dc_sm6, Yt = Calc_average_profile_time([profEN0505, profEN1010, profSP0505, profSP1010],
-#                                                                          'PO3_deconv_sm6', resolution, tmin, tmax)
-# avgprof_O3S_T_dc_sm12, avgprof_O3S_Terr_dc_sm12, Yt = Calc_average_profile_time([profEN0505, profEN1010, profSP0505, profSP1010],
-#                                                                          'PO3_deconv_sm12', resolution, tmin, tmax)
-# avgprof_O3S_T_dcjma, avgprof_O3S_Terr_dcjma, Yt = Calc_average_profile_time([profEN0505, profEN1010, profSP0505, profSP1010],
-#                                                                          'PO3_deconv_jma', resolution, tmin, tmax)
+avgprof_O3S_T, avgprof_O3S_Terr, Yt = Calc_average_profile_time([profEN0505, profEN1010, profSP0505, profSP1010],
+                                                                   'PO3', resolution, tmin, tmax)
+avgprof_O3S_T_dc, avgprof_O3S_Terr_dc, Yt = Calc_average_profile_time([profEN0505, profEN1010, profSP0505, profSP1010],
+                                                                         'PO3_deconv', resolution, tmin, tmax)
+avgprof_O3S_T_dc_sm6, avgprof_O3S_Terr_dc_sm6, Yt = Calc_average_profile_time([profEN0505, profEN1010, profSP0505, profSP1010],
+                                                                         'PO3_deconv_sm6', resolution, tmin, tmax)
+avgprof_O3S_T_dc_sm12, avgprof_O3S_Terr_dc_sm12, Yt = Calc_average_profile_time([profEN0505, profEN1010, profSP0505, profSP1010],
+                                                                         'PO3_deconv_sm12', resolution, tmin, tmax)
+avgprof_O3S_T_dcjma, avgprof_O3S_Terr_dcjma, Yt = Calc_average_profile_time([profEN0505, profEN1010, profSP0505, profSP1010],
+                                                                         'PO3_deconv_jma', resolution, tmin, tmax)
+
+avgprof_O3S_T_dcjma_sm6, avgprof_O3S_Terr_dcjma_sm6, Yt = Calc_average_profile_time([profEN0505, profEN1010, profSP0505, profSP1010],
+                                                                         'PO3_deconv_jma_sm6', resolution, tmin, tmax)
+avgprof_O3S_T_dcjma_sm12, avgprof_O3S_Terr_dcjma_sm12, Yt = Calc_average_profile_time([profEN0505, profEN1010, profSP0505, profSP1010],
+                                                                         'PO3_deconv_jma_sm12', resolution, tmin, tmax)
+avgprof_O3S_T_dcjma_sm18, avgprof_O3S_Terr_dcjma_sm18, Yt = Calc_average_profile_time([profEN0505, profEN1010, profSP0505, profSP1010],
+                                                                         'PO3_deconv_jma_sm18', resolution, tmin, tmax)
 #
-# avgprof_O3S_T_dcjma_sm6, avgprof_O3S_Terr_dcjma_sm6, Yt = Calc_average_profile_time([profEN0505, profEN1010, profSP0505, profSP1010],
-#                                                                          'PO3_deconv_jma_sm6', resolution, tmin, tmax)
-# avgprof_O3S_T_dcjma_sm12, avgprof_O3S_Terr_dcjma_sm12, Yt = Calc_average_profile_time([profEN0505, profEN1010, profSP0505, profSP1010],
-#                                                                          'PO3_deconv_jma_sm12', resolution, tmin, tmax)
-#
-# avgprof_OPM_T, avgprof_OPM_Terr, Yt = Calc_average_profile_time([profEN0505, profEN1010, profSP0505, profSP1010],
-#                                                                    'PO3_OPM', resolution, tmin, tmax )
-#
-#
-# avgprof_O3S_T_dcjma_smb6, avgprof_O3S_Terr_dcjma_smb6, Yt = Calc_average_profile_time([profEN0505, profEN1010, profSP0505, profSP1010],
-#                                                                          'PO3_deconv_smb6_jma', resolution, tmin, tmax)
-#
-# avgprof_O3S_T_dcjma_smb12, avgprof_O3S_Terr_dcjma_smb6, Yt = Calc_average_profile_time([profEN0505, profEN1010, profSP0505, profSP1010],
-#                                                                          'PO3_deconv_smb12_jma', resolution, tmin, tmax)
-# dimension = len(Yt)
+avgprof_OPM_T, avgprof_OPM_Terr, Yt = Calc_average_profile_time([profEN0505, profEN1010, profSP0505, profSP1010],
+                                                                   'PO3_OPM', resolution, tmin, tmax )
 #
 #
-# #standard
-# adifT, adifTerr, rdifT, rdifTerr = Calc_Dif(avgprof_O3S_T, avgprof_OPM_T, avgprof_O3S_Terr, dimension)
-# #deconvoluted
-# adifT_dc, adifTerr_dc, rdifT_dc, rdifTerr_dc = Calc_Dif(avgprof_O3S_T_dc, avgprof_OPM_T, avgprof_O3S_Terr_dc, dimension)
-# #deconvoluted smoothed
-# adifT_dc_sm6, adifTerr_dc_sm6, rdifT_dc_sm6, rdifTerr_dc_sm6 = Calc_Dif(avgprof_O3S_T_dc_sm6, avgprof_OPM_T, avgprof_O3S_Terr_dc_sm6, dimension)
-# adifT_dc_sm12, adifTerr_dc_sm12, rdifT_dc_sm12, rdifTerr_dc_sm12 = Calc_Dif(avgprof_O3S_T_dc_sm12, avgprof_OPM_T, avgprof_O3S_Terr_dc_sm12, dimension)
-# #deconvoluted jma corrected
-# adifT_dcjma, adifTerr_dcjma, rdifT_dcjma, rdifTerr_dcjma = Calc_Dif(avgprof_O3S_T_dcjma, avgprof_OPM_T, avgprof_O3S_Terr_dcjma, dimension)
-# #deconvoluted jma corrected smoothed
-# adifT_dcjma_sm6, adifTerr_dcjma_sm6, rdifT_dcjma_sm6, rdifTerr_dcjma_sm6 = Calc_Dif(avgprof_O3S_T_dcjma_sm6, avgprof_OPM_T,
-#                                                                                 avgprof_O3S_Terr_dcjma_sm6, dimension)
-# adifT_dcjma_sm12, adifTerr_dcjma_sm12, rdifT_dcjma_sm12, rdifTerr_dcjma_sm12 = Calc_Dif(avgprof_O3S_T_dcjma_sm12, avgprof_OPM_T,
-#                                                                                 avgprof_O3S_Terr_dcjma_sm12, dimension)
+
+dimension = len(Yt)
 #
+#
+#standard
+adifT, adifTerr, rdifT, rdifTerr = Calc_Dif(avgprof_O3S_T, avgprof_OPM_T, avgprof_O3S_Terr, dimension)
+#deconvoluted
+adifT_dc, adifTerr_dc, rdifT_dc, rdifTerr_dc = Calc_Dif(avgprof_O3S_T_dc, avgprof_OPM_T, avgprof_O3S_Terr_dc, dimension)
+#deconvoluted smoothed
+adifT_dc_sm6, adifTerr_dc_sm6, rdifT_dc_sm6, rdifTerr_dc_sm6 = Calc_Dif(avgprof_O3S_T_dc_sm6, avgprof_OPM_T, avgprof_O3S_Terr_dc_sm6, dimension)
+adifT_dc_sm12, adifTerr_dc_sm12, rdifT_dc_sm12, rdifTerr_dc_sm12 = Calc_Dif(avgprof_O3S_T_dc_sm12, avgprof_OPM_T, avgprof_O3S_Terr_dc_sm12, dimension)
+#deconvoluted jma corrected
+adifT_dcjma, adifTerr_dcjma, rdifT_dcjma, rdifTerr_dcjma = Calc_Dif(avgprof_O3S_T_dcjma, avgprof_OPM_T, avgprof_O3S_Terr_dcjma, dimension)
+#deconvoluted jma corrected smoothed
+adifT_dcjma_sm6, adifTerr_dcjma_sm6, rdifT_dcjma_sm6, rdifTerr_dcjma_sm6 = Calc_Dif(avgprof_O3S_T_dcjma_sm6, avgprof_OPM_T,
+                                                                                avgprof_O3S_Terr_dcjma_sm6, dimension)
+adifT_dcjma_sm12, adifTerr_dcjma_sm12, rdifT_dcjma_sm12, rdifTerr_dcjma_sm12 = Calc_Dif(avgprof_O3S_T_dcjma_sm12, avgprof_OPM_T,
+                                                                                avgprof_O3S_Terr_dcjma_sm12, dimension)
+
+adifT_dcjma_sm18, adifTerr_dcjma_sm18, rdifT_dcjma_sm18, rdifTerr_dcjma_sm18 = Calc_Dif(avgprof_O3S_T_dcjma_sm18, avgprof_OPM_T,
+                                                                                avgprof_O3S_Terr_dcjma_sm18, dimension)
 #
 #
 # ### Plotting
-# axtitle = 'Sonde - OPM  Difference (mPa)'
-# rxtitle = 'Sonde - OPM  Difference (%)'
+
 #
 # labellist = ['EN 0.5%-0.5B','EN 1.0%-1.0B', 'SP 0.5%-0.5B', 'SP 1.0%-1.0B']
 # # o3list = [totO3_EN0505, totO3_EN1010,  totO3_SP0505, totO3_SP1010]
@@ -362,38 +365,55 @@ errorPlot_ARDif_withtext(rdif_dcjma_smb12, rdiferr_dcjma_smb12, Y, [-40, 40], [1
 # print('test error', len(adifT), len(adifTerr))
 #
 #
-# errorPlot_ARDif_withtext(adifT, adifTerr, Yt, [-3, 3], [0, 9000],  '0910 Data',  axtitle, ytitlet, labellist, o3list, dfnplist,
-#                            'ADif_TSim_0910', folderpath ,  False, False)
-#
-# errorPlot_ARDif_withtext(rdifT, rdifTerr, Yt, [-40, 40], [0, 9000],  '0910 Data',  rxtitle, ytitlet, labellist, o3list, dfnplist,
-#                            'RDif_TSim_0910', folderpath, False, False)
-#
-# ## convoluted ones
-#
-# errorPlot_ARDif_withtext(adifT_dc, adifTerr_dc, Yt, [-3, 3], [0, 9000],  '0910 Data Conv-Deconv ',  axtitle, ytitlet,
-#                          labellist, o3list, dfnplist,
-#                            'ADif_TSim_Convoluted_0910', folderpath ,  False, False)
-#
-# errorPlot_ARDif_withtext(rdifT_dc, rdifTerr_dc, Yt, [-40, 40], [0, 9000],  '0910 Data Conv-Deconv ',  rxtitle, ytitlet,
-#                          labellist, o3list, dfnplist,
-#                            'RDif_TSim_Convoluted_0910', folderpath, False, False)
-# ## convoluted corrected jma
-# errorPlot_ARDif_withtext(adifT_dcjma, adifTerr_dcjma, Yt, [-3, 3], [0, 9000],  '0910 Data Conv-Deconv (PO3 JMA corr.)',  axtitle, ytitlet,
-#                          labellist, o3list, dfnplist,
-#                            'ADif_TSim_Convoluted_0910_jma', folderpath ,  False, False)
-#
-# errorPlot_ARDif_withtext(rdifT_dcjma, rdifTerr_dcjma, Yt, [-40, 40], [0, 9000],  '0910 Data Conv-Deconv (PO3 JMA corr.)',  rxtitle, ytitlet,
-#                          labellist, o3list, dfnplist,
-#                            'RDif_TSim_Convoluted_0910_jma', folderpath, False, False)
-#
-# ## convoluted smmmothed corrected jma
-# errorPlot_ARDif_withtext(adifT_dcjma, adifTerr_dcjma, Yt, [-3, 3], [0, 9000],  '0910 Data Conv-Deconv (PO3 JMA corr.)',  axtitle, ytitlet,
-#                          labellist, o3list, dfnplist,
-#                            'ADif_TSim_Convoluted_0910_jma', folderpath ,  False, False)
-#
-# errorPlot_ARDif_withtext(rdifT_dcjma, rdifTerr_dcjma, Yt, [-40, 40], [0, 9000],  '0910 Data Conv-Deconv (PO3 JMA corr.)',  rxtitle, ytitlet,
-#                          labellist, o3list, dfnplist,
-#                            'RDif_TSim_Convoluted_0910_jma', folderpath, False, False)
+errorPlot_ARDif_withtext(adifT, adifTerr, Yt, [-3, 3], [0, 9000],  '0910 Data',  axtitle_nojma, ytitlet, labellist, o3list, dfnplist,
+                           'ADif_TSim_0910', folderpath ,  False, False)
+
+errorPlot_ARDif_withtext(rdifT, rdifTerr, Yt, [-40, 40], [0, 9000],  '0910 Data',  rxtitle_nojma, ytitlet, labellist, o3list, dfnplist,
+                           'RDif_TSim_0910', folderpath, False, False)
+
+## convoluted ones
+
+errorPlot_ARDif_withtext(adifT_dc, adifTerr_dc, Yt, [-3, 3], [0, 9000],  '0910 Data Conv-Deconv ',  axtitle_nojma, ytitlet,
+                         labellist, o3list, dfnplist,
+                           'ADif_TSim_Convoluted_0910', folderpath ,  False, False)
+
+errorPlot_ARDif_withtext(rdifT_dc, rdifTerr_dc, Yt, [-40, 40], [0, 9000],  '0910 Data Conv-Deconv ',  rxtitle_nojma, ytitlet,
+                         labellist, o3list, dfnplist,
+                           'RDif_TSim_Convoluted_0910', folderpath, False, False)
+## convoluted corrected jma
+errorPlot_ARDif_withtext(adifT_dcjma, adifTerr_dcjma, Yt, [-3, 3], [0, 9000],  '0910 Data Conv-Deconv (PO3 JMA corr.)',  axtitle, ytitlet,
+                         labellist, o3list, dfnplist,
+                           'ADif_TSim_Convoluted_0910_jma', folderpath ,  False, False)
+
+errorPlot_ARDif_withtext(rdifT_dcjma, rdifTerr_dcjma, Yt, [-40, 40], [0, 9000],  '0910 Data Conv-Deconv (PO3 JMA corr.)',  rxtitle, ytitlet,
+                         labellist, o3list, dfnplist,
+                           'RDif_TSim_Convoluted_0910_jma', folderpath, False, False)
+
+## convoluted smmmothed corrected jma 6 seconds
+errorPlot_ARDif_withtext(adifT_dcjma_sm6, adifTerr_dcjma_sm6, Yt, [-3, 3], [0, 9000],  '0910 Data Conv-Deconv (PPO3 JMA Smoothed 6sec.)',  axtitle, ytitlet,
+                         labellist, o3list, dfnplist,
+                           'ADif_TSim_Convoluted_0910_jma_smoothed6', folderpath ,  False, False)
+
+errorPlot_ARDif_withtext(rdifT_dcjma_sm6, rdifTerr_dcjma_sm6, Yt, [-40, 40], [0, 9000],  '0910 Data Conv-Deconv (PO3 JMA Smoothed 6sec.)',  rxtitle, ytitlet,
+                         labellist, o3list, dfnplist,
+                           'RDif_TSim_Convoluted_0910_jma_smoothed6', folderpath, False, False)
+## convoluted smmmothed corrected jma 12 seconds
+errorPlot_ARDif_withtext(adifT_dcjma_sm12, adifTerr_dcjma_sm12, Yt, [-3, 3], [0, 9000],  '0910 Data Conv-Deconv (PPO3 JMA Smoothed 12sec.)',  axtitle, ytitlet,
+                         labellist, o3list, dfnplist,
+                           'ADif_TSim_Convoluted_0910_jma_smoothed12', folderpath ,  False, False)
+
+errorPlot_ARDif_withtext(rdifT_dcjma_sm12, rdifTerr_dcjma_sm12, Yt, [-40, 40], [0, 9000],  '0910 Data Conv-Deconv (PO3 JMA Smoothed 12sec.)',  rxtitle, ytitlet,
+                         labellist, o3list, dfnplist,
+                           'RDif_TSim_Convoluted_0910_jma_smoothed12', folderpath, False, False)
+
+## convoluted smmmothed corrected jma 12 seconds
+errorPlot_ARDif_withtext(adifT_dcjma_sm18, adifTerr_dcjma_sm18, Yt, [-3, 3], [0, 9000],  '0910 Data Conv-Deconv (PPO3 JMA Smoothed 18sec.)',  axtitle, ytitlet,
+                         labellist, o3list, dfnplist,
+                           'ADif_TSim_Convoluted_0910_jma_smoothed18', folderpath ,  False, False)
+
+errorPlot_ARDif_withtext(rdifT_dcjma_sm18, rdifTerr_dcjma_sm18, Yt, [-40, 40], [0, 9000],  '0910 Data Conv-Deconv (PO3 JMA Smoothed 18sec.)',  rxtitle, ytitlet,
+                         labellist, o3list, dfnplist,
+                           'RDif_TSim_Convoluted_0910_jma_smoothed18', folderpath, False, False)
 #
 #
 #
@@ -407,22 +427,59 @@ errorPlot_ARDif_withtext(rdif_dcjma_smb12, rdiferr_dcjma_smb12, Y, [-40, 40], [1
 #
 avgprof_O3S_cur, avgprof_O3S_curerr, Ycur = Calc_average_profileCurrent_pressure([profEN0505, profEN1010, profSP0505, profSP1010],
                                                                    'IM')
+avgprof_O3S_cur_fast, avgprof_O3S_curerr_fast, Ycur = Calc_average_profileCurrent_pressure([profEN0505, profEN1010, profSP0505, profSP1010],
+                                                                   'I_fast')
+
 avgprof_O3S_curSlow, avgprof_O3S_curSlowerr, Yslow = Calc_average_profileCurrent_pressure([profEN0505, profEN1010, profSP0505, profSP1010],
                                                                    'I_slow_conv')
 avgprof_O3S_cur_dc, avgprof_O3S_curerr_dc, Y = Calc_average_profileCurrent_pressure([profEN0505, profEN1010, profSP0505, profSP1010],
                                                                          'I_fast_deconv')
+
+avgprof_O3S_cur_dc_sm6, avgprof_O3S_curerr_dc_sm6, Y = Calc_average_profileCurrent_pressure([profEN0505, profEN1010, profSP0505, profSP1010],
+                                                                         'I_fast_deconv_sm6')
+avgprof_O3S_cur_dc_sm12, avgprof_O3S_curerr_dc_sm12, Y = Calc_average_profileCurrent_pressure([profEN0505, profEN1010, profSP0505, profSP1010],
+                                                                         'I_fast_deconv_sm12')
+avgprof_O3S_cur_dc_sm18, avgprof_O3S_curerr_dc_sm18, Y = Calc_average_profileCurrent_pressure([profEN0505, profEN1010, profSP0505, profSP1010],
+                                                                         'I_fast_deconv_sm18')
 avgprof_OPM_cur, avgprof_OPM_curerr, Y = Calc_average_profileCurrent_pressure([profEN0505, profEN1010, profSP0505, profSP1010],
                                                                    'I_OPM_jma')
+
+## fast minus ib0 plots
+avgprof_O3S_cur_mib0, avgprof_O3S_curerr_mib0, Y = Calc_average_profileCurrent_pressure([profEN0505, profEN1010, profSP1010, profSP1010],
+                                                                         'Ifast_minib0')
+avgprof_O3S_cur_dcmib0, avgprof_O3S_curerr_dcmib0, Y = Calc_average_profileCurrent_pressure([profEN0505, profEN1010, profSP1010, profSP1010],
+                                                                         'Ifast_minib0_deconv')
+avgprof_O3S_cur_dcmib0_sm6, avgprof_O3S_curerr_dcmib0_sm6, Y = Calc_average_profileCurrent_pressure([profEN0505, profEN1010, profSP1010, profSP1010],
+                                                                         'Ifast_minib0_deconv_sm6')
+avgprof_O3S_cur_dcmib0_sm12, avgprof_O3S_curerr_dcmib0_sm12, Y = Calc_average_profileCurrent_pressure([profEN0505, profEN1010, profSP1010, profSP1010],
+                                                                         'Ifast_minib0_deconv_sm12')
+avgprof_O3S_cur_dcmib0_sm18, avgprof_O3S_curerr_dcmib0_sm18, Y = Calc_average_profileCurrent_pressure([profEN0505, profEN1010, profSP1010, profSP1010],
+                                                                         'Ifast_minib0_deconv_sm18')
+
 
 dimension = len(Y)
 
 adifcur, adifcurerr, rdifcur, rdifcurerr = Calc_Dif(avgprof_O3S_cur, avgprof_OPM_cur, avgprof_O3S_curerr, dimension)
+adifcurf, adifcurerrf, rdifcurf, rdifcurerrf = Calc_Dif(avgprof_O3S_cur_fast, avgprof_OPM_cur, avgprof_O3S_curerr_fast, dimension)
+
 adifcur_dc, adifcurerr_dc, rdifcur_dc, rdifcurerr_dc = Calc_Dif(avgprof_O3S_cur_dc, avgprof_OPM_cur, avgprof_O3S_curerr_dc, dimension)
+adifcur_dc_sm6, adifcurerr_dc_sm6, rdifcur_dc_sm6, rdifcurerr_dc_sm6 = Calc_Dif(avgprof_O3S_cur_dc_sm6, avgprof_OPM_cur, avgprof_O3S_curerr_dc_sm6, dimension)
+adifcur_dc_sm12, adifcurerr_dc_sm12, rdifcur_dc_sm12, rdifcurerr_dc_sm12 = Calc_Dif(avgprof_O3S_cur_dc_sm12, avgprof_OPM_cur, avgprof_O3S_curerr_dc_sm12, dimension)
+adifcur_dc_sm18, adifcurerr_dc_sm18, rdifcur_dc_sm18, rdifcurerr_dc_sm18 = Calc_Dif(avgprof_O3S_cur_dc_sm18, avgprof_OPM_cur, avgprof_O3S_curerr_dc_sm18, dimension)
+
+adifcur_mib0, adifcurerr_mib0, rdifcur_mib0, rdifcurerr_mib0 = Calc_Dif(avgprof_O3S_cur_mib0, avgprof_OPM_cur, avgprof_O3S_curerr_mib0, dimension)
+adifcur_dcmib0, adifcurerr_dcmib0, rdifcur_dcmib0, rdifcurerr_dcmib0 = Calc_Dif(avgprof_O3S_cur_dcmib0, avgprof_OPM_cur, avgprof_O3S_curerr_dcmib0, dimension)
+adifcur_dcmib0_sm6, adifcurerr_dcmib0_sm6, rdifcur_dcmib0_sm6, rdifcurerr_dcmib0_sm6 = Calc_Dif(avgprof_O3S_cur_dcmib0_sm6, avgprof_OPM_cur, avgprof_O3S_curerr_dcmib0_sm6, dimension)
+adifcur_dcmib0_sm12, adifcurerr_dcmib0_sm12, rdifcur_dcmib0_sm12, rdifcurerr_dcmib0_sm12 = Calc_Dif(avgprof_O3S_cur_dcmib0_sm12, avgprof_OPM_cur, avgprof_O3S_curerr_dcmib0_sm12, dimension)
+adifcur_dcmib0_sm18, adifcurerr_dcmib0_sm18, rdifcur_dcmib0_sm18, rdifcurerr_dcmib0_sm18 = Calc_Dif(avgprof_O3S_cur_dcmib0_sm18, avgprof_OPM_cur, avgprof_O3S_curerr_dcmib0_sm18, dimension)
+adifcurf, adifcurerrf, rdifcurf, rdifcurerrf = Calc_Dif(avgprof_O3S_cur_fast, avgprof_OPM_cur, avgprof_O3S_curerr_fast, dimension)
+
 
 #
 # ### Plotting
-axtitlecur = r'Sonde - OPM  Difference ($\mu$A)'
-rxtitle = 'Sonde - OPM  Difference (%)'
+
+axtitlecur = r'Sonde - OPM[JMA]  Difference ($\mu$A)'
+rxtitle = 'Sonde - OPM[JMA]  Difference (%)'
 
 
 errorPlot_ARDif_withtext(adifcur, adifcurerr, Y, [-3, 3], [1000,5],  '0910 Data (Current)',  axtitlecur, ytitle, labellist, o3list, dfnplist,
@@ -431,54 +488,158 @@ errorPlot_ARDif_withtext(adifcur, adifcurerr, Y, [-3, 3], [1000,5],  '0910 Data 
 errorPlot_ARDif_withtext(rdifcur, rdifcurerr, Y, [-40, 40], [1000,5],  '0910 Data (Current)',  rxtitle, ytitle, labellist, o3list, dfnplist,
                            'Current_RDif_Pair_0910', folderpath, True, False)
 
-## convoluted ones
+errorPlot_ARDif_withtext(adifcurf, adifcurerrf, Y, [-3, 3], [1000,5],  '0910 Data (Current fast)',  axtitlecur, ytitle, labellist, o3list, dfnplist,
+                           'Currentfast_ADif_Pair_0910', folderpath ,  True, False)
 
-errorPlot_ARDif_withtext(adifcur_dc, adifcurerr_dc, Y, [-3, 3], [1000,5],  '0910 Data Conv-Deconv (Current)',  axtitlecur, ytitle,
+errorPlot_ARDif_withtext(rdifcurf, rdifcurerrf, Y, [-40, 40], [1000,5],  '0910 Data (Current) fast',  rxtitle, ytitle, labellist, o3list, dfnplist,
+                           'Currentfast_RDif_Pair_0910', folderpath, True, False)
+
+
+
+
+# ## convoluted ones
+#
+errorPlot_ARDif_withtext(adifcur_dc, adifcurerr_dc, Y, [-3, 3], [1000,5],  '0910 Data Conv-Deconv (Current )',  axtitlecur, ytitle,
                          labellist, o3list, dfnplist,
                            'Current_ADif_Pair_Convoluted_0910', folderpath ,  True, False)
 
 errorPlot_ARDif_withtext(rdifcur_dc, rdifcurerr_dc, Y, [-40, 40], [1000,5],  '0910 Data Conv-Deconv (Current)',  rxtitle, ytitle,
                          labellist, o3list, dfnplist,
                            'Current_RDif_Pair_Convoluted_0910', folderpath, True, False)
-#
+
+## convoluted ones sm6
+errorPlot_ARDif_withtext(adifcur_dc_sm6, adifcurerr_dc_sm6, Y, [-3, 3], [1000,5],  '0910 Data Conv-Deconv (Current Smoothed 6 secs)',  axtitlecur, ytitle,
+                         labellist, o3list, dfnplist,
+                           'Current_ADif_Pair_Convoluted_0910_smoothed6', folderpath ,  True, False)
+errorPlot_ARDif_withtext(rdifcur_dc_sm6, rdifcurerr_dc_sm6, Y, [-40, 40], [1000,5],  '0910 Data Conv-Deconv (Current Smoothed 6 secs)',  rxtitle, ytitle,
+                         labellist, o3list, dfnplist,
+                           'Current_RDif_Pair_Convoluted_0910_smoothed6', folderpath, True, False)
+
+## convoluted ones sm12
+errorPlot_ARDif_withtext(adifcur_dc_sm12, adifcurerr_dc_sm12, Y, [-3, 3], [1000,5],  '0910 Data Conv-Deconv (Current Smoothed 12 secs)',  axtitlecur, ytitle,
+                         labellist, o3list, dfnplist,
+                           'Current_ADif_Pair_Convoluted_0910_smoothed12', folderpath ,  True, False)
+errorPlot_ARDif_withtext(rdifcur_dc_sm12, rdifcurerr_dc_sm12, Y, [-40, 40], [1000,5],  '0910 Data Conv-Deconv (Current Smoothed 12 secs)',  rxtitle, ytitle,
+                         labellist, o3list, dfnplist,
+                           'Current_RDif_Pair_Convoluted_0910_smoothed12', folderpath, True, False)
+
+## convoluted ones sm18
+errorPlot_ARDif_withtext(adifcur_dc_sm18, adifcurerr_dc_sm18, Y, [-3, 3], [1000,5],  '0910 Data Conv-Deconv (Current Smoothed 18 secs)',  axtitlecur, ytitle,
+                         labellist, o3list, dfnplist,
+                           'Current_ADif_Pair_Convoluted_0910_smoothed18', folderpath ,  True, False)
+errorPlot_ARDif_withtext(rdifcur_dc_sm18, rdifcurerr_dc_sm18, Y, [-40, 40], [1000,5],  '0910 Data Conv-Deconv (Current Smoothed 18 secs)',  rxtitle, ytitle,
+                         labellist, o3list, dfnplist,
+                           'Current_RDif_Pair_Convoluted_0910_smoothed18', folderpath, True, False)
+
+
+axtitlecur = r'Sonde - OPM[JMA]  Difference ($\mu$A)'
+rxtitle = 'Sonde - OPM[JMA]  Difference (%)'
+
+## plotting fast component only
+errorPlot_ARDif_withtext(adifcurf, adifcurerrf, Y, [-3, 3], [1000,5],  '0910 Data (Current, I fast)',  axtitlecur, ytitle, labellist, o3list, dfnplist,
+                           'Currentmib0_fast_ADif_Pair_2009', folderpath ,  True, False)
+errorPlot_ARDif_withtext(rdifcurf, rdifcurerrf, Y, [-40, 40], [1000,5],  '0910 Data (Current, I fast)',  rxtitle, ytitle, labellist, o3list, dfnplist,
+                           'Currentmib0_fast_RDif_Pair_2009', folderpath, True, False)
+
+## min ob0 plots
+
+errorPlot_ARDif_withtext(adifcur_mib0, adifcurerr_mib0, Y, [-3, 3], [1000,5],  '0910 Data (Current, I fast minus iB0)',  axtitlecur, ytitle, labellist, o3list, dfnplist,
+                           'Currentmib0_ADif_Pair_2009', folderpath ,  True, False)
+errorPlot_ARDif_withtext(rdifcur_mib0, rdifcurerr_mib0, Y, [-40, 40], [1000,5],  '0910 Data (Current, I fast minus iB0)',  rxtitle, ytitle, labellist, o3list, dfnplist,
+                           'Currentmib0_RDif_Pair_2009', folderpath, True, False)
+
+errorPlot_ARDif_withtext(adifcur_dcmib0, adifcurerr_dcmib0, Y, [-3, 3], [1000,5],  '0910 Data  Conv-Deconv (Current, minus iB0)',  axtitlecur, ytitle, labellist, o3list, dfnplist,
+                           'Currentmib0_ADif_Pair_2009_Convoluted', folderpath ,  True, False)
+errorPlot_ARDif_withtext(rdifcur_dcmib0, rdifcurerr_dcmib0, Y, [-40, 40], [1000,5],  '0910 Data  Conv-Deconv (Current, minus iB0)',  rxtitle, ytitle, labellist, o3list, dfnplist,
+                           'Currentmib0_RDif_Pair_2009_Convoluted', folderpath, True, False)
+
+errorPlot_ARDif_withtext(adifcur_dcmib0_sm6, adifcurerr_dcmib0_sm6, Y, [-3, 3], [1000,5],  '0910 Data  Conv-Deconv (Current, minus iB0 smoothed 6 secs)',  axtitlecur, ytitle, labellist, o3list, dfnplist,
+                           'Currentmib0_ADif_Pair_2009_Convoluted_smoothed6', folderpath ,  True, False)
+errorPlot_ARDif_withtext(rdifcur_dcmib0_sm6, rdifcurerr_dcmib0_sm6, Y, [-40, 40], [1000,5],  '0910 Data  Conv-Deconv (Current, minus iB0 smoothed 6 secs)',  rxtitle, ytitle, labellist, o3list, dfnplist,
+                           'Currentmib0_RDif_Pair_2009_Convoluted_smoothed6', folderpath, True, False)
+
+errorPlot_ARDif_withtext(adifcur_dcmib0_sm12, adifcurerr_dcmib0_sm12, Y, [-3, 3], [1000,5],  '0910 Data  Conv-Deconv (Current, minus iB0 smoothed 12 secs)',  axtitlecur, ytitle, labellist, o3list, dfnplist,
+                           'Currentmib0_ADif_Pair_2009_Convoluted_smoothed12', folderpath ,  True, False)
+errorPlot_ARDif_withtext(rdifcur_dcmib0_sm12, rdifcurerr_dcmib0_sm12, Y, [-40, 40], [1000,5],  '0910 Data  Conv-Deconv (Current, minus iB0 smoothed 12 secs)',  rxtitle, ytitle, labellist, o3list, dfnplist,
+                           'Currentmib0_RDif_Pair_2009_Convoluted_smoothed12', folderpath, True, False)
+
+errorPlot_ARDif_withtext(adifcur_dcmib0_sm18, adifcurerr_dcmib0_sm18, Y, [-3, 3], [1000,5],  '0910 Data  Conv-Deconv (Current, minus iB0 smoothed 18 secs)',  axtitlecur, ytitle, labellist, o3list, dfnplist,
+                           'Currentmib0_ADif_Pair_2009_Convoluted_smoothed18', folderpath ,  True, False)
+errorPlot_ARDif_withtext(rdifcur_dcmib0_sm18, rdifcurerr_dcmib0_sm18, Y, [-40, 40], [1000,5],  '0910 Data  Conv-Deconv (Current, minus iB0 smoothed 18 secs)',  rxtitle, ytitle, labellist, o3list, dfnplist,
+                           'Currentmib0_RDif_Pair_2009_Convoluted_smoothed18', folderpath, True, False)
+
+
+errorPlot_ARDif_withtext(adifcur, adifcurerr, Y, [-3, 3], [1000,5],  '0910 Data (Current)',  axtitlecur, ytitle, labellist, o3list, dfnplist,
+                           'Current_ADif_Pair_2009', folderpath ,  True, False)
+
+errorPlot_ARDif_withtext(rdifcur, rdifcurerr, Y, [-40, 40], [1000,5],  '0910 Data (Current)',  rxtitle, ytitle, labellist, o3list, dfnplist,
+                           'Current_RDif_Pair_2009', folderpath, True, False)
+
 #
 # ##  asaf time
 #
 # ## order of the lists [en0505, en1010, sp0505, sp1010]
-# avgprof_O3S_curT, avgprof_O3S_curTerr, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1010, profSP0505, profSP1010],
-#                                                                    'IM', resolution, tmin, tmax)
-# avgprof_O3S_curSlowT, avgprof_O3S_curSlowTerr, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1010, profSP0505, profSP1010],
-#                                                                    'I_slow_conv', resolution, tmin, tmax)
-# avgprof_O3S_curT_dc, avgprof_O3S_curTerr_dc, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1010, profSP0505, profSP1010],
-#                                                                          'I_fast_deconv', resolution, tmin, tmax)
-# avgprof_OPM_curT, avgprof_OPM_curTerr, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1010, profSP0505, profSP1010],
-#                                                                    'I_OPM_jma', resolution, tmin, tmax )
+avgprof_O3S_curT, avgprof_O3S_curTerr, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1010, profSP0505, profSP1010],
+                                                                   'IM', resolution, tmin, tmax)
+avgprof_O3S_curSlowT, avgprof_O3S_curSlowTerr, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1010, profSP0505, profSP1010],
+                                                                   'I_slow_conv', resolution, tmin, tmax)
+avgprof_O3S_curT_dc, avgprof_O3S_curTerr_dc, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1010, profSP0505, profSP1010],
+                                                                         'I_fast_deconv', resolution, tmin, tmax)
+avgprof_O3S_curT_dc_sm6, avgprof_O3S_curTerr_dc_sm6, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1010, profSP0505, profSP1010],
+                                                                         'I_fast_deconv_sm6', resolution, tmin, tmax)
+avgprof_O3S_curT_dc_sm12, avgprof_O3S_curTerr_dc_sm12, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1010, profSP0505, profSP1010],
+                                                                         'I_fast_deconv_sm12', resolution, tmin, tmax)
+avgprof_O3S_curT_dc_sm18, avgprof_O3S_curTerr_dc_sm18, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1010, profSP0505, profSP1010],
+                                                                         'I_fast_deconv_sm18', resolution, tmin, tmax)
+avgprof_OPM_curT, avgprof_OPM_curTerr, Yt = Calc_average_profileCurrent_time([profEN0505, profEN1010, profSP0505, profSP1010],
+                                                                   'I_OPM_jma', resolution, tmin, tmax )
 #
-# dimension = len(Yt)
-#
-# adifcurT, adifcurTerr, rdifcurT, rdifcurTerr = Calc_Dif(avgprof_O3S_curT, avgprof_OPM_curT, avgprof_O3S_curTerr, dimension)
-# adifcurT_dc, adifcurTerr_dc, rdifcurT_dc, rdifcurTerr_dc = Calc_Dif(avgprof_O3S_curT_dc, avgprof_OPM_curT, avgprof_O3S_curTerr_dc, dimension)
-#
+dimension = len(Yt)
+
+adifcurT, adifcurTerr, rdifcurT, rdifcurTerr = Calc_Dif(avgprof_O3S_curT, avgprof_OPM_curT, avgprof_O3S_curTerr, dimension)
+adifcurT_dc, adifcurTerr_dc, rdifcurT_dc, rdifcurTerr_dc = Calc_Dif(avgprof_O3S_curT_dc, avgprof_OPM_curT, avgprof_O3S_curTerr_dc, dimension)
+adifcurT_dc_sm6, adifcurTerr_dc_sm6, rdifcurT_dc_sm6, rdifcurTerr_dc_sm6 = Calc_Dif(avgprof_O3S_curT_dc_sm6, avgprof_OPM_curT, avgprof_O3S_curTerr_dc_sm6, dimension)
+adifcurT_dc_sm12, adifcurTerr_dc_sm12, rdifcurT_dc_sm12, rdifcurTerr_dc_sm12 = Calc_Dif(avgprof_O3S_curT_dc_sm12, avgprof_OPM_curT, avgprof_O3S_curTerr_dc_sm12, dimension)
+adifcurT_dc_sm18, adifcurTerr_dc_sm18, rdifcurT_dc_sm18, rdifcurTerr_dc_sm18 = Calc_Dif(avgprof_O3S_curT_dc_sm18, avgprof_OPM_curT, avgprof_O3S_curTerr_dc_sm18, dimension)
+
 #
 # ### Plotting
 # axtitle = 'Sonde - OPM  Difference (mPa)'
 # rxtitle = 'Sonde - OPM  Difference (%)'
 #
-# errorPlot_ARDif_withtext(adifcurT, adifcurTerr, Yt, [-3, 3], [0, 9000],  '0910 Data (Current)',  axtitlecur, ytitlet, labellist, o3list, dfnplist,
-#                            'Current_ADif_TSim_0910_', folderpath ,  False, False)
-#
-# errorPlot_ARDif_withtext(rdifcurT, rdifcurTerr, Yt, [-40, 40], [0, 9000],  '0910 Data (Current)',  rxtitle, ytitlet, labellist, o3list, dfnplist,
-#                            'Current_RDif_TSim_0910', folderpath, False, False)
+errorPlot_ARDif_withtext(adifcurT, adifcurTerr, Yt, [-3, 3], [0, 9000],  '0910 Data (Current)',  axtitlecur, ytitlet, labellist, o3list, dfnplist,
+                           'Current_ADif_TSim_0910_', folderpath ,  False, False)
+errorPlot_ARDif_withtext(rdifcurT, rdifcurTerr, Yt, [-40, 40], [0, 9000],  '0910 Data (Current)',  rxtitle, ytitlet, labellist, o3list, dfnplist,
+                           'Current_RDif_TSim_0910', folderpath, False, False)
 #
 # ## convoluted ones
-#
-# errorPlot_ARDif_withtext(adifcurT_dc, adifcurTerr_dc, Yt, [-3, 3], [0, 9000],  '0910 Data Conv-Deconv (Current) ',  axtitlecur, ytitlet,
-#                          labellist, o3list, dfnplist,
-#                            'Current_ADif_TSim_Convoluted_0910', folderpath ,  False, False)
-#
-# errorPlot_ARDif_withtext(rdifcurT_dc, rdifcurTerr_dc, Yt, [-40, 40], [0, 9000],  '0910 Data Conv-Deconv (Current)',  rxtitle, ytitlet,
-#                          labellist, o3list, dfnplist,
-#                            'Current_RDif_TSim_Convoluted_0910', folderpath, False, False)
+errorPlot_ARDif_withtext(adifcurT_dc, adifcurTerr_dc, Yt, [-3, 3], [0, 9000],  '0910 Data Conv-Deconv (Current) ',  axtitlecur, ytitlet,
+                         labellist, o3list, dfnplist,
+                           'Current_ADif_TSim_Convoluted_0910', folderpath ,  False, False)
+errorPlot_ARDif_withtext(rdifcurT_dc, rdifcurTerr_dc, Yt, [-40, 40], [0, 9000],  '0910 Data Conv-Deconv (Current)',  rxtitle, ytitlet,
+                         labellist, o3list, dfnplist,
+                           'Current_RDif_TSim_Convoluted_0910', folderpath, False, False)
+# ## convoluted ones sm6
+errorPlot_ARDif_withtext(adifcurT_dc_sm6, adifcurTerr_dc_sm6, Yt, [-3, 3], [0, 9000],  '0910 Data Conv-Deconv (Current Smoothed 6 secs) ',  axtitlecur, ytitlet,
+                         labellist, o3list, dfnplist,
+                           'Current_ADif_TSim_Convoluted_0910_smoothed6', folderpath ,  False, False)
+errorPlot_ARDif_withtext(rdifcurT_dc_sm6, rdifcurTerr_dc_sm6, Yt, [-40, 40], [0, 9000],  '0910 Data Conv-Deconv (Current Smoothed 6 secs)',  rxtitle, ytitlet,
+                         labellist, o3list, dfnplist,
+                           'Current_RDif_TSim_Convoluted_0910_smoothed6', folderpath, False, False)
+# ## convoluted ones sm12
+errorPlot_ARDif_withtext(adifcurT_dc_sm12, adifcurTerr_dc_sm12, Yt, [-3, 3], [0, 9000],  '0910 Data Conv-Deconv (Current Smoothed 12 secs) ',  axtitlecur, ytitlet,
+                         labellist, o3list, dfnplist,
+                           'Current_ADif_TSim_Convoluted_0910_smoothed12', folderpath ,  False, False)
+errorPlot_ARDif_withtext(rdifcurT_dc_sm12, rdifcurTerr_dc_sm12, Yt, [-40, 40], [0, 9000],  '0910 Data Conv-Deconv (Current Smoothed 12 secs)',  rxtitle, ytitlet,
+                         labellist, o3list, dfnplist,
+                           'Current_RDif_TSim_Convoluted_0910_smoothed12', folderpath, False, False)
+# ## convoluted ones sm18
+errorPlot_ARDif_withtext(adifcurT_dc_sm18, adifcurTerr_dc_sm18, Yt, [-3, 3], [0, 9000],  '0910 Data Conv-Deconv (Current Smoothed 18 secs) ',  axtitlecur, ytitlet,
+                         labellist, o3list, dfnplist,
+                           'Current_ADif_TSim_Convoluted_0910_smoothed18', folderpath ,  False, False)
+errorPlot_ARDif_withtext(rdifcurT_dc_sm18, rdifcurTerr_dc_sm18, Yt, [-40, 40], [0, 9000],  '0910 Data Conv-Deconv (Current Smoothed 18 secs)',  rxtitle, ytitlet,
+                         labellist, o3list, dfnplist,
+                           'Current_RDif_TSim_Convoluted_0910_smoothed18', folderpath, False, False)
 
 #####  final plot for relative contribution of I_slow to the total current asaf of pressure
 #

@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 
-def ratiofunction_beta(df, sim, team, categorystr):
+def ratiofunction_beta(df, sim, team, categorystr, boolibo):
+
     r1 = [0] * len(sim);
     r2 = [0] * len(sim);
     r3 = [0] * len(sim);
@@ -30,6 +31,8 @@ def ratiofunction_beta(df, sim, team, categorystr):
     df3 = {}
     df4 = {}
 
+    df['iB0'] = 0.014
+
     for j in range(len(sim)):
         # print('simarray', sim[j])
         title = str(sim[j]) + '-' + str(team[j])
@@ -43,6 +46,8 @@ def ratiofunction_beta(df, sim, team, categorystr):
         r4_down = 8350;
         r4_up = 8400
 
+
+
         t1 = (df.Tsim >= r1_down) & (df.Tsim < r1_up)
         t2 = (df.Tsim >= r2_down) & (df.Tsim < r2_up)
         t3 = (df.Tsim >= r3_down) & (df.Tsim < r3_up)
@@ -53,11 +58,19 @@ def ratiofunction_beta(df, sim, team, categorystr):
         df3[j] = df[(df.Sim == sim[j]) & (df.Team == team[j]) & t3]
         df4[j] = df[(df.Sim == sim[j]) & (df.Team == team[j]) & t4]
 
-        r1[j] = np.array((df1[j].IM / (0.10 * df1[j].I_conv_slow)).tolist())
-        r2[j] = np.array((df2[j].IM / (0.10 * df2[j].I_conv_slow)).tolist())
-        r3[j] = np.array((df3[j].IM / (0.10 * df3[j].I_conv_slow)).tolist())
-        r4[j] = np.array((df4[j].IM / (0.10 * df4[j].I_conv_slow)).tolist())
+        if not boolibo:
 
+            r1[j] = np.array((df1[j].IM / (0.10 * df1[j].I_conv_slow)).tolist())
+            r2[j] = np.array((df2[j].IM / (0.10 * df2[j].I_conv_slow)).tolist())
+            r3[j] = np.array((df3[j].IM / (0.10 * df3[j].I_conv_slow)).tolist())
+            r4[j] = np.array((df4[j].IM / (0.10 * df4[j].I_conv_slow)).tolist())
+
+        if  boolibo:
+
+            r1[j] = np.array(( (df1[j].IM - df1[j].iB0) / (0.10 * df1[j].I_conv_slow)).tolist())
+            r2[j] = np.array(( (df2[j].IM - df2[j].iB0) / (0.10 * df2[j].I_conv_slow)).tolist())
+            r3[j] = np.array(( (df3[j].IM - df3[j].iB0) / (0.10 * df3[j].I_conv_slow)).tolist())
+            r4[j] = np.array(( (df4[j].IM - df4[j].iB0) / (0.10 * df4[j].I_conv_slow)).tolist())
         # print(j, np.nanmean(r1[j]))
 
         r1mean[j] = np.nanmean(r1[j])
@@ -80,14 +93,14 @@ def ratiofunction_beta(df, sim, team, categorystr):
         qerr_r4[j] = (np.nanquantile(r4[j], 0.75) - np.nanquantile(r4[j], 0.25)) / (2 * 0.6745)
 
 
-    print('in the function')
-    print('r1mean', r1mean)
-    print('r1median', r1median)
-
-    print('r2mean', r2mean)
-    print('r3mean', r3mean)
-    print('r4mean', r4mean)
-    print('r4median', r4median)
+    # print('in the function')
+    # print('r1mean', r1mean)
+    # print('r1median', r1median)
+    #
+    # print('r2mean', r2mean)
+    # print('r3mean', r3mean)
+    # print('r4mean', r4mean)
+    # print('r4median', r4median)
 
     rmean = [r1mean, r2mean, r3mean, r4mean]
     rstd = [r1std, r2std, r3std, r4std]
@@ -98,7 +111,7 @@ def ratiofunction_beta(df, sim, team, categorystr):
 
 
 ######
-def ratiofunction_beta_9602(df, sim, team, categorystr):
+def ratiofunction_beta_9602(df, sim, team, categorystr, boolib0):
 
     r1 = [0] * len(sim);
     r2 = [0] * len(sim);
@@ -116,6 +129,9 @@ def ratiofunction_beta_9602(df, sim, team, categorystr):
     df0 = {}
     df1 = {}
     df2 = {}
+
+    df['iB0'] = 0.014
+
 
     file = open('../Latex/9602_TimeConstant_' + categorystr + "5secslatex_table.txt", "w")
     file.write(categorystr + '\n')
@@ -141,11 +157,20 @@ def ratiofunction_beta_9602(df, sim, team, categorystr):
         # c = df1[j].IM .tolist()
         # sc = ( df1[j].I_conv_slow.tolist())
 
-        r1[j] =  np.array((df1[j].IM / (0.10 * df1[j].I_conv_slow)).tolist())
-        r2[j] =  np.array((df2[j].IM / (0.10 * df2[j].I_conv_slow)).tolist())
+        if not boolib0:
+            r1[j] = np.array((df1[j].IM / (0.10 * df1[j].I_conv_slow)).tolist())
+            r2[j] = np.array((df2[j].IM / (0.10 * df2[j].I_conv_slow)).tolist())
 
-        print(sim[j],team[j], 'Ratio', r1[j], r2[j])
-        print(sim[j], team[j], 'Curent', df1[j].IM.tolist(), df1[j].I_conv_slow.tolist() )
+
+        if boolib0:
+            r1[j] = np.array(((df1[j].IM - df1[j].iB0) / (0.10 * df1[j].I_conv_slow)).tolist())
+            r2[j] = np.array(((df2[j].IM - df2[j].iB0) / (0.10 * df2[j].I_conv_slow)).tolist())
+
+
+
+
+        # print(sim[j],team[j], 'Ratio', r1[j], r2[j])
+        # print(sim[j], team[j], 'Curent', df1[j].IM.tolist(), df1[j].I_conv_slow.tolist() )
         #
         r1mean[j] = np.nanmean(r1[j])
         r2mean[j] = np.nanmean(r2[j])
