@@ -123,6 +123,21 @@ def Calc_average_profileCurrent_pressure(dataframelist, xcolumn):
     #         150, 135, 120, 105, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 28, 26, 24, 22, 20, 18, 16, 14,
     #         12, 10, 8, 6]
 
+
+    # yref = [1000]
+    # for k in range(990, 500, -50):
+    #     yref.append(k)
+    # for l in range(500, 300, -25):
+    #     yref.append(l)
+    # for m in range(300, 100, -10):
+    #     yref.append(m)
+    # for n in range(100, 50, -5):
+    #     yref.append(n)
+    # for n in range(50, 6, -2):
+    #     yref.append(n)
+    #
+    # print(len(yref))
+
     n = len(yref) - 1
     Ygrid = [-9999.0] * n
 
@@ -213,6 +228,92 @@ def Calc_average_profileCurrent_time(dataframelist, xcolumn, ybin, tmin, tmax ):
     return Xgrid, Asigma, Ygrid
 
 ########
+
+def Calc_averageCurrent_Dif(dataframelist, xcolumn, opmcolumn,  stringy):
+
+
+    nd = len(dataframelist)
+    yref = [1000, 850, 700, 550, 400, 350, 300, 200, 150, 100, 75, 50, 35, 25, 20, 15,
+            12, 10, 8, 6]
+
+    ybin = 400
+    tmin = 200
+    tmax = 8000
+    ybin0 = ybin
+    ymax = tmax
+    fac = 1.0
+    ystart = tmin
+
+    if stringy =='pressure': n = len(yref) - 1
+    if stringy == 'time':     n = math.floor(ymax / ybin0)
+
+
+    Ygrid = [-9999.0] * n
+
+    Xgrid = [[-9999.0] * n for i in range(nd)]
+    OPMgrid = [[-9999.0] * n for i in range(nd)]
+    Xsigma = [[-9999.0] * n for i in range(nd)]
+
+    Agrid = [[-9999.0] * n for i in range(nd)]
+    Asigma = [[-9999.0] * n for i in range(nd)]
+
+    for j in range(nd):
+        dft = dataframelist[j]
+        dft.PFcor = dft[xcolumn]
+
+        for i in range(n):
+            dftmp1 = pd.DataFrame()
+            dfgrid = pd.DataFrame()
+
+            if stringy == 'pressure':
+                grid_min = yref[i + 1]
+                grid_max = yref[i]
+                Ygrid[i] = (grid_min + grid_max) / 2.0
+
+            if stringy == 'time':
+
+                grid_min = ystart + fac * float(ybin0) * float(i)
+                grid_max = ystart + fac * float(ybin0) * float(i + 1)
+                Ygrid[i] = (grid_min + grid_max) / 2.0
+
+            filta = dft.Pair >= grid_min
+            filtb = dft.Pair < grid_max
+            filter1 = filta & filtb
+            dftmp1['X'] = dft[filter1].PFcor
+            dftmp1[opmcolumn] = dft[filter1][opmcolumn]
+
+            filtnull = dftmp1.X > -9999.0
+            dfgrid['X'] = dftmp1[filtnull].X
+            dfgrid[opmcolumn] = dftmp1[filtnull][opmcolumn]
+
+            Xgrid[j][i] = np.nanmean(dfgrid.X)
+            Xsigma[j][i] = np.nanstd(dfgrid.X)
+            OPMgrid[j][i] = np.nanmean(dfgrid[opmcolumn])
+
+            Agrid[j][i] = np.nanmean(dfgrid.X - dfgrid[opmcolumn])
+            Asigma[j][i] = np.nanstd(dfgrid.X - dfgrid[opmcolumn])
+
+
+    dimension = len(Ygrid)
+    nol = len(Xgrid)
+
+    A1verr = [[-9999.0] * dimension for i in range(nol)]
+    A1v = [[-9999.0] * dimension for i in range(nol)]
+    R1verr = [[-9999.0] * dimension for i in range(nol)]
+    R1v = [[-9999.0] * dimension for i in range(nol)]
+
+    for k in range(nol):
+        profO3X = Xgrid[k]
+        profOPMX = OPMgrid[k]
+        profO3Xerr = Asigma[k]
+        for ik in range(dimension):
+            A1v[k][ik] = (profO3X[ik] - profOPMX[ik])
+            A1verr[k][ik] = (profO3Xerr[ik])
+            R1v[k][ik] = 100 * (profO3X[ik] - profOPMX[ik]) / profOPMX[ik]
+            R1verr[k][ik] = 100 * (profO3Xerr[ik] / profOPMX[ik])
+
+    return  A1v, A1verr, R1v, R1verr, Ygrid
+
 
 def Calc_Dif(O3list, OPMlist, O3errlist, dimension):
 

@@ -78,7 +78,7 @@ def errorPlot_ARDif_withtext(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, 
     # ax.xaxis.set_minor_locator(AutoMinorLocator(10))
     # ax.legend(loc='lower right', frameon=True, fontsize='small')
 
-    ax.legend(loc='lower right', frameon=True, fontsize='small')
+    ax.legend(loc='lower left', frameon=False, fontsize='x-small')
 
     # plt.show()
 
