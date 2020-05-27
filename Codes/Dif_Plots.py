@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from Josie_Functions import  Calc_averageCurrent_Dif, Calc_average_profile_pressure, Calc_average_profile_time, Calc_Dif, Calc_average_profileCurrent_pressure, Calc_average_profileCurrent_time
+from Josie_Functions import  Calc_average_Dif, Calc_average_profile_pressure, Calc_average_profile_time, Calc_Dif, Calc_average_profileCurrent_pressure, Calc_average_profileCurrent_time
 from Josie_PlotFunctions import  errorPlot_ARDif_withtext, errorPlot_general
 
 
@@ -9,7 +9,7 @@ folderpath = 'Dif_2009_debug'
 
 
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie_deconv_beta0alldata.csv", low_memory=False)
-df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_beta2ib0.csv", low_memory=False)
+df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_beta0_fixedvalue.csv", low_memory=False)
 
 print(list(df))
 
@@ -117,12 +117,12 @@ dfnplist = [profEN0505.drop_duplicates(['Sim', 'Team']), profEN1010.drop_duplica
             profSP1010_nodup]
 
 
-adif_IM, adif_IM_err, rdif_IM, rdif_IM_err, Yp = Calc_averageCurrent_Dif([profEN0505, profEN1010, profSP0505, profSP1010], 'IM', 'I_OPM_jma',  'pressure')
+adif_IM, adif_IM_err, rdif_IM, rdif_IM_err, Yp = Calc_average_Dif([profEN0505, profEN1010, profSP0505, profSP1010], 'IM', 'I_OPM_jma',  'pressure')
 
-adif_PO3, adif_PO3_err, rdif_PO3, rdif_PO3_err, Yp = Calc_averageCurrent_Dif([profEN0505, profEN1010, profSP0505, profSP1010], 'PO3', 'PO3_OPM',  'pressure')
+adif_PO3, adif_PO3_err, rdif_PO3, rdif_PO3_err, Yp = Calc_average_Dif([profEN0505, profEN1010, profSP0505, profSP1010], 'PO3', 'PO3_OPM',  'pressure')
 
-adif_ifdcsm, adif_ifdcsm_err, rdif_ifdcsm, rdif_ifdcsm_err, Yp = Calc_averageCurrent_Dif([profEN0505, profEN1010, profSP0505, profSP1010], 'I_fast_deconv_sm6', 'I_OPM_jma',  'pressure')
-adif_ifdcsmib0, adif_ifdcsmib0_err, rdif_ifdcsmib0, rdif_ifdcsmib0_err, Yp = Calc_averageCurrent_Dif([profEN0505, profEN1010, profSP0505, profSP1010], 'Ifast_minib0_deconv_sm6', 'I_OPM_jma',  'pressure')
+adif_ifdcsm, adif_ifdcsm_err, rdif_ifdcsm, rdif_ifdcsm_err, Yp = Calc_average_Dif([profEN0505, profEN1010, profSP0505, profSP1010], 'Ifast_deconv_sm6', 'I_OPM_jma',  'pressure')
+adif_ifdcsmib0, adif_ifdcsmib0_err, rdif_ifdcsmib0, rdif_ifdcsmib0_err, Yp = Calc_average_Dif([profEN0505, profEN1010, profSP0505, profSP1010], 'Ifast_minib0_deconv_sm6', 'I_OPM_jma',  'pressure')
 
 
 
@@ -137,3 +137,18 @@ errorPlot_ARDif_withtext(rdif_ifdcsm, rdif_ifdcsm_err, Yp, [-40, 40], [1000,5], 
 
 errorPlot_ARDif_withtext(rdif_ifdcsmib0, rdif_ifdcsmib0_err, Yp, [-40, 40], [1000,5],  '0910 Data (Current - ib0 deconv smoothed 6 secs.)',  rxtitlecur, ytitle, labellist, o3list, dfnplist,
                            'debug_Rdif_ifastdeconv_miniB0', folderpath ,  True, False)
+
+### corss check
+avgprof_O3S_cur, avgprof_O3S_curerr, Ycur = Calc_average_profileCurrent_pressure([profEN0505, profEN1010, profSP0505, profSP1010],
+                                                                   'IM')
+avgprof_OPM_cur, avgprof_OPM_curerr, Y = Calc_average_profileCurrent_pressure([profEN0505, profEN1010, profSP0505, profSP1010],
+                                                                   'I_OPM_jma')
+dimension = len(Y)
+
+adifcur, adifcurerr, rdifcur, rdifcurerr = Calc_Dif(avgprof_O3S_cur, avgprof_OPM_cur, avgprof_O3S_curerr, dimension)
+
+errorPlot_ARDif_withtext(adifcur, adifcurerr, Y, [-3, 3], [1000,5],  '0910 Data (Current)',  axtitlecur, ytitle, labellist, o3list, dfnplist,
+                           'Current_ADif_Pair_0910', folderpath ,  True, False)
+
+errorPlot_ARDif_withtext(rdifcur, rdifcurerr, Y, [-40, 40], [1000,5],  '0910 Data (Current)',  rxtitle, ytitle, labellist, o3list, dfnplist,
+                           'Current_RDif_Pair_0910', folderpath, True, False)

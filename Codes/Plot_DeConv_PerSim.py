@@ -7,8 +7,8 @@ import pickle
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv.csv", low_memory=False)
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut.csv", low_memory=False)
 
-df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_beta2ib0.csv", low_memory=False)
-# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv.csv", low_memory=False)
+# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_beta2ib0.csv", low_memory=False)
+df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_beta0alldata.csv", low_memory=False)
 
 # df = df.drop(df[(df.Sim == 179) & (df.Team == 4)].index)
 # df = df.drop(df[(df.Sim == 172) & (df.Team == 1)].index)
@@ -38,8 +38,8 @@ ensci = np.asarray(df.drop_duplicates(['Sim', 'Team'])['ENSCI'])
 
 dft = {}
 
-# simlist = [140, 159, 136, 144, 158]
-# teamlist = [1 ,3 ,3 ,3 ,3 ,4]
+simlist = [140, 140, 140, 140]
+teamlist = [1 ,2 ,3 ,4]
 
 for j in range(len(simlist)):
 
@@ -72,18 +72,12 @@ for j in range(len(simlist)):
     dft[j] = df[(df.Sim == simlist[j]) & (df.Team == teamlist[j])]
     dft[j] = dft[j].reset_index()
 
-    dft[j]['RDif_I'] = 100 * (dft[j].IM - dft[j].I_OPM_jma)/dft[j].I_OPM_jma
-    dft[j]['RDif_I_fastdeconvsm6'] = 100 * (dft[j].I_fast_deconv_sm6 - dft[j].I_OPM_jma)/dft[j].I_OPM_jma
-
-    dft[j]['Ratio'] = dft[j].IM / (0.10 * dft[j].I_conv_slow)
-    dft[j]['ADif_I'] = (dft[j].IM - dft[j].I_OPM_jma)
-
     ## 9602
     # t1_stop = dft[j].iloc[0]['R1_Tstop']
     # t2_stop = dft[j].iloc[0]['R2_Tstop']
 
     ## Plotting
-    rdifbool = 0
+    rdifbool = 1
 
     gs = gridspec.GridSpec(3, 1)
     #
@@ -95,14 +89,14 @@ for j in range(len(simlist)):
         plt.plot(dft[j].Tsim, dft[j].IM, label='I ECC')
         plt.plot(dft[j].Tsim, dft[j].I_fast_smb6, label='I fast smb6')
 
-        plt.plot(dft[j].Tsim, dft[j].I_fast_smb12, label='I fast smb12')
-        plt.plot(dft[j].Tsim, dft[j].I_fast_deconv_sm6, label='I deconv. sm.')
-        plt.plot(dft[j].Tsim, dft[j].I_fast_deconv_smb6, label='I sm. deconv.')
+        # plt.plot(dft[j].Tsim, dft[j].I_fast_smb12, label='I fast smb12')
+        # plt.plot(dft[j].Tsim, dft[j].I_fast_deconv_sm6, label='I deconv. sm.')
+        # plt.plot(dft[j].Tsim, dft[j].I_fast_deconv_smb6, label='I sm. deconv.')
 
-        # plt.plot(dft[j].Tsim, 0.1 * dft[j].I_conv_slow, label='0.1 * I slow conv. ', color='#d62728')
+        plt.plot(dft[j].Tsim, 0.1 * dft[j].I_conv_slow, label='0.1 * I slow conv. ', color='#d62728')
         plt.title(ptitle)
         plt.legend(loc='upper left', fontsize='x-small')
-        # plt.ylim(-0.01,25)
+        plt.ylim(-0.01,7)
         plt.xlim(0, 9000)
         # plt.ylim(0.03, 30)
         # ax2.set_yscale('log')
@@ -117,25 +111,32 @@ for j in range(len(simlist)):
         ax2.set_ylabel(r'Current ($\mu$A)')
         ax2.set_xticklabels([])
         # ax2.set_xlabel('Tsim (secs)')
-        plt.plot(dft[j].Tsim, dft[j].I_OPM_jma, label='I OPM JMA', linestyle="--")
-        plt.plot(dft[j].Tsim, dft[j].IM, label='I ECC')
-        plt.plot(dft[j].Tsim, dft[j].I_fast_deconv_sm6, label='I fast deconv sm6')
-        plt.plot(dft[j].Tsim, dft[j].I_fast_deconv_sm12, label='I fast deconv sm12',  linestyle="--" )
+        plt.plot(dft[j].Tsim, dft[j].I_OPM_jma.rolling(window=4, win_type='gaussian', center=True).mean(std=2), label='I OPM JMA', linestyle="--")
+        plt.plot(dft[j].Tsim, dft[j].IM.rolling(window=4, win_type='gaussian', center=True).mean(std=2), label='I ECC')
+        plt.plot(dft[j].Tsim, dft[j].Ifast_deconv_sm8, label='I fast deconv sm8')
+        # plt.plot(dft[j].Tsim, dft[j].I_fast_deconv_sm12, label='I fast deconv sm12',  linestyle="--" )
         # plt.plot(dft[j].Tsim, dft[j].I_fast_deconv_smb6, label='I fast sm6 deconv ')
 
-        # plt.plot(dft[j].Tsim, 0.1 * dft[j].I_conv_slow, label='0.1 * I slow conv. ', color='#d62728')
+        plt.plot(dft[j].Tsim, 0.1 * dft[j].I_conv_slow, label='0.1 * I slow conv. ', color='#d62728')
         # ax2.set_ylabel(r'Pressure (mPa)')
         ax2.set_xticklabels([])
-        ax2.set_xlabel('Tsim (secs)')
+        # ax2.set_xlabel('Tsim (secs)')
         # plt.plot(dft[j].Tsim, 0.1 * dft[j].I_conv_slow, label='0.1 * I slow conv. ', color='#d62728')
         plt.title(ptitle)
         plt.legend(loc='upper left', fontsize='x-small')
-        # plt.ylim(-0.01,25)
-        plt.xlim(0, 9000)
-        plt.ylim(-0.03, 7)
+        plt.ylim(-0.01,10)
+        plt.xlim(0, 8100)
+        # plt.ylim(-0.03, 1)
         # ax2.set_yscale('log')
-        # ax2.axvline(x=t1_stop, color='grey', linestyle='--')
+        # ax2.axvline(x=2375, color='grey', linestyle='--')
+        # ax2.axvline(x=4375, color='grey', linestyle='--')
+        # ax2.axvline(x=6375, color='grey', linestyle='--')
+        # ax2.axvline(x=8375, color='grey', linestyle='--')
+
+
         # ax2.axvline(x=t2_stop, color='grey', linestyle='--')
+
+        dft[j]['Ratio'] = dft[j].IM / (0.10 * dft[j].I_conv_slow)
 
         ax2 = plt.subplot(gs[2, :])  # create the second subplot, that MIGHT be there
         ax2.set_xlabel('Tsim (secs)')
@@ -150,11 +151,16 @@ for j in range(len(simlist)):
         # ax2.axhline(y=1, color='grey', linestyle='--')
         # ax2.axhline(y=0.5, color='grey', linestyle='--')
 
+
         ## RDif
+        dft[j]['RDif_I'] = 100 * (dft[j].Ifast_deconv_sm8 - dft[j].I_OPM_jma) / dft[j].I_OPM_jma
         ax2.set_ylabel(r'I$_{fast}(deconv sm6)$ - I$_{OPM,jma}$ (%) ')
         plt.ylim(-40, 40)
-        plt.xlim(0, 9000)
-        plt.plot(dft[j].Tsim, dft[j].RDif_I_fastdeconvsm6, linestyle="--", color='#2ca02c')
+        plt.xlim(0, 8100)
+        plt.plot(dft[j].Tsim, dft[j].RDif_I, linestyle="--", color='#2ca02c')
+        ax2.axhline(y=10, color='grey', linestyle='--')
+        ax2.axhline(y=0, color='grey', linestyle='--')
+        ax2.axhline(y=-10, color='grey', linestyle='--')
 
         ## ADif
         # ax2.set_ylabel(r'I$_{ECC}$ - I$_{OPM}$ ')
@@ -163,10 +169,10 @@ for j in range(len(simlist)):
         # ax2.axvline(x=t1_stop, color='grey', linestyle='--')
         # ax2.axvline(x=t2_stop, color='grey', linestyle='--')
 
+        # plt.show()
+        plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Deconv_PerSim_0910_debug/Current_RDif_' + title + '.eps')
+        plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Deconv_PerSim_0910_debug/Current_RDif_' + title + '.png')
         plt.show()
-        # plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Deconv_PerSim_0910/Current_RDif_deconv_' + title + '.eps')
-        # plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Deconv_PerSim_0910/Current_RDif_deconv_' + title + '.png')
-
         # fig, ax2 = plt.subplots()
         # ax2.set_ylabel(r'Current ($\mu$A)')
         # ax2.set_xlabel('Tsim (secs)')
@@ -181,8 +187,8 @@ for j in range(len(simlist)):
 
         # plt.xlim(500, 2600)
         #
-        # plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Deconv_PerSim_0910/Current_' + title + '.eps')
-        # plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Deconv_PerSim_0910/Current_' + title + '.png')
+        # plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Deconv_PerSim_0910_debug/Current_' + title + '.eps')
+        # plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Deconv_PerSim_0910_debug/Current_' + title + '.png')
         # #
         # pickle.dump(fig, open('/home/poyraden/Analysis/JosieAnalysis/Plots/pickle_plots/Current_' + title+'_2017.pickle', 'wb'))
         #
@@ -209,8 +215,8 @@ for j in range(len(simlist)):
         #
         # plt.legend(loc='upper left', fontsize = 'x-small')
 
-        # plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Deconv_PerSim_0910/PO3_' + title + '.eps')
-        # plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Deconv_PerSim_0910/PO3_' + title + '.png')
+        # plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Deconv_PerSim_0910_debug/PO3_' + title + '.eps')
+        # plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Deconv_PerSim_0910_debug/PO3_' + title + '.png')
         #
         # pickle.dump(fig, open('/home/poyraden/Analysis/JosieAnalysis/Plots/pickle_plots/PO3_' + title+'_2017.pickle', 'wb'))
 

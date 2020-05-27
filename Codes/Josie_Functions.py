@@ -229,7 +229,7 @@ def Calc_average_profileCurrent_time(dataframelist, xcolumn, ybin, tmin, tmax ):
 
 ########
 
-def Calc_averageCurrent_Dif(dataframelist, xcolumn, opmcolumn,  stringy):
+def Calc_average_Dif(dataframelist, xcolumn, opmcolumn,  stringy):
 
 
     nd = len(dataframelist)

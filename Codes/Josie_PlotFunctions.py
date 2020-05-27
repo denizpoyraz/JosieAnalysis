@@ -92,7 +92,7 @@ def errorPlot_ARDif_withtext(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, 
 
 
 
-def errorPlot_general(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, ytitle, labelist, colorlist, plotname, path, logbool):
+def errorPlot_general(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, ytitle, labelist, colorlist, plotname, path, logbool, linestylebool, fillbool):
     '''
 
     :param xlist:
@@ -106,6 +106,7 @@ def errorPlot_general(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, ytitle,
     :param labelist:
     :param plotname:
     :param logbool:
+    :param linestylebool:
     :return: just plots
     '''
 
@@ -114,9 +115,18 @@ def errorPlot_general(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, ytitle,
     n = [0] * d
     labell = [''] * d
     # colorl = ['black', 'red', 'blue', 'green']
+    dimension = len(xlist[0])
 
-    ## y locations of the extra text which is drawn for the total O3 values
-    texty = [0.23, 0.16, 0.09, 0.02]
+    plus = [[0] * dimension for i in range(d)]
+    minus = [[0] * dimension for i in range(d)]
+    plus1 = [[0] * dimension for i in range(d)]
+    minus1 = [[0] * dimension for i in range(d)]
+
+    for j in range(d):
+        plus[j] = [xlist[j][i] + 3  for i in range(dimension)]
+        minus[j] = [xlist[j][i] - 3 for i in range(dimension)]
+        plus1[j] = [xlist[j][i] + 1 for i in range(dimension)]
+        minus1[j] = [xlist[j][i] - 1 for i in range(dimension)]
 
     plt.close('all')
     fig, ax = plt.subplots()
@@ -127,6 +137,8 @@ def errorPlot_general(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, ytitle,
     plt.ylabel(ytitle)
     plt.grid(True)
 
+    lstyle = ['--', ':', '-.', '--', ':', '-.', '--', ':', '-.', '--', ':', '-.', '--', ':', '-.']
+
     # plt.yticks(np.arange(0, 7001, 1000))
 
     # reference line
@@ -135,16 +147,22 @@ def errorPlot_general(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, ytitle,
 
     for i in range(d):
         labell[i] = labelist[i]
+        if not linestylebool:
+            ax.errorbar(xlist[i], Y, xerr=xerrorlist[i], label=labell[i], color=colorlist[i], linewidth=1, elinewidth=0.5,capsize=1, capthick=0.5)
+        if linestylebool:
+            ax.errorbar(xlist[i], Y, xerr=xerrorlist[i], label=labell[i], color=colorlist[i], linewidth=1, elinewidth=0.5,capsize=1, capthick=0.5, linestyle=lstyle[i])
+        if fillbool:
+          ax.fill_betweenx(Y, minus[0], plus[0], alpha=0.1, facecolor='k', edgecolor= 'lightgrey')
+          ax.fill_betweenx(Y, minus1[0], plus1[0], alpha=0.1, facecolor='k', edgecolor= 'lightblue')
 
-        ax.errorbar(xlist[i], Y, xerr=xerrorlist[i], label=labell[i], color=colorlist[i], linewidth=1, elinewidth=0.5,
-                    capsize=1,
-                    capthick=0.5)
 
     ax.legend(loc='lower right', frameon=True, fontsize='x-small')
 
 
     plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/' + path + '/' + plotname + '.png')
     plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/' + path + '/' + plotname + '.eps')
+    plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/' + path + '/' + plotname + '.pdf')
+
 
     plt.close()
 #####################################################

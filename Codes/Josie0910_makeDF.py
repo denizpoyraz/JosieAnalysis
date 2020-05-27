@@ -10,13 +10,15 @@ slow = 25 * 60  # 25 minutes in seconds
 fast = 25  # 25seconds
 
 # Read the metadata file
-dfmeta = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Josie09_MetaData.csv")
-# dfmeta = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Josie10_MetaData.csv")
+# dfmeta = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Josie09_MetaData.csv")
+dfmeta = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Josie10_MetaData.csv")
+dfmeta_ib = pd.read_excel("/home/poyraden/Analysis/JOSIEfiles/ib_2010.xlsx")
+
 
 # all files
 ## use pathlib jspr
-allFiles = glob.glob("/home/poyraden/Analysis/JOSIEfiles/JOSIE-2009-Data-ReProc/*.O3R")
-# allFiles = glob.glob("/home/poyraden/Analysis/JOSIEfiles/JOSIE-2010-Data-ReProc/*.O3R")
+# allFiles = glob.glob("/home/poyraden/Analysis/JOSIEfiles/JOSIE-2009-Data-ReProc/*.O3R")
+allFiles = glob.glob("/home/poyraden/Analysis/JOSIEfiles/JOSIE-2010-Data-ReProc/*.O3R")
 
 
 list_data = []
@@ -29,6 +31,7 @@ columnStr = columnString.split(" ")
 
 column_metaString = "Year Sim Team Code Flow IB1 Cor Sol Buf ADX"
 columnMeta  = ['Year', 'Sim', 'Team', 'Code', 'Flow', 'IB1', 'Cor', 'ENSCI' , 'Sol', 'Buf', 'ADX']
+columnMeta_ib = ['Simib', 'Teamib', 'Yearib', 'iB0', 'iB1', 'iB2']
 
 #**********************************************
 # Main loop to merge all data sets
@@ -67,16 +70,32 @@ for filename in allFiles:
     common = [i for i in select_indicesTeam if i in select_indicesSim]
     index_common = common[0]
 
+    ## now the same for ib0 values
+
+    select_indicesTeam_ib = list(np.where(dfmeta_ib["Team"] == df['Header_Team'][0]))[0]
+    select_indicesSim_ib = list(np.where(dfmeta_ib["Sim"] == df['Header_Sim'][0]))[0]
+
+    common_ib = [i for i in select_indicesTeam_ib if i in select_indicesSim_ib]
+    index_common_ib = common_ib[0]
+
+    print('common_ib', common_ib)
+
      ## The index of the metadata that has the information of this simulation = index_common
     #  assign this row into a list
-    
     list_md = dfmeta.iloc[index_common,:].tolist()
+    list_md_ib = dfmeta_ib.iloc[index_common_ib,:].tolist()
 
     ## Add  metadata to the main df
     df = df.join(pd.DataFrame(
         [list_md],
         index = df.index,
         columns=columnMeta
+    ))
+
+    df = df.join(pd.DataFrame(
+        [list_md_ib],
+        index=df.index,
+        columns=columnMeta_ib
     ))
 
     df['PO3_stp'] = df['PO3'] * (df['Tair'] / 273.15)
@@ -159,54 +178,54 @@ for s in simlist:
 
 # # v2 cuts, use this and v3 standard more conservative cuts not valid for 140, 162, 163, 166  v2
 
-df=df[df.Tsim > 900]
-df=df[df.Tsim <= 8100]
-df = df.drop(df[(2000 < df.Tsim) & (df.Tsim < 2500) & (df.Sim != 140) & (df.Sim != 162) & (df.Sim != 163) & (
-                df.Sim != 166)].index)
-df = df.drop(df[(df.Tsim > 4000) & (df.Tsim < 4500) & (df.Sim != 140) & (df.Sim != 162) & (df.Sim != 163) & (
-                df.Sim != 166)].index)
-df = df.drop(df[(df.Tsim > 6000) & (df.Tsim < 6500) & (df.Sim != 140) & (df.Sim != 162) & (df.Sim != 163) & (
-                df.Sim != 166)].index)
-
-df = df.drop(df[(df.Sim == 141) & (df.Team == 3)].index)
-df = df.drop(df[(df.Sim == 143) & (df.Team == 2) & (df.Tsim > 7950) & (df.Tsim < 8100)].index)
-df = df.drop(df[(df.Sim == 147) & (df.Team == 3)].index)
-df = df.drop(df[(df.Sim == 158) & (df.Team == 2)].index)
-df = df.drop(df[(df.Sim == 167) & (df.Team == 4)].index)
-
-df = df.drop(df[(df.Sim == 158) & (df.Tsim > 7300) & (df.Tsim < 7700)].index)
-df = df.drop(df[(df.Sim == 159) & (df.Tsim > 7800) & (df.Tsim < 8000)].index)
-df = df.drop(df[(df.Sim == 161) & (df.Tsim > 6800) & (df.Tsim < 7200)].index)
-
-    # # additional cuts for specific simulations  v3
-df = df.drop(df[(df.Sim == 140) & (df.Tsim < 1000)].index)
-df = df.drop(df[(df.Sim == 140) & (df.Tsim > 2450) & (df.Tsim < 2800)].index)
-df = df.drop(df[(df.Sim == 140) & (df.Tsim > 4400) & (df.Tsim < 4800)].index)
-df = df.drop(df[(df.Sim == 140) & (df.Tsim > 6400) & (df.Tsim < 6800)].index)
-
-df = df.drop(df[(df.Sim == 162) & (df.Tsim > 2100) & (df.Tsim < 2550)].index)
-df = df.drop(df[(df.Sim == 162) & (df.Tsim > 4100) & (df.Tsim < 4600)].index)
-df = df.drop(df[(df.Sim == 162) & (df.Tsim > 5450) & (df.Tsim < 5800)].index)
-df = df.drop(df[(df.Sim == 162) & (df.Tsim > 6100) & (df.Tsim < 6550)].index)
-
-df = df.drop(df[(df.Sim == 163) & (df.Tsim > 2100) & (df.Tsim < 2550)].index)
-df = df.drop(df[(df.Sim == 163) & (df.Tsim > 4100) & (df.Tsim < 4600)].index)
-df = df.drop(df[(df.Sim == 163) & (df.Tsim > 5450) & (df.Tsim < 5800)].index)
-df = df.drop(df[(df.Sim == 163) & (df.Tsim > 6100) & (df.Tsim < 6550)].index)
-
-df = df.drop(df[(df.Sim == 166) & (df.Tsim > 2200) & (df.Tsim < 2650)].index)
-df = df.drop(df[(df.Sim == 166) & (df.Tsim > 4200) & (df.Tsim < 4700)].index)
-df = df.drop(df[(df.Sim == 166) & (df.Tsim > 6200) & (df.Tsim < 6650)].index)
-df = df.drop(df[(df.Sim == 166) & (df.Tsim > 7550) & (df.Tsim < 7750)].index)
-df = df.drop(df[(df.Sim == 166) & (df.Team == 1) & (df.Tsim > 4400) & (df.Tsim < 5400)].index)
-
-# # ## v3 cuts
+# df=df[df.Tsim > 900]
+# df=df[df.Tsim <= 8100]
+# df = df.drop(df[(2000 < df.Tsim) & (df.Tsim < 2500) & (df.Sim != 140) & (df.Sim != 162) & (df.Sim != 163) & (
+#                 df.Sim != 166)].index)
+# df = df.drop(df[(df.Tsim > 4000) & (df.Tsim < 4500) & (df.Sim != 140) & (df.Sim != 162) & (df.Sim != 163) & (
+#                 df.Sim != 166)].index)
+# df = df.drop(df[(df.Tsim > 6000) & (df.Tsim < 6500) & (df.Sim != 140) & (df.Sim != 162) & (df.Sim != 163) & (
+#                 df.Sim != 166)].index)
 #
-df = df.drop(df[(df.Sim == 159) & (df.Team == 1)].index)
-df = df.drop(df[(df.Sim == 158) & (df.Team == 1)].index)
-df = df.drop(df[(df.Sim == 163) & (df.Team == 4)].index)
-df = df.drop(df[(df.Sim == 159) & (df.Team == 4)].index)
-
+# df = df.drop(df[(df.Sim == 141) & (df.Team == 3)].index)
+# df = df.drop(df[(df.Sim == 143) & (df.Team == 2) & (df.Tsim > 7950) & (df.Tsim < 8100)].index)
+# df = df.drop(df[(df.Sim == 147) & (df.Team == 3)].index)
+# df = df.drop(df[(df.Sim == 158) & (df.Team == 2)].index)
+# df = df.drop(df[(df.Sim == 167) & (df.Team == 4)].index)
+#
+# df = df.drop(df[(df.Sim == 158) & (df.Tsim > 7300) & (df.Tsim < 7700)].index)
+# df = df.drop(df[(df.Sim == 159) & (df.Tsim > 7800) & (df.Tsim < 8000)].index)
+# df = df.drop(df[(df.Sim == 161) & (df.Tsim > 6800) & (df.Tsim < 7200)].index)
+#
+#     # # additional cuts for specific simulations  v3
+# df = df.drop(df[(df.Sim == 140) & (df.Tsim < 1000)].index)
+# df = df.drop(df[(df.Sim == 140) & (df.Tsim > 2450) & (df.Tsim < 2800)].index)
+# df = df.drop(df[(df.Sim == 140) & (df.Tsim > 4400) & (df.Tsim < 4800)].index)
+# df = df.drop(df[(df.Sim == 140) & (df.Tsim > 6400) & (df.Tsim < 6800)].index)
+#
+# df = df.drop(df[(df.Sim == 162) & (df.Tsim > 2100) & (df.Tsim < 2550)].index)
+# df = df.drop(df[(df.Sim == 162) & (df.Tsim > 4100) & (df.Tsim < 4600)].index)
+# df = df.drop(df[(df.Sim == 162) & (df.Tsim > 5450) & (df.Tsim < 5800)].index)
+# df = df.drop(df[(df.Sim == 162) & (df.Tsim > 6100) & (df.Tsim < 6550)].index)
+#
+# df = df.drop(df[(df.Sim == 163) & (df.Tsim > 2100) & (df.Tsim < 2550)].index)
+# df = df.drop(df[(df.Sim == 163) & (df.Tsim > 4100) & (df.Tsim < 4600)].index)
+# df = df.drop(df[(df.Sim == 163) & (df.Tsim > 5450) & (df.Tsim < 5800)].index)
+# df = df.drop(df[(df.Sim == 163) & (df.Tsim > 6100) & (df.Tsim < 6550)].index)
+#
+# df = df.drop(df[(df.Sim == 166) & (df.Tsim > 2200) & (df.Tsim < 2650)].index)
+# df = df.drop(df[(df.Sim == 166) & (df.Tsim > 4200) & (df.Tsim < 4700)].index)
+# df = df.drop(df[(df.Sim == 166) & (df.Tsim > 6200) & (df.Tsim < 6650)].index)
+# df = df.drop(df[(df.Sim == 166) & (df.Tsim > 7550) & (df.Tsim < 7750)].index)
+# df = df.drop(df[(df.Sim == 166) & (df.Team == 1) & (df.Tsim > 4400) & (df.Tsim < 5400)].index)
+#
+# # # ## v3 cuts
+# #
+# df = df.drop(df[(df.Sim == 159) & (df.Team == 1)].index)
+# df = df.drop(df[(df.Sim == 158) & (df.Team == 1)].index)
+# df = df.drop(df[(df.Sim == 163) & (df.Team == 4)].index)
+# df = df.drop(df[(df.Sim == 159) & (df.Team == 4)].index)
+#
 
 # correct Pair values, and assign them to the first participants Pair values
 
@@ -215,7 +234,7 @@ df = df.drop(df[(df.Sim == 159) & (df.Team == 4)].index)
 calculate_O3frac(df, simlist)
 
 
-df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2009_Data_withcut.csv")
+df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2010_Data_nocut.csv")
 
 
     

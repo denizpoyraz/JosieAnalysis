@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from Beta_Functions import ratiofunction_beta
+from Beta_Functions import ratiofunction_beta, ratiofunction_beta_9602
 
 tslow = 25 * 60
 tfast = 20
@@ -10,14 +10,23 @@ tfast = 20
 
 #######################################################################################################################
 
-df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut.csv", low_memory=False)
+# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut.csv", low_memory=False)
 
-print('0910', list(df))
+df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie9602_Data.csv", low_memory=False)
 
-# df = df.drop(df[(df.Sim == 140)].index)
-# df = df.drop(df[(df.Sim == 147)].index)
 
-df = df[df.ADX == 0]
+# print('0910', list(df))
+#
+# # df = df.drop(df[(df.Sim == 140)].index)
+# # df = df.drop(df[(df.Sim == 147)].index)
+# df = df.drop(df[(df.Sim == 147) & (df.Team == 3)].index)
+# df = df.drop(df[(df.Sim == 158) & (df.Team == 1)].index)
+# df = df.drop(df[(df.Sim == 158) & (df.Team == 2)].index)
+# df = df.drop(df[(df.Sim == 160) & (df.Team == 4)].index)
+# df = df.drop(df[(df.Sim == 165) & (df.Team == 4)].index)
+#
+#
+# df = df[df.ADX == 0]
 
 filtEN = df.ENSCI == 1
 filtSP = df.ENSCI == 0
@@ -53,54 +62,61 @@ team_sp0505 = profSP0505_nodup.Team.tolist()
 sim_sp1010 = profSP1010_nodup.Sim.tolist()
 team_sp1010 = profSP1010_nodup.Team.tolist()
 
-# rmean_en0505, rstd_en0505, rmedian_en0505 = ratiofunction_beta(df, sim_en0505, team_en0505, 'EN0505')
-# rmean_en1010, rstd_en1010, rmedian_en1010 = ratiofunction_beta(df, sim_en1010, team_en1010, 'EN1010')
-# rmean_sp0505, rstd_sp0505, rmedian_sp0505 = ratiofunction_beta(df, sim_sp0505, team_sp0505, 'SP0505')
-# rmean_sp1010, rstd_sp1010, rmedian_sp1010= ratiofunction_beta(df, sim_sp1010, team_sp1010, 'SPsp1010')
+rmean_en0505, rstd_en0505, rmedian_en0505, rqerr_en0505 = ratiofunction_beta_9602(df, sim_en0505, team_en0505, 'EN0505', 0)
+rmean_en1010, rstd_en1010, rmedian_en1010,  rqerr_en1010= ratiofunction_beta_9602(df, sim_en1010, team_en1010, 'EN1010', 0)
+rmean_sp0505, rstd_sp0505, rmedian_sp0505, rqerr_sp0505 = ratiofunction_beta_9602(df, sim_sp0505, team_sp0505, 'SP0505', 0)
+rmean_sp1010, rstd_sp1010, rmedian_sp1010, rqerr_sp1010 = ratiofunction_beta_9602(df, sim_sp1010, team_sp1010, 'SP1010', 0)
 
-rmean_en0505, rstd_en0505, rmedian_en0505, rqerr_en0505 = ratiofunction_beta(df, sim_en0505, team_en0505, 'EN0505')
-rmean_en1010, rstd_en1010, rmedian_en1010, rqerr_en1010 = ratiofunction_beta(df, sim_en1010, team_en1010, 'EN1010')
-rmean_sp0505, rstd_sp0505, rmedian_sp0505, rqerr_sp0505 = ratiofunction_beta(df, sim_sp0505, team_sp0505, 'SP0505')
-rmean_sp1010, rstd_sp1010, rmedian_sp1010, rqerr_sp1010 = ratiofunction_beta(df, sim_sp1010, team_sp1010, 'SP1010')
 
-r1_mean = np.concatenate((rmean_en0505[0], rmean_en1010[0], rmean_sp0505[0], rmean_sp1010[0]), axis=None)
-r2_mean = np.concatenate((rmean_en0505[1], rmean_en1010[1], rmean_sp0505[1], rmean_sp1010[1]), axis=None)
-r3_mean = np.concatenate((rmean_en0505[2], rmean_en1010[2], rmean_sp0505[2], rmean_sp1010[2]), axis=None)
-r4_mean = np.concatenate((rmean_en0505[3], rmean_en1010[3], rmean_sp0505[3], rmean_sp1010[3]), axis=None)
+# rmean_en0505, rstd_en0505, rmedian_en0505, rqerr_en0505 = ratiofunction_beta(df, sim_en0505, team_en0505, 'EN0505', 0)
+# rmean_en1010, rstd_en1010, rmedian_en1010, rqerr_en1010 = ratiofunction_beta(df, sim_en1010, team_en1010, 'EN1010', 0)
+# rmean_sp0505, rstd_sp0505, rmedian_sp0505, rqerr_sp0505 = ratiofunction_beta(df, sim_sp0505, team_sp0505, 'SP0505', 0)
+# rmean_sp1010, rstd_sp1010, rmedian_sp1010, rqerr_sp1010 = ratiofunction_beta(df, sim_sp1010, team_sp1010, 'SP1010', 0)
 
-r1_median = np.concatenate((rmedian_en0505[0], rmedian_en1010[0], rmedian_sp0505[0], rmedian_sp1010[0]), axis=None)
-r2_median = np.concatenate((rmedian_en0505[1], rmedian_en1010[1], rmedian_sp0505[1], rmedian_sp1010[1]), axis=None)
-r3_median = np.concatenate((rmedian_en0505[2], rmedian_en1010[2], rmedian_sp0505[2], rmedian_sp1010[2]), axis=None)
-r4_median = np.concatenate((rmedian_en0505[3], rmedian_en1010[3], rmedian_sp0505[3], rmedian_sp1010[3]), axis=None)
+# r1_mean = np.concatenate((rmean_en0505[0], rmean_en1010[0], rmean_sp0505[0], rmean_sp1010[0]), axis=None)
+# r2_mean = np.concatenate((rmean_en0505[1], rmean_en1010[1], rmean_sp0505[1], rmean_sp1010[1]), axis=None)
+# r3_mean = np.concatenate((rmean_en0505[2], rmean_en1010[2], rmean_sp0505[2], rmean_sp1010[2]), axis=None)
+# r4_mean = np.concatenate((rmean_en0505[3], rmean_en1010[3], rmean_sp0505[3], rmean_sp1010[3]), axis=None)
+#
+# r1_median = np.concatenate((rmedian_en0505[0], rmedian_en1010[0], rmedian_sp0505[0], rmedian_sp1010[0]), axis=None)
+# r2_median = np.concatenate((rmedian_en0505[1], rmedian_en1010[1], rmedian_sp0505[1], rmedian_sp1010[1]), axis=None)
+# r3_median = np.concatenate((rmedian_en0505[2], rmedian_en1010[2], rmedian_sp0505[2], rmedian_sp1010[2]), axis=None)
+# r4_median = np.concatenate((rmedian_en0505[3], rmedian_en1010[3], rmedian_sp0505[3], rmedian_sp1010[3]), axis=None)
 
-r_en0505_R1_4 = np.concatenate((rmean_en0505[0], rmean_en0505[1], rmean_en0505[2], rmean_en0505[3]), axis=None)
-r_en1010_R1_4 = np.concatenate((rmean_en1010[0], rmean_en1010[1], rmean_en1010[2], rmean_en1010[3]), axis=None)
-r_sp0505_R1_4 = np.concatenate((rmean_sp0505[0], rmean_sp0505[1], rmean_sp0505[2], rmean_sp0505[3]), axis=None)
-r_sp1010_R1_4 = np.concatenate((rmean_sp1010[0], rmean_sp1010[1], rmean_sp1010[3], rmean_sp1010[3]), axis=None)
 
-r_en0505_R2_4 = np.concatenate((rmean_en0505[1], rmean_en0505[2], rmean_en0505[3]), axis=None)
-r_en1010_R2_4 = np.concatenate((rmean_en1010[1], rmean_en1010[2], rmean_en1010[3]), axis=None)
-r_sp0505_R2_4 = np.concatenate((rmean_sp0505[1], rmean_sp0505[2], rmean_sp0505[3]), axis=None)
-r_sp1010_R2_4 = np.concatenate((rmean_sp1010[1], rmean_sp1010[2], rmean_sp1010[3]), axis=None)
+##0910
+# beta_en0505 = np.nanmedian(rmedian_en0505[1:4])
+# beta_en1010 = np.nanmedian(rmedian_en1010[1:4])
+# beta_sp0505 = np.nanmedian(rmedian_sp0505[1:4])
+# beta_sp1010 = np.nanmedian(rmedian_sp1010[1:4])
+#
+# mederr_en0505 = (np.nanquantile(rmedian_en0505[1:4], 0.75) - np.nanquantile(rmedian_en0505[1:4], 0.25)) / (2 * 0.6745)
+# mederr_en1010 = (np.nanquantile(rmedian_en1010[1:4], 0.75) - np.nanquantile(rmedian_en1010[1:4], 0.25)) / (2 * 0.6745)
+# mederr_sp0505 = (np.nanquantile(rmedian_sp0505[1:4], 0.75) - np.nanquantile(rmedian_sp0505[1:4], 0.25)) / (2 * 0.6745)
+# mederr_sp1010 = (np.nanquantile(rmedian_sp1010[1:4], 0.75) - np.nanquantile(rmedian_sp1010[1:4], 0.25)) / (2 * 0.6745)
 
-r_en0505_R2_4_median = np.concatenate((rmedian_en0505[1], rmedian_en0505[2], rmedian_en0505[3]), axis=None)
-r_en1010_R2_4_median = np.concatenate((rmedian_en1010[1], rmedian_en1010[2], rmedian_en1010[3]), axis=None)
-r_sp0505_R2_4_median = np.concatenate((rmedian_sp0505[1], rmedian_sp0505[2], rmedian_sp0505[3]), axis=None)
-r_sp1010_R2_4_median = np.concatenate((rmedian_sp1010[1], rmedian_sp1010[2], rmedian_sp1010[3]), axis=None)
+## 9602
+beta_en0505 = np.nanmedian(rmedian_en0505)
+beta_en1010 = np.nanmedian(rmedian_en1010)
+beta_sp0505 = np.nanmedian(rmedian_sp0505)
+beta_sp1010 = np.nanmedian(rmedian_sp1010)
 
-beta_en0505 = np.nanmedian(r_en0505_R2_4_median)
-beta_en1010 = np.nanmedian(r_en1010_R2_4_median)
-beta_sp0505 = np.nanmedian(r_sp0505_R2_4_median)
-beta_sp1010 = np.nanmedian(r_sp1010_R2_4_median)
+mederr_en0505 = (np.nanquantile(rmedian_en0505, 0.75) - np.nanquantile(rmedian_en0505, 0.25)) / (2 * 0.6745)
+mederr_en1010 = (np.nanquantile(rmedian_en1010, 0.75) - np.nanquantile(rmedian_en1010, 0.25)) / (2 * 0.6745)
+mederr_sp0505 = (np.nanquantile(rmedian_sp0505, 0.75) - np.nanquantile(rmedian_sp0505, 0.25)) / (2 * 0.6745)
+mederr_sp1010 = (np.nanquantile(rmedian_sp1010, 0.75) - np.nanquantile(rmedian_sp1010, 0.25)) / (2 * 0.6745)
 
+
+print('size', len(rmedian_en0505[0]), len(rmedian_en1010[0]), len(rmedian_sp0505[0]), len(rmedian_sp1010[0]))
 print('betas median', beta_en0505, beta_en1010, beta_sp0505, beta_sp1010)
+print('error median', mederr_en0505, mederr_en1010, mederr_sp0505, mederr_sp1010)
 
 # now use this beta values * 0.1 for the deconvolution of the signal and make a DF
 
 ## if you want to convolute another data-set, like 2017, you need to introduce it here
 
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut.csv", low_memory=False)
-df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_Data_nocut.csv", low_memory=False)
+# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_Data_nocut.csv", low_memory=False)
 
 print('2017', list(df))
 
@@ -129,6 +145,12 @@ for j in range(len(simlist)):
 
     af = 1
     beta = 0
+
+    ## HV beta values
+    beta_en0505 = 0.24
+    beta_en1010 = 0.9
+    beta_sp1010 = 0.9
+
 
     if (ensci[j] == 1) & (sol[j] == 0.5) & (buff[j] == 0.5): beta = beta_en0505 * 0.1
     if (ensci[j] == 1) & (sol[j] == 1.0) & (buff[j] == 1.0): beta = beta_en1010 * 0.1
@@ -284,4 +306,15 @@ df_dc = pd.concat(list_data, ignore_index=True)
 
 # df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv.csv")
 
-# df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv.csv")
+# df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconvHV.csv")
+
+
+
+
+# size 16 26 21 25
+# betas median 0.22836709156860585 0.5436204617396773 0.20820908285637468 0.5386389671847823
+# error median 0.08533925236730483 0.12418341911524286 0.0665053681281378 0.11619880626398213
+
+# size 16 20 21 23
+# betas median 0.22836709156860585 0.5267363578482107 0.20820908285637468 0.5429849955022146
+# error median 0.08533925236730483 0.06956360787317312 0.0665053681281378 0.11167703443887923

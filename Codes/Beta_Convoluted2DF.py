@@ -3,6 +3,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from Beta_Functions import ratiofunction_beta, ratiofunction_beta_9602
 
+def mederr(med):
+    err = (np.nanquantile(med, 0.75) - np.nanquantile(med, 0.25)) / (2 * 0.6745)
+    return err
+
+
 tslow = 25 * 60
 tfast = 20
 
@@ -60,19 +65,36 @@ clist =[ 'Tsim', 'Sim', 'Team', 'ENSCI', 'Sol', 'Buf', 'Pair','PO3', 'IM','TPint
 df1 = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut.csv", low_memory=False)
 df1 = df1[df1.ADX == 0]
 
-df1 = df1.drop(['Unnamed: 0', 'Unnamed: 0.1',  'ADif', 'ADif_PO3S','Flow','Header_IB1', 'Header_PFcor',
-                'Header_PFunc', 'Header_Sim', 'Header_Team', 'IB1', 'I_Pump','O3S', 'OPM', 'PO3_OPM_stp', 'PO3_jma',
-                'PO3_stp', 'RDif', 'RDif_PO3S', 'TPext','Tact', 'Tair', 'Tinlet', 'VMRO3', 'VMRO3_OPM', 'Year', 'Z', 'frac']
-               , axis=1)
+df1 = df1.drop(df1[(df1.Sim == 147) & (df1.Team == 3)].index)
+df1 = df1.drop(df1[(df1.Sim == 158) & (df1.Team == 1)].index)
+df1 = df1.drop(df1[(df1.Sim == 158) & (df1.Team == 2)].index)
+df1 = df1.drop(df1[(df1.Sim == 160) & (df1.Team == 4)].index)
+df1 = df1.drop(df1[(df1.Sim == 165) & (df1.Team == 4)].index)
 
-df1 = df1.reindex(columns=clist)
+#
+# df1 = df1.drop(['Unnamed: 0', 'Unnamed: 0.1',  'ADif', 'ADif_PO3S','Flow','Header_IB1', 'Header_PFcor',
+#                 'Header_PFunc', 'Header_Sim', 'Header_Team', 'IB1', 'I_Pump','O3S', 'OPM', 'PO3_OPM_stp', 'PO3_jma',
+#                 'PO3_stp', 'RDif', 'RDif_PO3S', 'TPext','Tact', 'Tair', 'Tinlet', 'VMRO3', 'VMRO3_OPM', 'Year', 'Z', 'frac']
+#                , axis=1)
+#
+# df1 = df1.reindex(columns=clist)
 print(list(df1))
-# df2 = df1.copy()
+# # df2 = df1.copy()
 
 df2 = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie9602_Data.csv", low_memory=False)
 
 df2 = df2.drop([ 'SST_Nr', 'SondeTypeNr'], axis=1)
 
+df2 = df2.drop(df2[(df2.Sim == 92) & (df2.Team == 3)].index)
+df2 = df2.drop(df2[(df2.Sim == 98) & (df2.Team == 7)].index)
+df2 = df2.drop(df2[(df2.Sim == 99) & (df2.Team == 7)].index)
+df2 = df2.drop(df2[(df2.Sim == 97) & (df2.Team == 6)].index)
+df2 = df2.drop(df2[(df2.Sim == 98) & (df2.Team == 6)].index)
+df2 = df2.drop(df2[(df2.Sim == 99) & (df2.Team == 6)].index)
+df2 = df2.drop(df2[(df2.Sim == 92) & (df2.Team == 4)].index)
+df2 = df2.drop(df2[(df2.Sim == 97) & (df2.Team == 5)].index)
+df2 = df2.drop(df2[(df2.Sim == 98) & (df2.Team == 5)].index)
+df2 = df2.drop(df2[(df2.Sim == 99) & (df2.Team == 5)].index)
 
 
 sim_0910, team_0910 = filter(df1)
@@ -112,12 +134,30 @@ rmedian_en1010 = np.concatenate((rmedian_en1010_9602, r_en1010_R2_4_median),  ax
 rmedian_sp0505 = np.concatenate((rmedian_sp0505_9602, r_sp0505_R2_4_median),  axis=None)
 rmedian_sp1010 = np.concatenate((rmedian_sp1010_9602, r_sp1010_R2_4_median),  axis=None)
 
+
+
 print('0910')
 print(np.nanmedian(r_en0505_R2_4_median), np.nanmedian(r_en1010_R2_4_median), np.nanmedian(r_sp0505_R2_4_median), np.nanmedian(r_sp1010_R2_4_median))
+print('0910 error qerr')
+print(mederr(r_en0505_R2_4_median), mederr(r_en1010_R2_4_median), mederr(r_sp0505_R2_4_median), mederr(r_sp1010_R2_4_median))
+# print('0910 error std')
+# print(stm_1, stm_2, stm_3, stm_4)
+
+# print(np.nanquantile(r_en0505_R2_4_median, 0.1587), np.nanquantile(r_en1010_R2_4_median, 0.1587), np.nanquantile(r_sp0505_R2_4_median, 0.1587),
+#       np.nanquantile(r_sp1010_R2_4_median, 0.1587))
+
 print('9602')
 print(np.nanmedian(rmedian_en0505_9602), np.nanmedian(rmedian_en1010_9602), np.nanmedian(rmedian_sp0505_9602), np.nanmedian(rmedian_sp1010_9602))
+print('9602 err')
+print(mederr(rmedian_en0505_9602), mederr(rmedian_en1010_9602), mederr(rmedian_sp0505_9602), mederr(rmedian_sp1010_9602))
 print('median en0505  en1010 sp0505 sp1010')
 print(np.nanmedian(rmedian_en0505), np.nanmedian(rmedian_en1010), np.nanmedian(rmedian_sp0505), np.nanmedian(rmedian_sp1010))
+print('all err')
+print(mederr(rmedian_en0505), mederr(rmedian_en1010), mederr(rmedian_sp0505), mederr(rmedian_sp1010))
+print('size')
+print(len(sim_0910[0]), len(sim_0910[1]), len(sim_0910[2]), len(sim_0910[3]))
+print(len(sim_9602[0]), len(sim_9602[1]), len(sim_9602[2]), len(sim_9602[3]))
+
 
 
 ######  0910 Data
@@ -134,6 +174,11 @@ beta_en1010 = np.nanmedian(rmedian_en1010)
 beta_sp0505 = np.nanmedian(rmedian_sp0505)
 beta_sp1010 = np.nanmedian(rmedian_sp1010)
 
+beta_en0505_err = mederr(rmedian_en0505)
+beta_en1010_err = mederr(rmedian_en1010)
+beta_sp0505_err = mederr(rmedian_sp0505)
+beta_sp1010_err = mederr(rmedian_sp1010)
+
 print('betas median', beta_en0505, beta_en1010, beta_sp0505, beta_sp1010)
 
 #
@@ -141,8 +186,8 @@ print('betas median', beta_en0505, beta_en1010, beta_sp0505, beta_sp1010)
 
 ## if you want to convolute another data-set, like 2017, you need to introduce it here
 
-df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut.csv", low_memory=False)
-# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_Data_nocut.csv", low_memory=False)
+# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut.csv", low_memory=False)
+df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_Data_nocut.csv", low_memory=False)
 
 
 
@@ -171,12 +216,12 @@ for j in range(len(simlist)):
     af = 1
     beta = 0
 
-    if (ensci[j] == 1) & (sol[j] == 0.5) & (buff[j] == 0.5): beta = beta_en0505 * 0.1
-    if (ensci[j] == 1) & (sol[j] == 1.0) & (buff[j] == 1.0): beta = beta_en1010 * 0.1
-    if (ensci[j] == 0) & (sol[j] == 0.5) & (buff[j] == 0.5): beta = beta_sp0505 * 0.1
-    if (ensci[j] == 0) & (sol[j] == 1.0) & (buff[j] == 1.0): beta = beta_sp1010 * 0.1
-    if (ensci[j] == 1) & (sol[j] == 1.0) & (buff[j] == 0.1): beta = 0.031
-    if (ensci[j] == 0) & (sol[j] == 1.0) & (buff[j] == 0.1): beta = 0.031
+    if (ensci[j] == 1) & (sol[j] == 0.5) & (buff[j] == 0.5): beta = (beta_en0505 - beta_en0505_err) * 0.1
+    if (ensci[j] == 1) & (sol[j] == 1.0) & (buff[j] == 1.0): beta = (beta_en1010  - beta_en1010_err)* 0.1
+    if (ensci[j] == 0) & (sol[j] == 0.5) & (buff[j] == 0.5): beta = (beta_sp0505 - beta_sp0505_err)  * 0.1
+    if (ensci[j] == 0) & (sol[j] == 1.0) & (buff[j] == 1.0): beta = (beta_sp1010 - beta_sp1010_err) * 0.1
+    if (ensci[j] == 1) & (sol[j] == 1.0) & (buff[j] == 0.1): beta = 0.031 - 0.010
+    if (ensci[j] == 0) & (sol[j] == 1.0) & (buff[j] == 0.1): beta = 0.031 - 0.010
 
 
     if ensci[j] == 0:
@@ -214,9 +259,16 @@ for j in range(len(simlist)):
     Ifastminib0 = [0] * size
     Ifastminib0_deconv = [0] * size
     Ifast_deconv_smb6 = [0] * size
+    Ifast_deconv_smb8 = [0] * size
+    Ifast_deconv_smb10 = [0] * size
     Ifast_deconv_smb12 = [0] * size
-    Ifast_deconv_smb18 = [0] * size
 
+    Ifast_deconv_smb6_gf1 = [0] * size
+    Ifast_deconv_smb8_gf1 = [0] * size
+    Ifast_deconv_smb6_gf2 = [0] * size
+    Ifast_deconv_smb8_gf2 = [0] * size
+    Ifast_deconv_smb6_gf4 = [0] * size
+    Ifast_deconv_smb8_gf4 = [0] * size
 
     for i in range(1, size - 1):
         t1 = dft[j].at[i + 1, 'Tsim']
@@ -231,9 +283,7 @@ for j in range(len(simlist)):
         Islow_conv[i + 1] = Islow[i] - (Islow[i] - Islow_conv[i]) * Xs
 
         Ifast[i + 1] = af * (dft[j].at[i + 1, 'IM'] - Islow_conv[i + 1])
-        # Ifastminib0[i + 1] = af * (dft[j].at[i + 1, 'IM'] - Islow_conv[i + 1] - dft[j].at[i + 1, 'iB0'] )
-        Ifastminib0[i + 1] = af * (dft[j].at[i + 1, 'IM'] - Islow_conv[i + 1] - 0.014 )
-
+        Ifastminib0[i + 1] = af * (dft[j].at[i + 1, 'IM'] - Islow_conv[i + 1] - dft[j].at[i + 1, 'iB0'] )
 
         Ifast_deconv[i + 1] = (Ifast[i + 1] - Ifast[i] * Xf) / (1 - Xf)
         Ifastminib0_deconv[i + 1] = (Ifastminib0[i + 1] - Ifastminib0[i] * Xf) / (1 - Xf)
@@ -243,10 +293,16 @@ for j in range(len(simlist)):
     dft[j]['I_slow_conv'] = Islow_conv
     dft[j]['I_fast'] = Ifast
     dft[j]['Ifast_minib0'] = Ifastminib0
-    dft[j]['I_fast_smb6'] = dft[j].I_fast.rolling(window=3).mean()
-    dft[j]['I_fast_smb12'] = dft[j].I_fast.rolling(window=6).mean()
-    dft[j]['I_fast_smb18'] = dft[j].I_fast.rolling(window=9).mean()
-
+    dft[j]['Ifast_minib0_smb6'] = dft[j].Ifast_minib0.rolling(window=3).mean()
+    dft[j]['Ifast_minib0_smb8'] = dft[j].Ifast_minib0.rolling(window=4).mean()
+    dft[j]['Ifast_minib0_smb10'] = dft[j].Ifast_minib0.rolling(window=5).mean()
+    dft[j]['Ifast_minib0_smb12'] = dft[j].Ifast_minib0.rolling(window=6).mean()
+    dft[j]['Ifast_minib0_smb6_gf1'] = dft[j].Ifast_minib0.rolling(window=3, win_type='gaussian', center=True).mean(std=1)
+    dft[j]['Ifast_minib0_smb8_gf1'] = dft[j].Ifast_minib0.rolling(window=4, win_type='gaussian', center=True).mean(std=1)
+    dft[j]['Ifast_minib0_smb6_gf2'] = dft[j].Ifast_minib0.rolling(window=3, win_type='gaussian', center=True).mean(std=2)
+    dft[j]['Ifast_minib0_smb8_gf2'] = dft[j].Ifast_minib0.rolling(window=4, win_type='gaussian', center=True).mean(std=2)
+    dft[j]['Ifast_minib0_smb6_gf4'] = dft[j].Ifast_minib0.rolling(window=3, win_type='gaussian', center=True).mean(std=4)
+    dft[j]['Ifast_minib0_smb8_gf4'] = dft[j].Ifast_minib0.rolling(window=4, win_type='gaussian', center=True).mean(std=4)
 
 
     for ii in range(0, size - 1):
@@ -255,16 +311,31 @@ for j in range(len(simlist)):
         Xs = np.exp(-(t1 - t2) / tslow)
         Xf = np.exp(-(t1 - t2) / tfast)
 
-        Ifast_deconv_smb6[ii + 1] = (dft[j].at[ii + 1, 'I_fast_smb6'] - dft[j].at[ii, 'I_fast_smb6'] * Xf) / (1 - Xf)
-        Ifast_deconv_smb12[ii + 1] = (dft[j].at[ii + 1, 'I_fast_smb12'] - dft[j].at[ii, 'I_fast_smb12'] * Xf) / (1 - Xf)
-        Ifast_deconv_smb18[ii + 1] = (dft[j].at[ii + 1, 'I_fast_smb18'] - dft[j].at[ii, 'I_fast_smb18'] * Xf) / (1 - Xf)
+        Ifast_deconv_smb6[ii + 1] = (dft[j].at[ii + 1, 'Ifast_minib0_smb6'] - dft[j].at[ii, 'Ifast_minib0_smb6'] * Xf) / (1 - Xf)
+        Ifast_deconv_smb8[ii + 1] = (dft[j].at[ii + 1, 'Ifast_minib0_smb8'] - dft[j].at[ii, 'Ifast_minib0_smb8'] * Xf) / (1 - Xf)
+        Ifast_deconv_smb10[ii + 1] = (dft[j].at[ii + 1, 'Ifast_minib0_smb10'] - dft[j].at[ii, 'Ifast_minib0_smb10'] * Xf) / (1 - Xf)
+        Ifast_deconv_smb12[ii + 1] = (dft[j].at[ii + 1, 'Ifast_minib0_smb12'] - dft[j].at[ii, 'Ifast_minib0_smb12'] * Xf) / (1 - Xf)
+
+        Ifast_deconv_smb6_gf1[ii + 1] = (dft[j].at[ii + 1, 'Ifast_minib0_smb6_gf1'] - dft[j].at[ii, 'Ifast_minib0_smb6_gf1'] * Xf) / (1 - Xf)
+        Ifast_deconv_smb8_gf1[ii + 1] = (dft[j].at[ii + 1, 'Ifast_minib0_smb8_gf1'] - dft[j].at[ii, 'Ifast_minib0_smb8_gf1'] * Xf) / (1 - Xf)
+        Ifast_deconv_smb6_gf2[ii + 1] = (dft[j].at[ii + 1, 'Ifast_minib0_smb6_gf2'] - dft[j].at[ii, 'Ifast_minib0_smb6_gf2'] * Xf) / (1 - Xf)
+        Ifast_deconv_smb8_gf2[ii + 1] = (dft[j].at[ii + 1, 'Ifast_minib0_smb8_gf2'] - dft[j].at[ii, 'Ifast_minib0_smb8_gf2'] * Xf) / (1 - Xf)
+        Ifast_deconv_smb6_gf4[ii + 1] = (dft[j].at[ii + 1, 'Ifast_minib0_smb6_gf4'] - dft[j].at[ii, 'Ifast_minib0_smb6_gf4'] * Xf) / (1 - Xf)
+        Ifast_deconv_smb8_gf4[ii + 1] = (dft[j].at[ii + 1, 'Ifast_minib0_smb8_gf4'] - dft[j].at[ii, 'Ifast_minib0_smb8_gf4'] * Xf) / (1 - Xf)
 
 
-    dft[j]['I_fast_deconv_smb6'] = Ifast_deconv_smb6
-    dft[j]['I_fast_deconv_smb12'] = Ifast_deconv_smb12
-    dft[j]['I_fast_deconv_smb18'] = Ifast_deconv_smb18
+    dft[j]['Ifast_minib0_deconv_smb6'] = Ifast_deconv_smb6
+    dft[j]['Ifast_minib0_deconv_smb8'] = Ifast_deconv_smb8
+    dft[j]['Ifast_minib0_deconv_smb10'] = Ifast_deconv_smb10
+    dft[j]['Ifast_minib0_deconv_smb12'] = Ifast_deconv_smb12
+    dft[j]['Ifast_minib0_deconv_smb6_gf1'] = Ifast_deconv_smb6_gf1
+    dft[j]['Ifast_minib0_deconv_smb8_gf1'] = Ifast_deconv_smb8_gf1
+    dft[j]['Ifast_minib0_deconv_smb6_gf2'] = Ifast_deconv_smb6_gf2
+    dft[j]['Ifast_minib0_deconv_smb8_gf2'] = Ifast_deconv_smb8_gf2
+    dft[j]['Ifast_minib0_deconv_smb6_gf4'] = Ifast_deconv_smb6_gf4
+    dft[j]['Ifast_minib0_deconv_smb8_gf4'] = Ifast_deconv_smb8_gf4
 
-    dft[j]['I_fast_deconv'] = Ifast_deconv
+    dft[j]['Ifast_deconv'] = Ifast_deconv
     dft[j]['Ifast_minib0_deconv'] = Ifastminib0_deconv
 
     # dft[j]['I_fastminib0'] = Ifastminib0
@@ -276,61 +347,89 @@ for j in range(len(simlist)):
         for p in range(len(JMA) - 1):
             if (dft[j].at[k, 'Pair'] >= Pval[p + 1]) & (dft[j].at[k, 'Pair'] < Pval[p]):
                 # print(p, Pval[p + 1], Pval[p ])
-                dft[j].at[k, 'PO3_deconv_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fast_deconv'] / \
+                dft[j].at[k, 'PO3_deconv_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'Ifast_deconv'] / \
                                                 (dft[j].at[k, 'PFcor'] * JMA[p])
-                dft[j].at[k, 'PO3_deconv_smb6_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fast_deconv_smb6'] / \
+                dft[j].at[k, 'PO3_minib0_deconv_smb6_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'Ifast_minib0_deconv_smb6'] / \
                                                 (dft[j].at[k, 'PFcor'] * JMA[p])
-                dft[j].at[k, 'PO3_deconv_smb12_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fast_deconv_smb12'] / \
-                                                (dft[j].at[k, 'PFcor'] * JMA[p])
-                dft[j].at[k, 'PO3_deconv_smb18_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fast_deconv_smb18'] / \
-                                                (dft[j].at[k, 'PFcor'] * JMA[p])
-                # dft[j].at[k, 'PO3_minib0_deconv_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fastminib0_deconv'] / \
-                #                                 (dft[j].at[k, 'PFcor'] * JMA[p])
-                dft[j].at[k, 'PO3_slow_conv_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_slow_conv'] / \
-                                                 (dft[j].at[k, 'PFcor'] * JMA[p])
+                dft[j].at[k, 'PO3_minib0_deconv_smb8_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'Ifast_minib0_deconv_smb8'] / \
+                                                             (dft[j].at[k, 'PFcor'] * JMA[p])
+                dft[j].at[k, 'PO3_minib0_deconv_smb10_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'Ifast_minib0_deconv_smb10'] / \
+                                                             (dft[j].at[k, 'PFcor'] * JMA[p])
+                dft[j].at[k, 'PO3_minib0_deconv_smb12_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'Ifast_minib0_deconv_smb12'] / \
+                                                             (dft[j].at[k, 'PFcor'] * JMA[p])
+
 
         if (dft[j].at[k, 'Pair'] <= Pval[14]):
-            dft[j].at[k, 'PO3_deconv_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fast_deconv'] / \
+            dft[j].at[k, 'PO3_deconv_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'Ifast_deconv'] / \
                                             (dft[j].at[k, 'PFcor'] * JMA[14])
-            dft[j].at[k, 'PO3_deconv_smb6_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fast_deconv_smb6'] / \
+            dft[j].at[k, 'PO3_minib0_deconv_smb6_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'Ifast_minib0_deconv_smb6'] / \
                                             (dft[j].at[k, 'PFcor'] * JMA[14])
-            dft[j].at[k, 'PO3_deconv_smb12_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fast_deconv_smb12'] / \
+            dft[j].at[k, 'PO3_minib0_deconv_smb8_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'Ifast_minib0_deconv_smb8'] / \
                                             (dft[j].at[k, 'PFcor'] * JMA[14])
-            dft[j].at[k, 'PO3_deconv_smb18_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fast_deconv_smb18'] / \
+            dft[j].at[k, 'PO3_minib0_deconv_smb10_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'Ifast_minib0_deconv_smb10'] / \
                                             (dft[j].at[k, 'PFcor'] * JMA[14])
-            # dft[j].at[k, 'PO3_minib0_deconv_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_fastminib0_deconv'] / \
-            #                                 (dft[j].at[k, 'PFcor'] * JMA[14])
-            dft[j].at[k, 'PO3_slow_conv_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'I_slow_conv'] / \
-                                             (dft[j].at[k, 'PFcor'] * JMA[14])
+            dft[j].at[k, 'PO3_minib0_deconv_smb12_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'Ifast_minib0_deconv_smb12'] / \
+                                            (dft[j].at[k, 'PFcor'] * JMA[14])
 
-    dft[j]['PO3_deconv'] = 0.043085 * dft[j]['TPint'] * dft[j]['I_fast_deconv'] / dft[j]['PFcor']
-    dft[j]['PO3_deconv_smb6'] = 0.043085 * dft[j]['TPint'] * dft[j]['I_fast_deconv_smb6'] / dft[j]['PFcor']
 
     # dft[j]['PO3_minib0_deconv'] = 0.043085 * dft[j]['TPint'] * dft[j]['I_fastminib0_deconv'] / dft[j]['PFcor']
 
     dft[j]['PO3_slow_conv'] = 0.043085 * dft[j]['TPint'] * dft[j]['I_slow_conv'] / dft[j]['PFcor']
 
-    dft[j]['PO3_deconv_jma_sm6'] = dft[j].PO3_deconv_jma.rolling(window=3).mean()
-    dft[j]['PO3_deconv_sm6'] = dft[j].PO3_deconv.rolling(window=3).mean()
-    dft[j]['I_fast_deconv_sm6'] = dft[j].I_fast_deconv.rolling(window=3).mean()
+    dft[j]['Ifast_deconv_sm6'] = dft[j].Ifast_deconv.rolling(window=3).mean()
     dft[j]['Ifast_minib0_deconv_sm6'] = dft[j].Ifast_minib0_deconv.rolling(window=3).mean()
+    dft[j]['Ifast_minib0_deconv_sm6_gf1'] = dft[j].Ifast_minib0_deconv.rolling(window=3, win_type='gaussian', center=True).mean(std=1)
+    dft[j]['Ifast_minib0_deconv_sm6_gf2'] = dft[j].Ifast_minib0_deconv.rolling(window=3, win_type='gaussian', center=True).mean(std=2)
+    dft[j]['Ifast_minib0_deconv_sm6_gf4'] = dft[j].Ifast_minib0_deconv.rolling(window=3, win_type='gaussian', center=True).mean(std=4)
 
-    dft[j]['PO3_deconv_jma_sm12'] = dft[j].PO3_deconv_jma.rolling(window=6).mean()
-    dft[j]['PO3_deconv_sm12'] = dft[j].PO3_deconv.rolling(window=6).mean()
-    dft[j]['I_fast_deconv_sm12'] = dft[j].I_fast_deconv.rolling(window=6).mean()
+
+    dft[j]['PO3_deconv_jma_sm6'] = dft[j].PO3_deconv_jma.rolling(window=3).mean()
+
+    dft[j]['Ifast_deconv_sm8'] = dft[j].Ifast_deconv.rolling(window=4).mean()
+    dft[j]['Ifast_minib0_deconv_sm8'] = dft[j].Ifast_minib0_deconv.rolling(window=4).mean()
+    dft[j]['Ifast_minib0_deconv_sm8_gf1'] = dft[j].Ifast_minib0_deconv.rolling(window=4, win_type='gaussian', center=True).mean(std=1)
+    dft[j]['Ifast_minib0_deconv_sm8_gf2'] = dft[j].Ifast_minib0_deconv.rolling(window=4, win_type='gaussian', center=True).mean(std=2)
+    dft[j]['Ifast_minib0_deconv_sm8_gf4'] = dft[j].Ifast_minib0_deconv.rolling(window=4, win_type='gaussian', center=True).mean(std=4)
+
+
+    # dft[j]['PO3_deconv_jma_sm8'] = dft[j].PO3_deconv_jma.rolling(window=4).mean()
+    # dft[j]['PO3_deconv_jma_sm8_gf1'] = dft[j].PO3_deconv_jma.rolling(window=4, win_type='gaussian', center=True).mean(std=1)
+    # dft[j]['PO3_deconv_jma_sm8_gf2'] = dft[j].PO3_deconv_jma.rolling(window=4, win_type='gaussian', center=True).mean(std=2)
+    # dft[j]['PO3_deconv_jma_sm8_gf4'] = dft[j].PO3_deconv_jma.rolling(window=4, win_type='gaussian', center=True).mean(std=4)
+
+    dft[j]['Ifast_deconv_sm10'] = dft[j].Ifast_deconv.rolling(window=5).mean()
+    dft[j]['Ifast_minib0_deconv_sm10'] = dft[j].Ifast_minib0_deconv.rolling(window=5).mean()
+    dft[j]['Ifast_minib0_deconv_sm10_gf05'] = dft[j].Ifast_minib0_deconv.rolling(window=5, win_type='gaussian', center=True).mean(std=0.5)
+    dft[j]['Ifast_minib0_deconv_sm10_gf1'] = dft[j].Ifast_minib0_deconv.rolling(window=5, win_type='gaussian', center=True).mean(std=1)
+    dft[j]['Ifast_minib0_deconv_sm10_gf2'] = dft[j].Ifast_minib0_deconv.rolling(window=5, win_type='gaussian', center=True).mean(std=2)
+    dft[j]['Ifast_minib0_deconv_sm10_gf4'] = dft[j].Ifast_minib0_deconv.rolling(window=5, win_type='gaussian', center=True).mean(std=4)
+    dft[j]['Ifast_minib0_deconv_sm10_gf8'] = dft[j].Ifast_minib0_deconv.rolling(window=5, win_type='gaussian', center=True).mean(std=8)
+
+
+    # dft[j]['PO3_deconv_jma_sm10'] = dft[j].PO3_deconv_jma.rolling(window=5).mean()
+    # dft[j]['PO3_deconv_jma_sm10_gf1'] = dft[j].PO3_deconv_jma.rolling(window=5, win_type='gaussian', center=True).mean(
+    #     std=1)
+    # dft[j]['PO3_deconv_jma_sm10_gf2'] = dft[j].PO3_deconv_jma.rolling(window=5, win_type='gaussian', center=True).mean(
+    #     std=2)
+    # dft[j]['PO3_deconv_jma_sm10_gf4'] = dft[j].PO3_deconv_jma.rolling(window=5, win_type='gaussian', center=True).mean(
+    #     std=4)
+
+    dft[j]['Ifast_deconv_sm12'] = dft[j].Ifast_deconv.rolling(window=6).mean()
     dft[j]['Ifast_minib0_deconv_sm12'] = dft[j].Ifast_minib0_deconv.rolling(window=6).mean()
-
-    dft[j]['PO3_deconv_jma_sm18'] = dft[j].PO3_deconv_jma.rolling(window=9).mean()
-    dft[j]['PO3_deconv_sm18'] = dft[j].PO3_deconv.rolling(window=9).mean()
-    dft[j]['I_fast_deconv_sm18'] = dft[j].I_fast_deconv.rolling(window=9).mean()
-    dft[j]['Ifast_minib0_deconv_sm18'] = dft[j].Ifast_minib0_deconv.rolling(window=9).mean()
+    # dft[j]['PO3_deconv_jma_sm12'] = dft[j].PO3_deconv_jma.rolling(window=6).mean()
+    # dft[j]['PO3_deconv_jma_sm12_gf1'] = dft[j].PO3_deconv_jma.rolling(window=6, win_type='gaussian', center=True).mean(
+    #     std=1)
+    # dft[j]['PO3_deconv_jma_sm12_gf2'] = dft[j].PO3_deconv_jma.rolling(window=6, win_type='gaussian', center=True).mean(
+    #     std=2)
+    # dft[j]['PO3_deconv_jma_sm12_gf4'] = dft[j].PO3_deconv_jma.rolling(window=6, win_type='gaussian', center=True).mean(
+    #     std=4)
 
     list_data.append(dft[j])
 
 df_dc = pd.concat(list_data, ignore_index=True)
 
-df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_beta2ib0.csv")
+df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv_beta0minus1sigma.csv.csv")
 
-# df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv_beta2ib0.csv")
+# df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv_beta0plus1sigma.csv")
 
 ## naming beta2:  used all data for betas, also en0505 and spc0505 in 9602 data

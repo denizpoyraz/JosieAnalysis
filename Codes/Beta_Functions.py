@@ -31,7 +31,10 @@ def ratiofunction_beta(df, sim, team, categorystr, boolibo):
     df3 = {}
     df4 = {}
 
-    df['iB0'] = 0.014
+    # df['iB0'] = 0.014
+
+    file = open('../Latex/0910_TimeConstant_beta0' + categorystr + "5secslatex_table.txt", "w")
+    file.write(categorystr + '\n')
 
     for j in range(len(sim)):
         # print('simarray', sim[j])
@@ -46,6 +49,15 @@ def ratiofunction_beta(df, sim, team, categorystr, boolibo):
         r4_down = 8350;
         r4_up = 8400
 
+        if sim[j] == 140:
+            r1_down = 2700;
+            r1_up = 2740;
+            r2_down = 4700;
+            r2_up = 4740;
+            r3_down = 6700;
+            r3_up = 6740;
+            r4_down = 8700;
+            r4_up = 8740
 
 
         t1 = (df.Tsim >= r1_down) & (df.Tsim < r1_up)
@@ -92,20 +104,65 @@ def ratiofunction_beta(df, sim, team, categorystr, boolibo):
         qerr_r3[j] = (np.nanquantile(r3[j], 0.75) - np.nanquantile(r3[j], 0.25)) / (2 * 0.6745)
         qerr_r4[j] = (np.nanquantile(r4[j], 0.75) - np.nanquantile(r4[j], 0.25)) / (2 * 0.6745)
 
+        lr1 = str(round(r1mean[j], 2)) + '\pm ' + str(round(r1std[j], 2))
+        lr2 = str(round(r2mean[j], 2)) + '\pm ' + str(round(r2std[j], 2))
+        lr3 = str(round(r3mean[j], 2)) + '\pm ' + str(round(r3std[j], 2))
+        lr4 = str(round(r4mean[j], 2)) + '\pm ' + str(round(r4std[j], 2))
+        lr5 = str(round(r1median[j], 2)) + '\pm ' + str(round(qerr_r1[j], 2))
+        lr6 = str(round(r2median[j], 2)) + '\pm ' + str(round(qerr_r2[j], 2))
+        lr7 = str(round(r3median[j], 2)) + '\pm ' + str(round(qerr_r3[j], 2))
+        lr8 = str(round(r4median[j], 2)) + '\pm ' + str(round(qerr_r4[j], 2))
 
-    # print('in the function')
-    # print('r1mean', r1mean)
-    # print('r1median', r1median)
-    #
-    # print('r2mean', r2mean)
-    # print('r3mean', r3mean)
-    # print('r4mean', r4mean)
-    # print('r4median', r4median)
+        mat = '$'
+        end = '&'
+
+        file.write('\hline' + '\n')
+        file.write( mat + title + mat + end +  mat + lr1 + mat + ' & ' + mat + lr2 + mat + ' & ' + mat + lr3 + mat +' & ' + mat + lr4 + mat + r'\\' + '\n')
+        # file.write( mat + title + mat + end + 'Median' + end + mat + lr5 + mat + ' & ' + mat + lr6 + mat + ' & ' + mat + lr7 + mat +' & ' + mat + lr8 + mat + r'\\' + '\n')
 
     rmean = [r1mean, r2mean, r3mean, r4mean]
     rstd = [r1std, r2std, r3std, r4std]
     rmedian = [r1median, r2median, r3median, r4median]
-    qerr = [qerr_r1, qerr_r2, qerr_r3, qerr_r4]
+
+    qerr_1 = (np.nanquantile(r1median, 0.75) - np.nanquantile(r1median, 0.25)) / (2 * 0.6745)
+    qerr_2 = (np.nanquantile(r2median, 0.75) - np.nanquantile(r2median, 0.25)) / (2 * 0.6745)
+    qerr_3 = (np.nanquantile(r3median, 0.75) - np.nanquantile(r3median, 0.25)) / (2 * 0.6745)
+    qerr_4 = (np.nanquantile(r4median, 0.75) - np.nanquantile(r4median, 0.25)) / (2 * 0.6745)
+
+    qerr = [qerr_1, qerr_2, qerr_3, qerr_4]
+
+    mederr = (np.nanquantile(rmedian[1:4], 0.75) - np.nanquantile(rmedian[1:4], 0.25)) / (2 * 0.6745)
+
+    print('median error', mederr)
+
+    print('qerr', qerr)
+
+    # print('Test mean', len(rmean[0]))
+    # print('Test median', len(rmedian[0]))
+
+    file.write('\hline' + '\n')
+    file.write('\hline' + '\n')
+    file.write(
+        'Mean & ' + mat + str(round(np.nanmean(r1mean), 2)) + '\pm ' + str(round(np.nanstd(r1mean), 2)) + mat + ' & ' +
+        mat + str(round(np.nanmean(r2mean), 2)) + '\pm ' + str(round(np.nanstd(r2mean), 2)) + mat + ' & ' +
+        mat + str(round(np.nanmean(r3mean), 2)) + '\pm ' + str(round(np.nanstd(r3mean), 2)) + mat + ' & ' +
+        mat + str(round(np.nanmean(r4mean), 2)) + '\pm ' + str(round(np.nanstd(r4mean), 2)) + mat +  r'\\' + '\n')
+    # file.write('Median  & ' + mat + str(np.round(np.nanmedian(r1median), 2)) + '\pm ' + str(np.round(qerr_r1, 2)) + mat + ' & ')
+    # # +
+    # #            mat + str(round(np.nanmedian(r2median), 2)) + '\pm ' + str(round(qerr_r2, 2)) + mat +
+    # #            str(round(np.nanmedian(r3median), 2)) + '\pm ' + str(round(qerr_r3, 2)) + mat + ' & ' + mat +
+    # #            str(round(np.nanmedian(r4median), 2)) + '\pm ' + str(round(qerr_r4, 2)) + mat + r'\\' + '\n')
+    # # file.write('\hline' + '\n')
+    file.write('Mean & ' + mat + str(round(np.nanmedian(r1median), 2)) + '\pm ' + str(round(qerr_1, 2)) + mat + ' & ' +
+mat + str(round(np.nanmedian(r2median), 2)) + '\pm ' + str(round(qerr_2, 2)) + mat + ' & ' +
+        mat + str(round(np.nanmedian(r3median), 2)) + '\pm ' + str(round(qerr_3, 2)) + mat + ' & ' +
+        mat + str(round(np.nanmedian(r4median), 2)) + '\pm ' + str(round(qerr_4, 2)) + mat + r'\\' + '\n')
+
+    file.write('\hline' + '\n')
+    file.write('Mean R2-R4 &' + mat + str(round(np.nanmean(rmean[1:4]), 2)) + '\pm ' + str(
+        round(np.nanstd(rmean[1:4]), 2)) + mat + ' & ' + r'\\' + '\n')
+    file.write('Median R2-R4 &' + mat + str(round(np.nanmedian(rmedian[1:4]), 2)) + '\pm ' + str(
+        round(mederr, 2)) + mat + ' & ' + r'\\' + '\n')
 
     return rmean, rstd, rmedian, qerr
 
@@ -166,9 +223,6 @@ def ratiofunction_beta_9602(df, sim, team, categorystr, boolib0):
             r1[j] = np.array(((df1[j].IM - df1[j].iB0) / (0.10 * df1[j].I_conv_slow)).tolist())
             r2[j] = np.array(((df2[j].IM - df2[j].iB0) / (0.10 * df2[j].I_conv_slow)).tolist())
 
-
-
-
         # print(sim[j],team[j], 'Ratio', r1[j], r2[j])
         # print(sim[j], team[j], 'Curent', df1[j].IM.tolist(), df1[j].I_conv_slow.tolist() )
         #
@@ -200,16 +254,19 @@ def ratiofunction_beta_9602(df, sim, team, categorystr, boolib0):
     qerr_1 = (np.nanquantile(r1median, 0.75) - np.nanquantile(r1median, 0.25)) / (2 * 0.6745)
     qerr_2 = (np.nanquantile(r2median, 0.75) - np.nanquantile(r2median, 0.25)) / (2 * 0.6745)
 
+    mederr = (np.nanquantile(rmedian, 0.75) - np.nanquantile(rmedian, 0.25)) / (2 * 0.6745)
+
+
     file.write('\hline' + '\n')
     file.write('\hline' + '\n')
     file.write('Mean & ' + mat + str(round(np.nanmean(r1mean), 2)) + '\pm ' + str(round(np.nanstd(r1mean), 2)) + mat + ' & ' +
                mat + str(round(np.nanmean(r2mean), 2)) + '\pm ' + str(round(np.nanstd(r2mean), 2)) + mat  + r'\\' + '\n')
-    file.write('Median  & ' + mat + str(round(np.nanmedian(r1mean), 2)) + '\pm ' + str(round(qerr_1, 2)) + mat + ' & ' +
-               mat + str(round(np.nanmedian(r2mean), 2)) + '\pm ' + str(round(qerr_2, 2)) + mat  + r'\\' + '\n')
+    file.write('Median  & ' + mat + str(round(np.nanmedian(r1median), 2)) + '\pm ' + str(round(qerr_1, 2)) + mat + ' & ' +
+               mat + str(round(np.nanmedian(r2median), 2)) + '\pm ' + str(round(qerr_2, 2)) + mat  + r'\\' + '\n')
     file.write('\hline' + '\n')
     file.write('\hline' + '\n')
     file.write('Mean R1-R2 &' + mat + str(round(np.nanmean(rmean), 2)) + '\pm ' + str(round(np.nanstd(rmean), 2)) + mat + ' & '+ r'\\' + '\n')
-    file.write('Median R1-R2 &' + mat + str(round(np.nanmedian(rmedian), 2)) + '\pm ' + str(round(np.nanstd(rmedian), 2)) + mat + ' & '+ r'\\' + '\n')
+    file.write('Median R1-R2 &' + mat + str(round(np.nanmedian(rmedian), 2)) + '\pm ' + str(round(mederr, 2)) + mat + ' & '+ r'\\' + '\n')
 
     file.close()
 
