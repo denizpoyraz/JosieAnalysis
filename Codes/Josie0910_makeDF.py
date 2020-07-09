@@ -6,18 +6,37 @@ import math
 from math import log
 from makeDF_Functions import calculate_O3frac
 
+from Analyse_Functions import polyfit
+
+
+##########  part for TP Cell:
+
+
+df17 = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv.csv", low_memory=False)
+
+p_en, p_sp = polyfit(df17)
+
+
+
+#######################################################################
+
+## 17/06 correction for TPint and TPext exchange
+
 slow = 25 * 60  # 25 minutes in seconds
 fast = 25  # 25seconds
 
 # Read the metadata file
-# dfmeta = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Josie09_MetaData.csv")
 dfmeta = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Josie10_MetaData.csv")
+# dfmeta = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Josie10_MetaData.csv")
 dfmeta_ib = pd.read_excel("/home/poyraden/Analysis/JOSIEfiles/ib_2010.xlsx")
+dfmeta_m = pd.read_excel("/home/poyraden/Analysis/JOSIEfiles/2010_mass.xlsx")
+
+
 
 
 # all files
 ## use pathlib jspr
-# allFiles = glob.glob("/home/poyraden/Analysis/JOSIEfiles/JOSIE-2009-Data-ReProc/*.O3R")
+# allFiles = glob.glob("/home/poyraden/Analysis/JOSIEfiles/JOSIE-2010-Data-ReProc/*.O3R")
 allFiles = glob.glob("/home/poyraden/Analysis/JOSIEfiles/JOSIE-2010-Data-ReProc/*.O3R")
 
 
@@ -32,12 +51,29 @@ columnStr = columnString.split(" ")
 column_metaString = "Year Sim Team Code Flow IB1 Cor Sol Buf ADX"
 columnMeta  = ['Year', 'Sim', 'Team', 'Code', 'Flow', 'IB1', 'Cor', 'ENSCI' , 'Sol', 'Buf', 'ADX']
 columnMeta_ib = ['Simib', 'Teamib', 'Yearib', 'iB0', 'iB1', 'iB2']
+columnMeta_m = ['Simm', 'Teamm', 'Mspre', 'Mspost', 'Diff']
+
+Pval = np.array([1000, 730, 535, 382, 267, 185, 126, 85, 58, 39, 26.5, 18.1, 12.1, 8.3, 6])
+JMA = np.array(
+    [0.999705941, 0.997216654, 0.995162562, 0.992733959, 0.989710199, 0.985943645, 0.981029252, 0.974634364,
+     0.966705137, 0.956132227, 0.942864263, 0.9260478, 0.903069813, 0.87528384, 0.84516337])
+
+Temp = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+Pw_temp = [6.1, 8.7, 12.3, 17.1, 23.4, 31.7, 42.4, 56.2, 73.7, 95.8, 125.3]
+
+yref_pair = [1000, 850, 700, 550, 400, 350, 300, 200, 150, 100, 75, 50, 35, 25, 20, 15,
+        12, 10, 8, 6]
+
+
+y_pair=  [925.0, 775.0, 625.0, 475.0, 375.0, 325.0, 250.0, 175.0, 125.0, 87.5, 62.5, 42.5, 30.0, 22.5, 17.5, 13.5, 11.0, 9.0, 7.0]
 
 #**********************************************
 # Main loop to merge all data sets
 #**********************************************
 for filename in allFiles:
-    file = open(filename,'r')
+    file = open(filename, 'r')
+    # Get the participant information from the name of the file
+    print(filename)
     # Get the participant information from the name of the file
     tmp_team = filename.split("/")[6]  # 7 for home, 6 for kmi
     header_team =( tmp_team.split("_")[2]).split(".")[0]
@@ -78,12 +114,21 @@ for filename in allFiles:
     common_ib = [i for i in select_indicesTeam_ib if i in select_indicesSim_ib]
     index_common_ib = common_ib[0]
 
-    print('common_ib', common_ib)
+    ## now the same for mass diff values
+
+    select_indicesTeam_m = list(np.where(dfmeta_m["Team"] == df['Header_Team'][0]))[0]
+    select_indicesSim_m = list(np.where(dfmeta_m["Sim"] == df['Header_Sim'][0]))[0]
+
+    common_m = [i for i in select_indicesTeam_m if i in select_indicesSim_m]
+    index_common_m = common_m[0]
+
+    print('common_m', common_m)
 
      ## The index of the metadata that has the information of this simulation = index_common
     #  assign this row into a list
     list_md = dfmeta.iloc[index_common,:].tolist()
     list_md_ib = dfmeta_ib.iloc[index_common_ib,:].tolist()
+    list_md_m = dfmeta_m.iloc[index_common_m,:].tolist()
 
     ## Add  metadata to the main df
     df = df.join(pd.DataFrame(
@@ -98,33 +143,74 @@ for filename in allFiles:
         columns=columnMeta_ib
     ))
 
-    df['PO3_stp'] = df['PO3'] * (df['Tair'] / 273.15)
-    df['PO3_OPM_stp'] = df['PO3_OPM'] * (df['Tair'] / 273.15)
+    df = df.join(pd.DataFrame(
+        [list_md_m],
+        index=df.index,
+        columns=columnMeta_m
+    ))
+
+    # df['PO3_stp'] = df['PO3'] * (df['Tair'] / 273.15)
+    # df['PO3_OPM_stp'] = df['PO3_OPM'] * (df['Tair'] / 273.15)
 
     ## convert OPM pressure to current
-    df['I_OPM'] = (df['PO3_OPM'] * df['PFcor']) / (df['TPint'] * 0.043085)
+    df['I_OPM'] = (df['PO3_OPM'] * df['PFcor']) / (df['TPext'] * 0.043085)
 
-    Pval = np.array([1000, 730, 535, 382, 267, 185, 126, 85, 58, 39, 26.5, 18.1, 12.1, 8.3, 6])
-    JMA = np.array(
-        [0.999705941, 0.997216654, 0.995162562, 0.992733959, 0.989710199, 0.985943645, 0.981029252, 0.974634364,
-         0.966705137, 0.956132227, 0.942864263, 0.9260478, 0.903069813, 0.87528384, 0.84516337])
+    df['TPextC'] = df['TPext'] - 273
 
     for k in range(len(df)):
         ## jma corrections for OPM current, OPM_I_jma will be used only for Ua in the convolution of
         ## the slow component of the signal
+
+        for pi in range(len(yref_pair) -1):
+
+            if (df.at[k, 'Pair'] >= yref_pair[pi + 1]) & (df.at[k, 'Pair'] < yref_pair[pi]) :
+                if (df.at[k, 'ENSCI'] == 1): df.at[k, 'Tcell'] = df.at[k, 'TPext'] - p_en(y_pair[pi])
+                if (df.at[k, 'ENSCI'] == 0): df.at[k, 'Tcell'] = df.at[k, 'TPext'] - p_sp(y_pair[pi])
+
+        if (df.at[k, 'Pair'] <= yref_pair[19]) :
+            if(df.at[k, 'ENSCI'] == 1): df.at[k, 'Tcell'] = df.at[k, 'TPext'] - p_en(y_pair[18])
+            if(df.at[k, 'ENSCI'] == 0): df.at[k, 'Tcell'] = df.at[k, 'TPext'] - p_sp(y_pair[18])
+
+        df.at[k, 'TcellC'] = df.at[k, 'Tcell'] -  273
+
+        for t in range(len(Temp) - 1):
+
+            if (df.at[k, 'TcellC'] >= Temp[t]) & (df.at[k, 'TcellC'] < Temp[t + 1]):
+                df.at[k, 'Pw'] = Pw_temp[t]
+
+        # print(df.at[k, 'TcellC'])
+
+        if (df.at[k, 'TcellC'] >= Temp[10]): df.at[k, 'Pw'] = Pw_temp[10]
+        if (df.at[k, 'TcellC'] < Temp[0]): df.at[k, 'Pw'] = Pw_temp[0]
+
+
         for p in range(len(JMA) - 1):
+
             if (df.at[k, 'Pair'] >= Pval[p + 1]) & (df.at[k, 'Pair'] < Pval[p]):
                 # print(p, Pval[p + 1], Pval[p ])
                 df.at[k, 'I_OPM_jma'] = df.at[k, 'PO3_OPM'] * df.at[k, 'PFcor'] * JMA[p] / \
-                                          (df.at[k, 'TPint'] * 0.043085)
-                df.at[k,'PO3_jma'] = 0.043085 * df.at[k, 'TPint']  * (df.at[k, 'IM'] - df.at[k, 'IB1']) / (df.at[k, 'PFcor'] * JMA[p])
+                                          (df.at[k, 'TPext'] * 0.043085)
+                df.at[k,'PO3_jma'] = 0.043085 * df.at[k, 'TPext']  * (df.at[k, 'IM'] - df.at[k, 'IB1']) / (df.at[k, 'PFcor'] * JMA[p])
+
+                df.at[k, 'JMA'] = JMA[p]
+
+
         if (df.at[k, 'Pair'] <= Pval[14]):
-            df.at[k, 'OPM_I_jma'] = df.at[k, 'PO3_OPM'] * df.at[k, 'PFcor'] * JMA[14] / \
-                                          (df.at[k, 'TPint'] * 0.043085)
-            df.at[k, 'PO3_jma'] = 0.043085 * df.at[k, 'TPint'] * (df.at[k, 'IM'] - df.at[k, 'IB1']) / (
+            df.at[k, 'I_OPM_jma'] = df.at[k, 'PO3_OPM'] * df.at[k, 'PFcor'] * JMA[14] / \
+                                          (df.at[k, 'TPext'] * 0.043085)
+            df.at[k, 'PO3_jma'] = 0.043085 * df.at[k, 'TPext'] * (df.at[k, 'IM'] - df.at[k, 'IB1']) / (
                         df.at[k, 'PFcor'] * JMA[14])
+            df.at[k, 'JMA'] = JMA[14]
 
 
+
+        # if (df.at[k, 'Pw'] < df.at[k, 'Pair']):
+        df.at[k, 'massloss'] = 0.0001 * 1000 * (df.at[k, 'Pw'] / (461.52 * df.at[k, 'Tcell'])) * df.at[k, 'JMA'] * \
+                                   df.at[k, 'PFcor']
+        df.at[k, 'Tboil'] = (( 237.3 * np.log10(df.at[k, 'Pair']) )  - 186.47034)  / (8.2858 - np.log10(df.at[k, 'Pair']))
+
+
+    df['total_massloss'] = np.trapz(df.massloss, x=df.Tsim)
 
     size = len(df)
     Ums_i = [0] * size
@@ -176,69 +262,13 @@ for s in simlist:
     df.loc[filt4, 'Pair'] = np.array(df.loc[filt1, 'Pair'])
 
 
-# # v2 cuts, use this and v3 standard more conservative cuts not valid for 140, 162, 163, 166  v2
-
-# df=df[df.Tsim > 900]
-# df=df[df.Tsim <= 8100]
-# df = df.drop(df[(2000 < df.Tsim) & (df.Tsim < 2500) & (df.Sim != 140) & (df.Sim != 162) & (df.Sim != 163) & (
-#                 df.Sim != 166)].index)
-# df = df.drop(df[(df.Tsim > 4000) & (df.Tsim < 4500) & (df.Sim != 140) & (df.Sim != 162) & (df.Sim != 163) & (
-#                 df.Sim != 166)].index)
-# df = df.drop(df[(df.Tsim > 6000) & (df.Tsim < 6500) & (df.Sim != 140) & (df.Sim != 162) & (df.Sim != 163) & (
-#                 df.Sim != 166)].index)
-#
-# df = df.drop(df[(df.Sim == 141) & (df.Team == 3)].index)
-# df = df.drop(df[(df.Sim == 143) & (df.Team == 2) & (df.Tsim > 7950) & (df.Tsim < 8100)].index)
-# df = df.drop(df[(df.Sim == 147) & (df.Team == 3)].index)
-# df = df.drop(df[(df.Sim == 158) & (df.Team == 2)].index)
-# df = df.drop(df[(df.Sim == 167) & (df.Team == 4)].index)
-#
-# df = df.drop(df[(df.Sim == 158) & (df.Tsim > 7300) & (df.Tsim < 7700)].index)
-# df = df.drop(df[(df.Sim == 159) & (df.Tsim > 7800) & (df.Tsim < 8000)].index)
-# df = df.drop(df[(df.Sim == 161) & (df.Tsim > 6800) & (df.Tsim < 7200)].index)
-#
-#     # # additional cuts for specific simulations  v3
-# df = df.drop(df[(df.Sim == 140) & (df.Tsim < 1000)].index)
-# df = df.drop(df[(df.Sim == 140) & (df.Tsim > 2450) & (df.Tsim < 2800)].index)
-# df = df.drop(df[(df.Sim == 140) & (df.Tsim > 4400) & (df.Tsim < 4800)].index)
-# df = df.drop(df[(df.Sim == 140) & (df.Tsim > 6400) & (df.Tsim < 6800)].index)
-#
-# df = df.drop(df[(df.Sim == 162) & (df.Tsim > 2100) & (df.Tsim < 2550)].index)
-# df = df.drop(df[(df.Sim == 162) & (df.Tsim > 4100) & (df.Tsim < 4600)].index)
-# df = df.drop(df[(df.Sim == 162) & (df.Tsim > 5450) & (df.Tsim < 5800)].index)
-# df = df.drop(df[(df.Sim == 162) & (df.Tsim > 6100) & (df.Tsim < 6550)].index)
-#
-# df = df.drop(df[(df.Sim == 163) & (df.Tsim > 2100) & (df.Tsim < 2550)].index)
-# df = df.drop(df[(df.Sim == 163) & (df.Tsim > 4100) & (df.Tsim < 4600)].index)
-# df = df.drop(df[(df.Sim == 163) & (df.Tsim > 5450) & (df.Tsim < 5800)].index)
-# df = df.drop(df[(df.Sim == 163) & (df.Tsim > 6100) & (df.Tsim < 6550)].index)
-#
-# df = df.drop(df[(df.Sim == 166) & (df.Tsim > 2200) & (df.Tsim < 2650)].index)
-# df = df.drop(df[(df.Sim == 166) & (df.Tsim > 4200) & (df.Tsim < 4700)].index)
-# df = df.drop(df[(df.Sim == 166) & (df.Tsim > 6200) & (df.Tsim < 6650)].index)
-# df = df.drop(df[(df.Sim == 166) & (df.Tsim > 7550) & (df.Tsim < 7750)].index)
-# df = df.drop(df[(df.Sim == 166) & (df.Team == 1) & (df.Tsim > 4400) & (df.Tsim < 5400)].index)
-#
-# # # ## v3 cuts
-# #
-# df = df.drop(df[(df.Sim == 159) & (df.Team == 1)].index)
-# df = df.drop(df[(df.Sim == 158) & (df.Team == 1)].index)
-# df = df.drop(df[(df.Sim == 163) & (df.Team == 4)].index)
-# df = df.drop(df[(df.Sim == 159) & (df.Team == 4)].index)
 #
 
 # correct Pair values, and assign them to the first participants Pair values
-
-
-
 calculate_O3frac(df, simlist)
 
 
-df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2010_Data_nocut.csv")
-
-
-    
-
+df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2010_Data_nocut_tempfixed_paper.csv")
 
 
 

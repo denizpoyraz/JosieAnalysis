@@ -18,6 +18,9 @@ def Calc_average_profile_pressure(dataframelist, xcolumn):
     yref = [1000, 850, 700, 550, 400, 350, 300, 200, 150, 100, 75, 50, 35, 25, 20, 15,
             12, 10, 8, 6]
 
+    # yref = [1000, 850, 750, 650,  550, 450, 350, 300, 200, 175, 150, 125, 100, 80, 60, 50, 40, 35, 30, 25, 20, 15,
+    #         12, 10, 8, 6]
+    # #
     # yref = [1000, 950, 900, 850, 800, 750, 700, 650, 600, 550, 500, 450, 400, 350, 325, 300, 275, 250, 225, 200, 175,
     #         150, 135, 120, 105, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 28, 26, 24, 22, 20, 18, 16, 14,
     #         12, 10, 8, 6]
@@ -38,6 +41,7 @@ def Calc_average_profile_pressure(dataframelist, xcolumn):
         for i in range(n):
             dftmp1 = pd.DataFrame()
             dfgrid = pd.DataFrame()
+
 
             grid_min = yref[i + 1]
             grid_max = yref[i]
@@ -61,7 +65,7 @@ def Calc_average_profile_pressure(dataframelist, xcolumn):
 
             # print('j', j, 'i',i, Xgrid[j][i])
 
-    return Xgrid, Asigma, Ygrid
+    return Xgrid, Xsigma, Ygrid
 
 
 
@@ -109,9 +113,65 @@ def Calc_average_profile_time(dataframelist, xcolumn, ybin, tmin, tmax ):
             Agrid[j][i] = np.nanmean(dfgrid.X - dfgrid['PO3_OPM'])
             Asigma[j][i] = np.nanstd(dfgrid.X - dfgrid['PO3_OPM'])
 
-    return Xgrid, Asigma, Ygrid
+    return Xgrid, Xsigma, Ygrid
 
 ####################
+def Calc_average_profile_Pair(dataframelist, xcolumn):
+
+    #
+    yref = [1000, 950, 900, 850, 800, 750, 700, 650, 600, 550, 500, 450, 400, 350, 325, 300, 275, 250, 225, 200, 175,
+            150, 135, 120, 105, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 28, 26, 24, 22, 20, 18, 16, 14,
+            12, 10, 8, 6]
+
+
+    # yref = [1000, 850, 700,  550, 400, 350, 300, 200, 150, 100, 75,  50, 35, 25, 20, 15,
+    #         12, 10, 8, 6]
+
+    nd = len(dataframelist)
+
+
+    ymin = 0.0
+    fac = 1.0
+    n = len(yref) - 1
+    Ygrid = [-9999.0] * n
+
+    Xgrid = [[-9999.0] * n for i in range(nd)]
+    Xsigma = [[-9999.0] * n for i in range(nd)]
+    Agrid = [[-9999.0] * n for i in range(nd)]
+    Asigma = [[-9999.0] * n for i in range(nd)]
+
+    for j in range(nd):
+        dft = dataframelist[j]
+        dft.PFcor = dft[xcolumn]
+
+        for i in range(n):
+            dftmp1 = pd.DataFrame()
+            dfgrid = pd.DataFrame()
+            grid_min = yref[i + 1]
+            grid_max = yref[i]
+            Ygrid[i] = (grid_min + grid_max) / 2.0
+
+            filta = dft.Tsim >= grid_min
+            filtb = dft.Tsim < grid_max
+            filter1 = filta & filtb
+            dftmp1['X'] = dft[filter1].PFcor
+            dftmp1['PO3_OPM'] = dft[filter1]['PO3_OPM']
+
+            filtnull = dftmp1.X > -9999.0
+            dfgrid['X'] = dftmp1[filtnull].X
+            dfgrid['PO3_OPM'] = dftmp1[filtnull].PO3_OPM
+
+            Xgrid[j][i] = np.nanmean(dfgrid.X)
+            Xsigma[j][i] = np.nanstd(dfgrid.X)
+
+            Agrid[j][i] = np.nanmean(dfgrid.X - dfgrid['PO3_OPM'])
+            Asigma[j][i] = np.nanstd(dfgrid.X - dfgrid['PO3_OPM'])
+
+
+
+    return Xgrid, Xsigma, Ygrid
+
+
 
 def Calc_average_profileCurrent_pressure(dataframelist, xcolumn):
     nd = len(dataframelist)
@@ -615,52 +675,6 @@ def calculate_O3frac17(df, simlist):
         df.loc[filt8, 'RDif'] = Rdif8
         df.loc[filt8, 'frac'] = frac8
 
-
-def Calc_average_profile_Pair(dataframe, xcolumn):
-
-    dft = dataframe
-    dft.PFcor = dft[xcolumn]
-
-    #
-    yref = [1000, 950, 900, 850, 800, 750, 700, 650, 600, 550, 500, 450, 400, 350, 325, 300, 275, 250, 225, 200, 175,
-            150, 135, 120, 105, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 28, 26, 24, 22, 20, 18, 16, 14,
-            12, 10, 8, 6]
-
-
-    # yref = [1000, 850, 700,  550, 400, 350, 300, 200, 150, 100, 75,  50, 35, 25, 20, 15,
-    #         12, 10, 8, 6]
-
-    n = len(yref) - 1
-    Xgrid = [-9999.0] * n
-    Xsigma = [-9999.0] * n
-    Ygrid = [-9999.0] * n
-
-    for i in range(n):
-        dftmp1 = pd.DataFrame()
-        dfgrid = pd.DataFrame()
-
-        grid_min = yref[i + 1]
-        grid_max = yref[i]
-        Ygrid[i] = (grid_min + grid_max) / 2.0
-
-        filta = dft.Pair >= grid_min
-        filtb = dft.Pair < grid_max
-        filter1 = filta & filtb
-        dftmp1['X'] = dft[filter1].PFcor
-
-        filtnull = dftmp1.X > -9999.0
-        # filtfin = np.isnan(dftmp1.X)
-        # filtfin = not(filtfin)
-        # filterall = filtnull & filtfin
-        filterall = filtnull
-        dfgrid['X'] = dftmp1[filterall].X
-        tmp = np.array(dfgrid.X.tolist())
-        # dfgrid = dfgrid.dropna()  ## problems with nan
-        Xgrid[i] = np.nanmean(dfgrid.X)
-        Xsigma[i] = np.nanstd(dfgrid.X)
-
-    # print('Xgrid', Xgrid)
-    return Xgrid, Xsigma, Ygrid
 
 
 

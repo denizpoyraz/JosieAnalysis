@@ -8,7 +8,7 @@ import pickle
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut.csv", low_memory=False)
 
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_beta2ib0.csv", low_memory=False)
-df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_beta0alldata.csv", low_memory=False)
+df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_final.csv", low_memory=False)
 
 # df = df.drop(df[(df.Sim == 179) & (df.Team == 4)].index)
 # df = df.drop(df[(df.Sim == 172) & (df.Team == 1)].index)
@@ -38,8 +38,8 @@ ensci = np.asarray(df.drop_duplicates(['Sim', 'Team'])['ENSCI'])
 
 dft = {}
 
-simlist = [140, 140, 140, 140]
-teamlist = [1 ,2 ,3 ,4]
+# simlist = [141, 141, 141, 141]
+# teamlist = [1 ,2 ,3 ,4]
 
 for j in range(len(simlist)):
 
@@ -77,7 +77,7 @@ for j in range(len(simlist)):
     # t2_stop = dft[j].iloc[0]['R2_Tstop']
 
     ## Plotting
-    rdifbool = 1
+    rdifbool = 0
 
     gs = gridspec.GridSpec(3, 1)
     #
@@ -85,17 +85,35 @@ for j in range(len(simlist)):
         ax2 = plt.subplot(gs[:, :])  # create the first subplot that will ALWAYS be there
         ax2.set_ylabel(r'Current ($\mu$A)')
         ax2.set_xlabel('Tsim (secs)')
-        plt.plot(dft[j].Tsim, dft[j].I_OPM_jma, label='I OPM JMA', linestyle="--")
-        plt.plot(dft[j].Tsim, dft[j].IM, label='I ECC')
-        plt.plot(dft[j].Tsim, dft[j].I_fast_smb6, label='I fast smb6')
+        plt.plot(dft[j].Tsim, dft[j].I_OPM_jma, label='I OPM JMA')
+        # plt.plot(dft[j].Tsim, dft[j].I_OPM_jma_sm8, label='I OPM JMA sm8')
+
+        plt.plot(dft[j].Tsim, dft[j].I_OPM_jma_sm20, label='I OPM JMA sm20')
+        plt.plot(dft[j].Tsim, dft[j].I_OPM_jma_sm40, label='I OPM JMA sm40')
+
+        # plt.plot(dft[j].Tsim, dft[j].I_OPM_jma_sm20, label='I OPM JMA sm20', linestyle="--")
+
+
+        # plt.plot(dft[j].Tsim, dft[j].IM, label='I ECC')
+        # plt.plot(dft[j].Tsim, dft[j].IM_sm8, label='I ECC sm8')
+        # plt.plot(dft[j].Tsim, dft[j].IM_sm20, label='I ECC sm20')
+
+        # plt.plot(dft[j].Tsim, dft[j].Ifast_minib0_deconv.rolling(window=4).mean(), label='Ifast - ib0 sm8')
+        plt.plot(dft[j].Tsim, dft[j].Ifast_minib0_deconv.rolling(window=10).mean(), label='Ifast - ib0 sm20')
+        plt.plot(dft[j].Tsim, dft[j].Ifast_minib0_deconv.rolling(window=20).mean(), label='Ifast - ib0 sm40')
+
+        # plt.plot(dft[j].Tsim, dft[j].Ifast_minib0_deconv.rolling(window=4, win_type='gaussian', center=True).mean(std=2), label='I fast sm 8 secs gf2')
+        # plt.plot(dft[j].Tsim, dft[j].Ifast_minib0_deconv.rolling(window=3, win_type='gaussian', center=True).mean(std=2), label='I fast sm 6 secs gf2')
+
+
 
         # plt.plot(dft[j].Tsim, dft[j].I_fast_smb12, label='I fast smb12')
         # plt.plot(dft[j].Tsim, dft[j].I_fast_deconv_sm6, label='I deconv. sm.')
         # plt.plot(dft[j].Tsim, dft[j].I_fast_deconv_smb6, label='I sm. deconv.')
 
-        plt.plot(dft[j].Tsim, 0.1 * dft[j].I_conv_slow, label='0.1 * I slow conv. ', color='#d62728')
+        # plt.plot(dft[j].Tsim, 0.1 * dft[j].I_conv_slow, label='0.1 * I slow conv. ', color='#d62728')
         plt.title(ptitle)
-        plt.legend(loc='upper left', fontsize='x-small')
+        plt.legend(loc='upper left', fontsize='large')
         plt.ylim(-0.01,7)
         plt.xlim(0, 9000)
         # plt.ylim(0.03, 30)

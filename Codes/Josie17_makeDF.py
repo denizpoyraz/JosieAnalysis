@@ -9,6 +9,19 @@ import numpy as np
 import glob
 
 from makeDF_Functions import calculate_O3frac17
+from Analyse_Functions import polyfit
+
+
+##########  part for TP Cell:
+
+
+df17 = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv.csv", low_memory=False)
+
+p_en, p_sp = polyfit(df17)
+
+
+
+#######################################################################
 
 slow = 25 * 60  # 25 minutes in seconds
 fast = 25  # 25seconds
@@ -33,6 +46,20 @@ column_metaString = 'Sim Simulator_RunNr Date Team Ini_Prep_Date Prep_SOP Serial
                     'RespTime_4_1p5_sec_p1 RespTime_1minOver2min_microamps PostTestSolution_Lost_gr PumpMotorCurrent ' \
                     'PumpMotorCurrent_Post PF_Unc PF_Cor BG'
 columnMeta = column_metaString.split(" ")
+
+Pval = np.array([1000, 730, 535, 382, 267, 185, 126, 85, 58, 39, 26.5, 18.1, 12.1, 8.3, 6])
+JMA = np.array(
+    [0.999705941, 0.997216654, 0.995162562, 0.992733959, 0.989710199, 0.985943645, 0.981029252, 0.974634364,
+     0.966705137, 0.956132227, 0.942864263, 0.9260478, 0.903069813, 0.87528384, 0.84516337])
+
+Temp = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+Pw_temp = [6.1, 8.7, 12.3, 17.1, 23.4, 31.7, 42.4, 56.2, 73.7, 95.8, 125.3]
+
+yref_pair = [1000, 850, 700, 550, 400, 350, 300, 200, 150, 100, 75, 50, 35, 25, 20, 15,
+        12, 10, 8, 6]
+
+y_pair=  [925.0, 775.0, 625.0, 475.0, 375.0, 325.0, 250.0, 175.0, 125.0, 87.5, 62.5, 42.5, 30.0, 22.5, 17.5, 13.5, 11.0, 9.0, 7.0]
+
 
 # **********************************************
 # Main loop to merge all data sets
@@ -90,34 +117,70 @@ for filename in allFiles:
         columns=columnMeta
     ))
 
-    df['PO3_stp'] = df['PO3'] * (df['Tair'] / 273.15)
-    df['PO3_OPM_stp'] = df['PO3_OPM'] * (df['Tair'] / 273.15)
-    df['RDif_PO3'] = 100 * (df['PO3'] - df['PO3_OPM'])/(df['PO3_OPM'])
+    # df['PO3_stp'] = df['PO3'] * (df['Tair'] / 273.15)
+    # df['PO3_OPM_stp'] = df['PO3_OPM'] * (df['Tair'] / 273.15)
+    # df['RDif_PO3'] = 100 * (df['PO3'] - df['PO3_OPM'])/(df['PO3_OPM'])
+
+    df['TPextC'] = df['TPext'] - 273
 
 
     ## convert OPM pressure to current
-    df['I_OPM'] = (df['PO3_OPM'] * df['PFcor']) / (df['TPint'] * 0.043085)
+    df['I_OPM'] = (df['PO3_OPM'] * df['PFcor']) / (df['TPext'] * 0.043085)
 
-    Pval = np.array([1000, 730, 535, 382, 267, 185, 126, 85, 58, 39, 26.5, 18.1, 12.1, 8.3, 6])
-    JMA = np.array(
-        [0.999705941, 0.997216654, 0.995162562, 0.992733959, 0.989710199, 0.985943645, 0.981029252, 0.974634364,
-         0.966705137, 0.956132227, 0.942864263, 0.9260478, 0.903069813, 0.87528384, 0.84516337])
 
     for k in range(len(df)):
         ## jma corrections for OPM current, OPM_I_jma will be used only for Ua in the convolution of
         ## the slow component of the signal
+
+        for pi in range(len(yref_pair) -1):
+
+            if (df.at[k, 'Pair'] >= yref_pair[pi + 1]) & (df.at[k, 'Pair'] < yref_pair[pi]) :
+                if (df.at[k, 'ENSCI'] == 1): df.at[k, 'Tcell'] = df.at[k, 'TPext'] - p_en(y_pair[pi])
+                if (df.at[k, 'ENSCI'] == 0): df.at[k, 'Tcell'] = df.at[k, 'TPext'] - p_sp(y_pair[pi])
+
+        if (df.at[k, 'Pair'] <= yref_pair[19]) :
+            if(df.at[k, 'ENSCI'] == 1): df.at[k, 'Tcell'] = df.at[k, 'TPext'] - p_en(y_pair[18])
+            if(df.at[k, 'ENSCI'] == 0): df.at[k, 'Tcell'] = df.at[k, 'TPext'] - p_sp(y_pair[18])
+
+        df.at[k, 'TcellC'] = df.at[k, 'Tcell'] - 273
+
+        for t in range(len(Temp) - 1):
+
+            if (df.at[k, 'TcellC'] >= Temp[t]) & (df.at[k, 'TcellC'] < Temp[t + 1]):
+                df.at[k, 'Pw'] = Pw_temp[t]
+
+        if (df.at[k, 'TcellC'] >= Temp[10]): df.at[k, 'Pw'] = Pw_temp[10]
+        if (df.at[k, 'TcellC'] < Temp[0]): df.at[k, 'Pw'] = Pw_temp[0]
+
+
         for p in range(len(JMA) - 1):
+
             if (df.at[k, 'Pair'] >= Pval[p + 1]) & (df.at[k, 'Pair'] < Pval[p]):
                 # print(p, Pval[p + 1], Pval[p ])
                 df.at[k, 'I_OPM_jma'] = df.at[k, 'PO3_OPM'] * df.at[k, 'PFcor'] * JMA[p] / \
-                                        (df.at[k, 'TPint'] * 0.043085)
-                df.at[k, 'PO3_jma'] = 0.043085 * df.at[k, 'TPint'] * (df.at[k, 'IM'] - df.at[k, 'iB1']) / (
+                                        (df.at[k, 'TPext'] * 0.043085)
+                df.at[k, 'PO3_jma'] = 0.043085 * df.at[k, 'TPext'] * (df.at[k, 'IM'] - df.at[k, 'iB1']) / (
                             df.at[k, 'PFcor'] * JMA[p])
+
+                df.at[k, 'JMA'] = JMA[p]
+
         if (df.at[k, 'Pair'] <= Pval[14]):
-            df.at[k, 'OPM_I_jma'] = df.at[k, 'PO3_OPM'] * df.at[k, 'PFcor'] * JMA[14] / \
-                                    (df.at[k, 'TPint'] * 0.043085)
-            df.at[k, 'PO3_jma'] = 0.043085 * df.at[k, 'TPint'] * (df.at[k, 'IM'] - df.at[k, 'iB1']) / (
+            df.at[k, 'I_OPM_jma'] = df.at[k, 'PO3_OPM'] * df.at[k, 'PFcor'] * JMA[14] / \
+                                    (df.at[k, 'TPext'] * 0.043085)
+            df.at[k, 'PO3_jma'] = 0.043085 * df.at[k, 'TPext'] * (df.at[k, 'IM'] - df.at[k, 'iB1    ']) / (
                     df.at[k, 'PFcor'] * JMA[14])
+            df.at[k, 'JMA'] = JMA[14]
+
+
+        # if (df.at[k, 'Pw'] < df.at[k, 'Pair']):
+        df.at[k, 'massloss'] = 0.0001 * 1000 * df.at[k, 'Pw'] / (461.52 * df.at[k, 'Tcell']) * df.at[k, 'JMA'] * \
+                                   df.at[k, 'PFcor']
+        df.at[k, 'Tboil'] = (( 237.3 * np.log10(df.at[k, 'Pair']) )  - 186.47034)  / (8.2858 - np.log10(df.at[k, 'Pair']))
+
+        # if (df.at[k, 'Pw'] >= df.at[k, 'Pair']):
+        #     df.at[k, 'massloss'] = 0
+
+    df['total_massloss'] = np.trapz(df.massloss, x=df.Tsim)
 
     size = len(df)
     Ums_i = [0] * size
@@ -192,7 +255,9 @@ for s in simlist:
 calculate_O3frac17(df, simlist)
 
 
-df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_Data_nocut.csv")
+df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_Data_nocut_tempfixed_paper.csv")
+# df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_Data_nocut.csv")
+#
 
 # In[ ]:
 

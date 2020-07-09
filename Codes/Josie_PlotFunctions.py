@@ -62,7 +62,7 @@ def errorPlot_ARDif_withtext(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, 
     for i in range(d):
         n[i] = len(dfnoduplist[i])
         labell[i] = labelist[i] + ' ( n =' + str(n[i]) + ')'
-        textl[i] = 'tot O3 ratio: ' + str(round(O3valuelist[0], 2))
+        # textl[i] = 'tot O3 ratio: ' + str(round(O3valuelist[0], 2))
 
         ax.errorbar(xlist[i], Y, xerr=xerrorlist[i], label=labell[i], color=colorl[i], linewidth=1, elinewidth=0.5,
                     capsize=1,
@@ -78,7 +78,7 @@ def errorPlot_ARDif_withtext(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, 
     # ax.xaxis.set_minor_locator(AutoMinorLocator(10))
     # ax.legend(loc='lower right', frameon=True, fontsize='small')
 
-    ax.legend(loc='lower left', frameon=False, fontsize='x-small')
+    ax.legend(loc='lower left', frameon=False, fontsize='small')
 
     # plt.show()
 
@@ -122,11 +122,11 @@ def errorPlot_general(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, ytitle,
     plus1 = [[0] * dimension for i in range(d)]
     minus1 = [[0] * dimension for i in range(d)]
 
-    for j in range(d):
-        plus[j] = [xlist[j][i] + 3  for i in range(dimension)]
-        minus[j] = [xlist[j][i] - 3 for i in range(dimension)]
-        plus1[j] = [xlist[j][i] + 1 for i in range(dimension)]
-        minus1[j] = [xlist[j][i] - 1 for i in range(dimension)]
+    # for j in range(d):
+    #     plus[j] = [xlist[j][i] + 3  for i in range(dimension)]
+    #     minus[j] = [xlist[j][i] - 3 for i in range(dimension)]
+    #     plus1[j] = [xlist[j][i] + 1 for i in range(dimension)]
+    #     minus1[j] = [xlist[j][i] - 1 for i in range(dimension)]
 
     plt.close('all')
     fig, ax = plt.subplots()
@@ -143,12 +143,14 @@ def errorPlot_general(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, ytitle,
 
     # reference line
     ax.axvline(x=0, color='grey', linestyle='--')
-    if logbool: ax.set_yscale('log')
+    if logbool:
+        ax.set_yscale('log')
+        # ax.set_xscale('log')
 
     for i in range(d):
         labell[i] = labelist[i]
         if not linestylebool:
-            ax.errorbar(xlist[i], Y, xerr=xerrorlist[i], label=labell[i], color=colorlist[i], linewidth=1, elinewidth=0.5,capsize=1, capthick=0.5)
+            ax.errorbar(xlist[i], Y, xerr=xerrorlist[i], label=labell[i], color=colorlist[i], linewidth=2, elinewidth=0.5,capsize=1, capthick=0.5)
         if linestylebool:
             ax.errorbar(xlist[i], Y, xerr=xerrorlist[i], label=labell[i], color=colorlist[i], linewidth=1, elinewidth=0.5,capsize=1, capthick=0.5, linestyle=lstyle[i])
         if fillbool:
@@ -156,12 +158,14 @@ def errorPlot_general(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, ytitle,
           ax.fill_betweenx(Y, minus1[0], plus1[0], alpha=0.1, facecolor='k', edgecolor= 'lightblue')
 
 
-    ax.legend(loc='lower right', frameon=True, fontsize='x-small')
+    ax.legend(loc='best', frameon=True, fontsize='large')
 
 
     plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/' + path + '/' + plotname + '.png')
     plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/' + path + '/' + plotname + '.eps')
     plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/' + path + '/' + plotname + '.pdf')
+
+    plt.show()
 
 
     plt.close()
