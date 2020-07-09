@@ -1,7 +1,9 @@
 import numpy as np
 import pandas as pd
 
-def ratiofunction_beta(df, sim, team, categorystr, boolibo):
+def ratiofunction_beta(df, sim, team, categorystr, boolibo, slow, fast):
+
+    ##modifications made for timzescan, i slow conv used for beta calculation will be calculated in this function!
 
     r1 = [0] * len(sim);
     r2 = [0] * len(sim);
@@ -25,7 +27,7 @@ def ratiofunction_beta(df, sim, team, categorystr, boolibo):
     qerr_r3 = np.zeros(len(sim))
     qerr_r4 = np.zeros(len(sim))
 
-    df0 = {}
+    dft = {}
     df1 = {}
     df2 = {}
     df3 = {}
@@ -60,29 +62,53 @@ def ratiofunction_beta(df, sim, team, categorystr, boolibo):
             r4_up = 8740
 
 
-        t1 = (df.Tsim >= r1_down) & (df.Tsim < r1_up)
-        t2 = (df.Tsim >= r2_down) & (df.Tsim < r2_up)
-        t3 = (df.Tsim >= r3_down) & (df.Tsim < r3_up)
-        t4 = (df.Tsim >= r4_down) & (df.Tsim < r4_up)
+        dft[j] = df[(df.Sim == sim[j]) & (df.Team == team[j])]
+        dft[j].reset_index(inplace=True)
 
-        df1[j] = df[(df.Sim == sim[j]) & (df.Team == team[j]) & t1]
-        df2[j] = df[(df.Sim == sim[j]) & (df.Team == team[j]) & t2]
-        df3[j] = df[(df.Sim == sim[j]) & (df.Team == team[j]) & t3]
-        df4[j] = df[(df.Sim == sim[j]) & (df.Team == team[j]) & t4]
+        # t1 = (dft[j].Tsim >= r1_down) & (dft[j].Tsim < r1_up)
+        # t2 = (dft[j].Tsim >= r2_down) & (dft[j].Tsim < r2_up)
+        # t3 = (dft[j].Tsim >= r3_down) & (dft[j].Tsim < r3_up)
+        # t4 = (dft[j].Tsim >= r4_down) & (dft[j].Tsim < r4_up)
+
+        # zeroindex = int(np.mean(dft[j] .index))
+
+
+        size = len(dft[j])
+        Ums_i = [0] * size
+        # Ua_i = [0] * size
+
+        Ums_i[0] = dft[j].at[0, 'IM']
+
+        ## only convolute slow part of the signal, which is needed for beta calculation
+        for i in range(size - 1):
+            # Ua_i = dft[j]['I_OPM_jma'].iloc[i + 1, ]
+            Ua_i = dft[j].at[i+1, 'I_OPM_jma']
+            t1 = dft[j].at[i + 1, 'Tsim']
+            t2 = dft[j].at[i, 'Tsim']
+            Xs = np.exp(-(t1 - t2) / slow)
+            Xf = np.exp(-(t1 - t2) / fast)
+            Ums_i[i + 1] = Ua_i - (Ua_i - Ums_i[i]) * Xs
+
+        dft[j]['I_conv_slow_scan'] = Ums_i
+
+        df1[j] = dft[j][(dft[j].Tsim >= r1_down) & (dft[j].Tsim < r1_up)]
+        df2[j] = dft[j][(dft[j].Tsim >= r2_down) & (dft[j].Tsim < r2_up)]
+        df3[j] = dft[j][(dft[j].Tsim >= r3_down) & (dft[j].Tsim < r3_up)]
+        df4[j] = dft[j][(dft[j].Tsim >= r4_down) & (dft[j].Tsim < r4_up)]
 
         if not boolibo:
 
-            r1[j] = np.array((df1[j].IM / (0.10 * df1[j].I_conv_slow)).tolist())
-            r2[j] = np.array((df2[j].IM / (0.10 * df2[j].I_conv_slow)).tolist())
-            r3[j] = np.array((df3[j].IM / (0.10 * df3[j].I_conv_slow)).tolist())
-            r4[j] = np.array((df4[j].IM / (0.10 * df4[j].I_conv_slow)).tolist())
+            r1[j] = np.array((df1[j].IM / (0.10 * df1[j].I_conv_slow_scan)).tolist())
+            r2[j] = np.array((df2[j].IM / (0.10 * df2[j].I_conv_slow_scan)).tolist())
+            r3[j] = np.array((df3[j].IM / (0.10 * df3[j].I_conv_slow_scan)).tolist())
+            r4[j] = np.array((df4[j].IM / (0.10 * df4[j].I_conv_slow_scan)).tolist())
 
         if  boolibo:
 
-            r1[j] = np.array(( (df1[j].IM - df1[j].iB0) / (0.10 * df1[j].I_conv_slow)).tolist())
-            r2[j] = np.array(( (df2[j].IM - df2[j].iB0) / (0.10 * df2[j].I_conv_slow)).tolist())
-            r3[j] = np.array(( (df3[j].IM - df3[j].iB0) / (0.10 * df3[j].I_conv_slow)).tolist())
-            r4[j] = np.array(( (df4[j].IM - df4[j].iB0) / (0.10 * df4[j].I_conv_slow)).tolist())
+            r1[j] = np.array(( (df1[j].IM - df1[j].iB0) / (0.10 * df1[j].I_conv_slow_scan)).tolist())
+            r2[j] = np.array(( (df2[j].IM - df2[j].iB0) / (0.10 * df2[j].I_conv_slow_scan)).tolist())
+            r3[j] = np.array(( (df3[j].IM - df3[j].iB0) / (0.10 * df3[j].I_conv_slow_scan)).tolist())
+            r4[j] = np.array(( (df4[j].IM - df4[j].iB0) / (0.10 * df4[j].I_conv_slow_scan)).tolist())
         # print(j, np.nanmean(r1[j]))
 
         r1mean[j] = np.nanmean(r1[j])
@@ -168,7 +194,7 @@ mat + str(round(np.nanmedian(r2median), 2)) + '\pm ' + str(round(qerr_2, 2)) + m
 
 
 ######
-def ratiofunction_beta_9602(df, sim, team, categorystr, boolib0):
+def ratiofunction_beta_9602(df, sim, team, categorystr, boolib0, slow, fast):
 
     r1 = [0] * len(sim);
     r2 = [0] * len(sim);
@@ -183,7 +209,7 @@ def ratiofunction_beta_9602(df, sim, team, categorystr, boolib0):
     qerr_r1 = np.zeros(len(sim))
     qerr_r2 = np.zeros(len(sim))
 
-    df0 = {}
+    dft = {}
     df1 = {}
     df2 = {}
 
@@ -199,29 +225,47 @@ def ratiofunction_beta_9602(df, sim, team, categorystr, boolib0):
         # print('simarray', sim[j])
         title = str(sim[j]) + '-' + str(team[j])
 
-        df0[j] = df[(df.Sim == sim[j]) & (df.Team == team[j])]
-        df0[j].reset_index(inplace=True)
-        year = (df0[j].iloc[0]['JOSIE_Nr'])
+        dft[j] = df[(df.Sim == sim[j]) & (df.Team == team[j])]
+        dft[j].reset_index(inplace=True)
 
-        rt1 = (df0[j].iloc[0]['R1_Tstop'])
-        rt2 = (df0[j].iloc[0]['R2_Tstop'])
+
+        size = len(dft[j])
+        Ums_i = [0] * size
+        Ua_i = [0] * size
+        Ums_i[0] = dft[j].at[0, 'IM']
+
+        ## only convolute slow part of the signal, which is needed for beta calculation
+        for i in range(size - 1):
+            Ua_i = dft[j].at[i + 1, 'I_OPM_jma']
+            t1 = dft[j].at[i + 1, 'Tsim']
+            t2 = dft[j].at[i, 'Tsim']
+            Xs = np.exp(-(t1 - t2) / slow)
+            Xf = np.exp(-(t1 - t2) / fast)
+            Ums_i[i + 1] = Ua_i - (Ua_i - Ums_i[i]) * Xs
+
+        dft[j]['I_conv_slow_scan'] = Ums_i
+
+        year = (dft[j].iloc[0]['JOSIE_Nr'])
+
+        rt1 = (dft[j].iloc[0]['R1_Tstop'])
+        rt2 = (dft[j].iloc[0]['R2_Tstop'])
         if sim[j] == 90: rt1 = 1050
-        t1 = (df0[j].Tsim <= rt1 ) & (df0[j].Tsim >= rt1 - 5)
-        t2 = (df0[j].Tsim <= rt2 ) & (df0[j].Tsim >= rt2 - 5)
+        t1 = (dft[j].Tsim <= rt1 ) & (dft[j].Tsim >= rt1 - 5)
+        t2 = (dft[j].Tsim <= rt2 ) & (dft[j].Tsim >= rt2 - 5)
         #
-        df1[j] = df0[j][t1]
-        df2[j] = df0[j][t2]
+        df1[j] = dft[j][t1]
+        df2[j] = dft[j][t2]
         # c = df1[j].IM .tolist()
         # sc = ( df1[j].I_conv_slow.tolist())
 
         if not boolib0:
-            r1[j] = np.array((df1[j].IM / (0.10 * df1[j].I_conv_slow)).tolist())
-            r2[j] = np.array((df2[j].IM / (0.10 * df2[j].I_conv_slow)).tolist())
+            r1[j] = np.array((df1[j].IM / (0.10 * df1[j].I_conv_slow_scan)).tolist())
+            r2[j] = np.array((df2[j].IM / (0.10 * df2[j].I_conv_slow_scan)).tolist())
 
 
         if boolib0:
-            r1[j] = np.array(((df1[j].IM - df1[j].iB0) / (0.10 * df1[j].I_conv_slow)).tolist())
-            r2[j] = np.array(((df2[j].IM - df2[j].iB0) / (0.10 * df2[j].I_conv_slow)).tolist())
+            r1[j] = np.array(((df1[j].IM - df1[j].iB0) / (0.10 * df1[j].I_conv_slow_scan)).tolist())
+            r2[j] = np.array(((df2[j].IM - df2[j].iB0) / (0.10 * df2[j].I_conv_slow_scan)).tolist())
 
         # print(sim[j],team[j], 'Ratio', r1[j], r2[j])
         # print(sim[j], team[j], 'Curent', df1[j].IM.tolist(), df1[j].I_conv_slow.tolist() )
