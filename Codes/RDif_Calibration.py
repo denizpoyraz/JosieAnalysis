@@ -175,21 +175,21 @@ adif_IM_deconv8_minib0, adif_IM_deconv8_minib0_err, rdif_IM_deconv8_minib0, rdif
 errorPlot_ARDif_withtext(adif_IM, adif_IM_err, Yp, [-1, 1], [1000,5],  '0910 Data  (Current)',
                          axtitlecur, ytitle,labellist, o3list, dfnplist,'Current_ADif_IM', folderpath, True, True)
 
-errorPlot_ARDif_withtext(rdif_IM, rdif_IM_err, Yp, [-20, 20], [1000,5],  '0910 Data  (Current)',
+errorPlot_ARDif_withtext(rdif_IM, rdif_IM_err, Yp, [-40, 40], [1000,5],  '0910 Data  (Current)',
                          rxtitlecur, ytitle,labellist, o3list, dfnplist,'Current_RDif_IM_20rangw', folderpath, True, True)
 
 errorPlot_ARDif_withtext(adif_IM_deconv8, adif_IM_deconv8_err, Yp, [-1, 1], [1000,5],  '0910 Data Conv-Deconv (Current Smoothed 8 secs, beta0)',
-                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'Current_ADif_Convoluted_0910_smoothed8_beta0', folderpath, True, False)
+                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'Current_ADif_Convoluted_0910_smoothed8_beta0_nojmaopm', folderpath, True, False)
 
-errorPlot_ARDif_withtext(rdif_IM_deconv8, rdif_IM_deconv8_err, Yp, [-20, 20], [1000,5],  '0910 Data Conv-Deconv (Current Smoothed 8 secs, beta0)',
-                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'Current_RDif_Convoluted_0910_smoothed8_beta0_20range', folderpath, True, False)
+errorPlot_ARDif_withtext(rdif_IM_deconv8, rdif_IM_deconv8_err, Yp, [-40, 40], [1000,5],  '0910 Data Conv-Deconv (Current Smoothed 8 secs, beta0)',
+                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'Current_RDif_Convoluted_0910_smoothed8_beta0_20range_nojmaopm', folderpath, True, False)
 
 
 errorPlot_ARDif_withtext(adif_IM_deconv8_minib0, adif_IM_deconv8_minib0_err, Yp, [-1, 1], [1000,5],  '0910 Data Conv-Deconv (Current - iB0 Smoothed 8 secs, beta0)',
-                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'Current_ADif_Convoluted_0910_smoothed8_minib0_beta0', folderpath, True, False)
+                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'Current_ADif_Convoluted_0910_smoothed8_minib0_beta0_nojmaopm', folderpath, True, False)
 
-errorPlot_ARDif_withtext(rdif_IM_deconv8_minib0, rdif_IM_deconv8_minib0_err, Yp, [-20, 20], [1000,5],  '0910 Data Conv-Deconv (Current - iB0 Smoothed 8 secs, beta0)',
-                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'Current_RDif_Convoluted_0910_smoothed8_minib0beta0_20range', folderpath, True, False)
+errorPlot_ARDif_withtext(rdif_IM_deconv8_minib0, rdif_IM_deconv8_minib0_err, Yp, [-40, 40], [1000,5],  '0910 Data Conv-Deconv (Current - iB0 Smoothed 8 secs, beta0)',
+                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'Current_RDif_Convoluted_0910_smoothed8_minib0beta0_20range_nojmaopm', folderpath, True, False)
 
 # errorPlot_ARDif_withtext(rdif_IM_deconv8b, rdif_IM_deconv8b_err, Yp, [-20, 20], [1000,5],  '0910 Data Conv-Deconv (Current Smoothed 8 secs)',
 #                          rxtitlecurb, ytitle,labellist, o3list, dfnplist,'Current_RDif_Convoluted_0910_smoothed8b', folderpath, True, False)
