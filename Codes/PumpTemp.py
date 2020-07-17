@@ -45,8 +45,8 @@ def plothost(hostarr1, hostarr2, hostarr3, hostarr32, hostarr4, twinarr1, twinar
     host.set_title(mtitle)
     # host.set_title("SP 1.0%-1.0B")
     host.set_xlim(0, 35)
-    host.set_ylim(1000, 2)
-    host.set_yscale('log')
+    host.set_ylim(30, 0)
+    # host.set_yscale('log')
 
     # # par1.set_xlabel("TBoil - TCell/ TCell [%]")
     par2.set_xlabel("Pw - Pair")
@@ -108,21 +108,21 @@ def plothost(hostarr1, hostarr2, hostarr3, hostarr32, hostarr4, twinarr1, twinar
     plt.draw()
 
 
-df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_Data_nocut_tempfixed_paper.csv", low_memory=False)
-
-df = cuts2017(df)
+# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_Data_nocut_tempfixed_paper.csv", low_memory=False)
+#
+# df = cuts2017(df)
 # df = df[df.Sim > 185]
-df = df[df.Sim < 186]
+# df = df[df.Sim < 186]
 
 
-df['DeltaP'] = df['Pw'] - df['Pair']
+# df['DeltaP'] = df['Pw'] - df['Pair']
 
 # df = df[df.Sim < 186]
 # #
-# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut_tempfixed_paper.csv", low_memory=False)
-#
-# df['DeltaP'] = df['Pw'] - df['Pair']
-# df = cuts0910(df)
+df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut_tempfixed_paper.csv", low_memory=False)
+
+df['DeltaP'] = df['Pw'] - df['Pair']
+df = cuts0910(df)
 # # df = df[df.Year == 2009]
 # df = df[df.Year == 2010]
 
@@ -157,7 +157,7 @@ filtB01 = df.Buf == 0.1
 filterEN0505 = (filtEN & filtS05 & filtB05)
 filterEN1010 = (filtEN & filtS10 & filtB10)
 #2017
-filterEN1010 = (filtEN & filtS10 & filtB01)
+# filterEN1010 = (filtEN & filtS10 & filtB01)
 
 ###
 profEN0505 = df.loc[filterEN0505]
@@ -170,7 +170,7 @@ profEN1010_nodup = profEN1010.drop_duplicates(['Sim', 'Team'])
 filterSP1010 = (filtSP & filtS10 & filtB10)
 filterSP0505 = (filtSP & filtS05 & filtB05)
 #2017
-filterSP0505 = (filtSP & filtS10 & filtB01)
+# filterSP0505 = (filtSP & filtS10 & filtB01)
 
 profSP1010 = df.loc[filterSP1010]
 profSP0505 = df.loc[filterSP0505]
@@ -230,23 +230,23 @@ for k in range(4):
 
 ###  part a
 
-mtitle0 = '2017 EN 0.5%-0.5B'
-stitle0 = '17_EN0505_RADif_boil'
+mtitle0 = '0910 EN 0.5%-0.5B'
+stitle0 = '0910_EN0505_RADif_sr'
 
-mtitle1 = '2017 EN 1.0%-0.1B'
-stitle1 = '17_EN1701_RADif_boil'
+# mtitle1 = '0910 EN 1.0%-0.1B'
+# stitle1 = '0910_EN1001_RADif_sr'
 
-# # mtitle1 = '2010 EN 1.0%-1.0B'
-# # stitle1 = '10_EN1010_RADif_boil'
+mtitle1 = '0910 EN 1.0%-1.0B'
+stitle1 = '0910_EN1010_RADif_sr'
 #
-# # mtitle2 = '2010 SP 0.5%-0.5B'
-# # stitle2 = '10_SP0505_RADif_boil'
+mtitle2 = '0910 SP 0.5%-0.5B'
+stitle2 = '0910_SP0505_RADif_sr'
 #
-mtitle2 = '2017 SP 1.0%-0.1B'
-stitle2 = '17_SP1001_RADif_boil'
+# mtitle2 = '0910 SP 1.0%-0.1B'
+# stitle2 = '0910_SP1001_RADif_sr'
 
-mtitle3 = '2017 SP 1.0%-1.0B'
-stitle3 = '17_SP1010_RADif_boil'
+mtitle3 = '0910 SP 1.0%-1.0B'
+stitle3 = '0910_SP1010_RADif_sr'
 
 # p1, = host.plot(avgprof_tpint[0], Y, label="TPint ")
 # p2, = host.plot(avgprof_tpext[0], Y, label="TPext ")

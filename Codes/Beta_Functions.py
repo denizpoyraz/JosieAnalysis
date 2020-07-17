@@ -35,8 +35,9 @@ def ratiofunction_beta(df, sim, team, categorystr, boolibo, slow, fast):
 
     # df['iB0'] = 0.014
 
-    file = open('../Latex/0910_TimeConstant_beta0' + categorystr + "5secslatex_table.txt", "w")
+    file = open('../Latex/0910_TimeConstant_beta0' + categorystr + "1607_table.txt", "w")
     file.write(categorystr + '\n')
+    file.write('\hline' + '\n')
 
     for j in range(len(sim)):
         # print('simarray', sim[j])
@@ -89,7 +90,7 @@ def ratiofunction_beta(df, sim, team, categorystr, boolibo, slow, fast):
             Xf = np.exp(-(t1 - t2) / fast)
             Ums_i[i + 1] = Ua_i - (Ua_i - Ums_i[i]) * Xs
 
-        dft[j]['I_conv_slow_scan'] = Ums_i
+        dft[j]['I_conv_slow_jma'] = Ums_i
 
         df1[j] = dft[j][(dft[j].Tsim >= r1_down) & (dft[j].Tsim < r1_up)]
         df2[j] = dft[j][(dft[j].Tsim >= r2_down) & (dft[j].Tsim < r2_up)]
@@ -98,17 +99,17 @@ def ratiofunction_beta(df, sim, team, categorystr, boolibo, slow, fast):
 
         if not boolibo:
 
-            r1[j] = np.array((df1[j].IM / (0.10 * df1[j].I_conv_slow_scan)).tolist())
-            r2[j] = np.array((df2[j].IM / (0.10 * df2[j].I_conv_slow_scan)).tolist())
-            r3[j] = np.array((df3[j].IM / (0.10 * df3[j].I_conv_slow_scan)).tolist())
-            r4[j] = np.array((df4[j].IM / (0.10 * df4[j].I_conv_slow_scan)).tolist())
+            r1[j] = np.array((df1[j].IM / (0.10 * df1[j].I_conv_slow_jma)).tolist())
+            r2[j] = np.array((df2[j].IM / (0.10 * df2[j].I_conv_slow_jma)).tolist())
+            r3[j] = np.array((df3[j].IM / (0.10 * df3[j].I_conv_slow_jma)).tolist())
+            r4[j] = np.array((df4[j].IM / (0.10 * df4[j].I_conv_slow_jma)).tolist())
 
         if  boolibo:
 
-            r1[j] = np.array(( (df1[j].IM - df1[j].iB0) / (0.10 * df1[j].I_conv_slow_scan)).tolist())
-            r2[j] = np.array(( (df2[j].IM - df2[j].iB0) / (0.10 * df2[j].I_conv_slow_scan)).tolist())
-            r3[j] = np.array(( (df3[j].IM - df3[j].iB0) / (0.10 * df3[j].I_conv_slow_scan)).tolist())
-            r4[j] = np.array(( (df4[j].IM - df4[j].iB0) / (0.10 * df4[j].I_conv_slow_scan)).tolist())
+            r1[j] = np.array(( (df1[j].IM - df1[j].iB0) / (0.10 * df1[j].I_conv_slow_jma)).tolist())
+            r2[j] = np.array(( (df2[j].IM - df2[j].iB0) / (0.10 * df2[j].I_conv_slow_jma)).tolist())
+            r3[j] = np.array(( (df3[j].IM - df3[j].iB0) / (0.10 * df3[j].I_conv_slow_jma)).tolist())
+            r4[j] = np.array(( (df4[j].IM - df4[j].iB0) / (0.10 * df4[j].I_conv_slow_jma)).tolist())
         # print(j, np.nanmean(r1[j]))
 
         r1mean[j] = np.nanmean(r1[j])
@@ -142,7 +143,6 @@ def ratiofunction_beta(df, sim, team, categorystr, boolibo, slow, fast):
         mat = '$'
         end = '&'
 
-        file.write('\hline' + '\n')
         file.write( mat + title + mat + end +  mat + lr1 + mat + ' & ' + mat + lr2 + mat + ' & ' + mat + lr3 + mat +' & ' + mat + lr4 + mat + r'\\' + '\n')
         # file.write( mat + title + mat + end + 'Median' + end + mat + lr5 + mat + ' & ' + mat + lr6 + mat + ' & ' + mat + lr7 + mat +' & ' + mat + lr8 + mat + r'\\' + '\n')
 
@@ -179,7 +179,7 @@ def ratiofunction_beta(df, sim, team, categorystr, boolibo, slow, fast):
     # #            str(round(np.nanmedian(r3median), 2)) + '\pm ' + str(round(qerr_r3, 2)) + mat + ' & ' + mat +
     # #            str(round(np.nanmedian(r4median), 2)) + '\pm ' + str(round(qerr_r4, 2)) + mat + r'\\' + '\n')
     # # file.write('\hline' + '\n')
-    file.write('Mean & ' + mat + str(round(np.nanmedian(r1median), 2)) + '\pm ' + str(round(qerr_1, 2)) + mat + ' & ' +
+    file.write('Median & ' + mat + str(round(np.nanmedian(r1median), 2)) + '\pm ' + str(round(qerr_1, 2)) + mat + ' & ' +
 mat + str(round(np.nanmedian(r2median), 2)) + '\pm ' + str(round(qerr_2, 2)) + mat + ' & ' +
         mat + str(round(np.nanmedian(r3median), 2)) + '\pm ' + str(round(qerr_3, 2)) + mat + ' & ' +
         mat + str(round(np.nanmedian(r4median), 2)) + '\pm ' + str(round(qerr_4, 2)) + mat + r'\\' + '\n')
@@ -215,6 +215,12 @@ def ratiofunction_beta_9602(df, sim, team, categorystr, boolib0, slow, fast):
 
     df['iB0'] = 0.014
 
+    Pval_komhyr = np.array([1000, 199, 59, 30, 20, 10, 7, 5])
+    komhyr_sp_tmp = np.array([1, 1.007, 1.018, 1.022, 1.032, 1.055, 1.070, 1.092])
+    komhyr_en_tmp = np.array([1, 1.007, 1.018, 1.029, 1.041, 1.066, 1.087, 1.124])
+
+    komhyr_sp = [1 / i for i in komhyr_sp_tmp]
+    komhyr_en = [1 / i for i in komhyr_en_tmp]
 
     file = open('../Latex/9602_TimeConstant_' + categorystr + "5secslatex_table.txt", "w")
     file.write(categorystr + '\n')
@@ -225,47 +231,80 @@ def ratiofunction_beta_9602(df, sim, team, categorystr, boolib0, slow, fast):
         # print('simarray', sim[j])
         title = str(sim[j]) + '-' + str(team[j])
 
-        dft[j] = df[(df.Sim == sim[j]) & (df.Team == team[j])]
-        dft[j].reset_index(inplace=True)
+        dftj = df[(df.Sim == sim[j]) & (df.Team == team[j])]
+        dftj.reset_index(inplace=True)
 
 
-        size = len(dft[j])
+        size = len(dftj)
         Ums_i = [0] * size
         Ua_i = [0] * size
-        Ums_i[0] = dft[j].at[0, 'IM']
+        Ums_i[0] = dftj.at[0, 'IM']
 
         ## only convolute slow part of the signal, which is needed for beta calculation
-        for i in range(size - 1):
-            Ua_i = dft[j].at[i + 1, 'I_OPM_jma']
-            t1 = dft[j].at[i + 1, 'Tsim']
-            t2 = dft[j].at[i, 'Tsim']
+        for k in range(size - 1):
+
+            ## komhyr corrections
+            for p in range(len(komhyr_en) - 1):
+
+                if dftj.at[k, 'ENSCI'] == 1:
+                    if (dftj.at[k, 'Pair'] >= Pval_komhyr[p + 1]) & (dftj.at[k, 'Pair'] < Pval_komhyr[p]):
+                        # print(p, Pval[p + 1], Pval[p ])
+                        dftj.at[k, 'I_OPM_komhyr'] = dftj.at[k, 'PO3_OPM'] * dftj.at[k, 'PFcor'] * komhyr_en[p] / \
+                                                   (dftj.at[k, 'TPint'] * 0.043085)
+                if dftj.at[k, 'ENSCI'] == 0:
+                    if (dftj.at[k, 'Pair'] >= Pval_komhyr[p + 1]) & (dftj.at[k, 'Pair'] < Pval_komhyr[p]):
+                        # print(p, Pval[p + 1], Pval[p ])
+                        dftj.at[k, 'I_OPM_komhyr'] = dftj.at[k, 'PO3_OPM'] * dftj.at[k, 'PFcor'] * komhyr_sp[p] / \
+                                                   (dftj.at[k, 'TPint'] * 0.043085)
+
+            if (dftj.at[k, 'Pair'] <= Pval_komhyr[7]):
+
+                if dftj.at[k, 'ENSCI'] == 1:
+                    dftj.at[k, 'I_OPM_komhyr'] = dftj.at[k, 'PO3_OPM'] * dftj.at[k, 'PFcor'] * komhyr_en[7] / \
+                                               (dftj.at[k, 'TPint'] * 0.043085)
+                if dftj.at[k, 'ENSCI'] == 0:
+                    dftj.at[k, 'I_OPM_komhyr'] = dftj.at[k, 'PO3_OPM'] * dftj.at[k, 'PFcor'] * komhyr_sp[7] / \
+                                               (dftj.at[k, 'TPint'] * 0.043085)
+
+            size = len(dftj)
+            Ums_i = [0] * size
+            Ua_i = [0] * size
+            Ums_i[0] = dftj.at[0, 'IM']
+
+            ## only convolute slow part of the signal, which is needed for beta calculation
+        for ik in range(size - 1):
+
+
+            Ua_i = dftj.at[ik + 1, 'I_OPM_jma']
+            t1 = dftj.at[ik + 1, 'Tsim']
+            t2 = dftj.at[ik, 'Tsim']
             Xs = np.exp(-(t1 - t2) / slow)
             Xf = np.exp(-(t1 - t2) / fast)
-            Ums_i[i + 1] = Ua_i - (Ua_i - Ums_i[i]) * Xs
+            Ums_i[ik + 1] = Ua_i - (Ua_i - Ums_i[ik]) * Xs
 
-        dft[j]['I_conv_slow_scan'] = Ums_i
+        dftj['I_conv_slow_jma'] = Ums_i
 
-        year = (dft[j].iloc[0]['JOSIE_Nr'])
+        year = (dftj.iloc[0]['JOSIE_Nr'])
 
-        rt1 = (dft[j].iloc[0]['R1_Tstop'])
-        rt2 = (dft[j].iloc[0]['R2_Tstop'])
+        rt1 = (dftj.iloc[0]['R1_Tstop'])
+        rt2 = (dftj.iloc[0]['R2_Tstop'])
         if sim[j] == 90: rt1 = 1050
-        t1 = (dft[j].Tsim <= rt1 ) & (dft[j].Tsim >= rt1 - 5)
-        t2 = (dft[j].Tsim <= rt2 ) & (dft[j].Tsim >= rt2 - 5)
+        t1 = (dftj.Tsim <= rt1 ) & (dftj.Tsim >= rt1 - 5)
+        t2 = (dftj.Tsim <= rt2 ) & (dftj.Tsim >= rt2 - 5)
         #
-        df1[j] = dft[j][t1]
-        df2[j] = dft[j][t2]
+        df1[j] = dftj[t1]
+        df2[j] = dftj[t2]
         # c = df1[j].IM .tolist()
         # sc = ( df1[j].I_conv_slow.tolist())
 
         if not boolib0:
-            r1[j] = np.array((df1[j].IM / (0.10 * df1[j].I_conv_slow_scan)).tolist())
-            r2[j] = np.array((df2[j].IM / (0.10 * df2[j].I_conv_slow_scan)).tolist())
+            r1[j] = np.array((df1[j].IM / (0.10 * df1[j].I_conv_slow_jma)).tolist())
+            r2[j] = np.array((df2[j].IM / (0.10 * df2[j].I_conv_slow_jma)).tolist())
 
 
         if boolib0:
-            r1[j] = np.array(((df1[j].IM - df1[j].iB0) / (0.10 * df1[j].I_conv_slow_scan)).tolist())
-            r2[j] = np.array(((df2[j].IM - df2[j].iB0) / (0.10 * df2[j].I_conv_slow_scan)).tolist())
+            r1[j] = np.array(((df1[j].IM - df1[j].iB0) / (0.10 * df1[j].I_conv_slow_jma)).tolist())
+            r2[j] = np.array(((df2[j].IM - df2[j].iB0) / (0.10 * df2[j].I_conv_slow_jma)).tolist())
 
         # print(sim[j],team[j], 'Ratio', r1[j], r2[j])
         # print(sim[j], team[j], 'Curent', df1[j].IM.tolist(), df1[j].I_conv_slow.tolist() )
@@ -286,7 +325,6 @@ def ratiofunction_beta_9602(df, sim, team, categorystr, boolib0, slow, fast):
 
         mat = '$'
 
-        file.write('\hline' + '\n')
         file.write(mat + str(int(year)) + '-' + title + mat + ' & ' + mat + lr1 + mat + ' & ' + mat + lr2 + mat + ' & ' + mat + lr3 + mat +
                    ' & ' + mat + lr4 + mat + r'\\' + '\n')
 

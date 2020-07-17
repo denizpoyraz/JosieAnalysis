@@ -33,6 +33,7 @@ df1 = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_decon
 df2 = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_beta0_tfast15_tempfixed_0907.csv", low_memory=False)
 df3 = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_beta0_tfast20_tempfixed_0907.csv", low_memory=False)
 df4 = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_beta0_tfast25_tempfixed_0907.csv", low_memory=False)
+df5 = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_beta0_tfast50.csv", low_memory=False)
 
 
 
@@ -42,7 +43,7 @@ df1 = cuts0910(df1)
 df2 = cuts0910(df2)
 df3 = cuts0910(df3)
 df4 = cuts0910(df4)
-# df5 = cuts2017(df5)
+df5 = cuts0910(df5)
 # df6 = cuts2017(df6)
 
 
@@ -73,7 +74,7 @@ filterEN1010_1 = ((df1.ENSCI == 1) & (df1.Sol == 1.0) & (df1.Buf == 1.0))
 filterEN1010_2 = ((df2.ENSCI == 1) & (df2.Sol == 1.0) & (df2.Buf == 1.0))
 filterEN1010_3 = ((df3.ENSCI == 1) & (df3.Sol == 1.0) & (df3.Buf == 1.0))
 filterEN1010_4 = ((df4.ENSCI == 1) & (df4.Sol == 1.0) & (df4.Buf == 1.0))
-# filterEN1010_5 = ((df5.ENSCI == 1) & (df5.Sol == 1.0) & (df5.Buf == 1.0))
+filterEN1010_5 = ((df5.ENSCI == 1) & (df5.Sol == 1.0) & (df5.Buf == 1.0))
 # filterEN1010_6 = ((df6.ENSCI == 1) & (df6.Sol == 1.0) & (df6.Buf == 1.0))
 
 # #2017
@@ -94,7 +95,7 @@ filterSP0505_1 = ((df1.ENSCI == 0) & (df1.Sol == 0.5) & (df1.Buf == 0.5))
 filterSP0505_2 = ((df2.ENSCI == 0) & (df2.Sol == 0.5) & (df2.Buf == 0.5))
 filterSP0505_3 = ((df3.ENSCI == 0) & (df3.Sol == 0.5) & (df3.Buf == 0.5))
 filterSP0505_4 = ((df4.ENSCI == 0) & (df4.Sol == 0.5) & (df4.Buf == 0.5))
-# filterSP0505_5 = ((df5.ENSCI == 0) & (df5.Sol == 0.5) & (df5.Buf == 0.5))
+filterSP0505_5 = ((df5.ENSCI == 0) & (df5.Sol == 0.5) & (df5.Buf == 0.5))
 # filterSP0505_6 = ((df6.ENSCI == 0) & (df6.Sol == 0.5) & (df6.Buf == 0.5))
 
 # ## 2017
@@ -113,14 +114,14 @@ filterSP1010_1 = ((df1.ENSCI == 0) & (df1.Sol == 1.0) & (df1.Buf == 1.0))
 filterSP1010_2 = ((df2.ENSCI == 0) & (df2.Sol == 1.0) & (df2.Buf == 1.0))
 filterSP1010_3 = ((df3.ENSCI == 0) & (df3.Sol == 1.0) & (df3.Buf == 1.0))
 filterSP1010_4 = ((df4.ENSCI == 0) & (df4.Sol == 1.0) & (df4.Buf == 1.0))
-# filterSP1010_5 = ((df5.ENSCI == 0) & (df5.Sol == 1.0) & (df5.Buf == 1.0))
+filterSP1010_5 = ((df5.ENSCI == 0) & (df5.Sol == 1.0) & (df5.Buf == 1.0))
 # filterSP1010_6 = ((df6.ENSCI == 0) & (df6.Sol == 1.0) & (df6.Buf == 1.0))
 
 
 # filterSP1001 = (filtSP & filtS10 & filtB01)
 
 profEN0505 = [ df1[(df1.ENSCI == 1) & (df1.Sol == 0.5) & (df1.Buf == 0.5)], df2[(df2.ENSCI == 1) & (df2.Sol == 0.5) & (df2.Buf == 0.5)],
-               df3[(df3.ENSCI == 1) & (df3.Sol == 0.5) & (df3.Buf == 0.5)] , df4[(df4.ENSCI == 1) & (df4.Sol == 0.5) & (df4.Buf == 0.5)]]
+               df3[(df3.ENSCI == 1) & (df3.Sol == 0.5) & (df3.Buf == 0.5)] , df4[(df4.ENSCI == 1) & (df4.Sol == 0.5) & (df4.Buf == 0.5)], df4[(df4.ENSCI == 1) & (df4.Sol == 0.5) & (df4.Buf == 0.5)] ]
 # ,
     #            df5[(df5.ENSCI == 1) & (df5.Sol == 0.5) & (df5.Buf == 0.5)], df6[(df6.ENSCI == 1) & (df6.Sol == 0.5) & (df6.Buf == 0.5)]]
 
@@ -178,25 +179,61 @@ rxtitlecurb = 'Sonde - OPM[JMA] smoothed  Difference (%)'
 # errorPlot_ARDif_withtext(rdif_IM_deconv8, rdif_IM_deconv8_err, Yp, [-40, 40], [1000,5],  '0910 Data Conv-Deconv (Current Smoothed 8 secs)',
 #                          rxtitlecur, ytitle,labellist, [0], [0],'SP_smoothed8', folderpath, True, False)
 
-errorPlot_general(rdif_IM_deconv_en0505, rdif_IM_deconv_en0505_err, Yp, [-20, 20], [1000,5],  '0910 Data Conv-Deconv (Current - iB0 Smoothed 8 secs) ENSCI 0.5%-0.5',
-                         rxtitlecur, ytitle,labellist_0505, colorlist, 'tfast_EN0505_smoothed8', folderpath, True, False, False)
+# errorPlot_general(rdif_IM_deconv_en0505, rdif_IM_deconv_en0505_err, Yp, [-20, 20], [1000,5],  '0910 Data Conv-Deconv (Current - iB0 Smoothed 8 secs) ENSCI 0.5%-0.5',
+#                          rxtitlecur, ytitle,labellist_0505, colorlist, 'tfast_EN0505_smoothed8', folderpath, True, False, False)
+# #
+# errorPlot_general(rdif_IM_deconv_en1010, rdif_IM_deconv_en1010_err, Yp, [-20, 20], [1000,5],  '0910 Data Conv-Deconv (Current - iB0 Smoothed 8 secs) ENSCI 1.0%-1.0',
+#                          rxtitlecur, ytitle,labellist_1010, colorlist, 'tfastEN1010_smoothed8', folderpath, True, False, False)
 #
-errorPlot_general(rdif_IM_deconv_en1010, rdif_IM_deconv_en1010_err, Yp, [-20, 20], [1000,5],  '0910 Data Conv-Deconv (Current - iB0 Smoothed 8 secs) ENSCI 1.0%-1.0',
-                         rxtitlecur, ytitle,labellist_1010, colorlist, 'tfastEN1010_smoothed8', folderpath, True, False, False)
-
-# errorPlot_general(rdif_IM_deconv_en1010, rdif_IM_deconv_en1010_err, Yp, [-20, 20], [1000,5],  '0910 Data Conv-Deconv (Current Smoothed 8 secs) ENSCI 1.0%-0.1',
-#                          rxtitlecur, ytitle,labellist_1001, colorlist, 'tfast_EN1001_smoothed8', folderpath, True, False, False)
-
-errorPlot_general(rdif_IM_deconv_sp0505, rdif_IM_deconv_sp0505_err, Yp, [-20, 20], [1000,5],  '0910 Data Conv-Deconv (Current - iB0 Smoothed 8 secs) SP 0.5%-0.5',
-                         rxtitlecur, ytitle,labellist_0505, colorlist, 'tfastSP0505_smoothed8', folderpath, True, False, False)
-
-# errorPlot_general(rdif_IM_deconv_sp0505, rdif_IM_deconv_sp0505_err, Yp, [-20, 20], [1000,5],  '0910 Data Conv-Deconv (Current Smoothed 8 secs) SP 1.0%-0.1',
-#                          rxtitlecur, ytitle,labellist_1001, colorlist, 'tfast_SP1001_smoothed8', folderpath, True, False, False)
-
-
-errorPlot_general(rdif_IM_deconv_sp1010, rdif_IM_deconv_sp1010_err, Yp, [-20, 20], [1000,5],  '0910 Data Conv-Deconv (Current - iB0 Smoothed 8 secs) SP 1.0%-1.0',
-                         rxtitlecur, ytitle,labellist_1010, colorlist, 'tfast_SP1010_smoothed8', folderpath, True, False, False)
+# # errorPlot_general(rdif_IM_deconv_en1010, rdif_IM_deconv_en1010_err, Yp, [-20, 20], [1000,5],  '0910 Data Conv-Deconv (Current Smoothed 8 secs) ENSCI 1.0%-0.1',
+# #                          rxtitlecur, ytitle,labellist_1001, colorlist, 'tfast_EN1001_smoothed8', folderpath, True, False, False)
+#
+# errorPlot_general(rdif_IM_deconv_sp0505, rdif_IM_deconv_sp0505_err, Yp, [-20, 20], [1000,5],  '0910 Data Conv-Deconv (Current - iB0 Smoothed 8 secs) SP 0.5%-0.5',
+#                          rxtitlecur, ytitle,labellist_0505, colorlist, 'tfastSP0505_smoothed8', folderpath, True, False, False)
+#
+# # errorPlot_general(rdif_IM_deconv_sp0505, rdif_IM_deconv_sp0505_err, Yp, [-20, 20], [1000,5],  '0910 Data Conv-Deconv (Current Smoothed 8 secs) SP 1.0%-0.1',
+# #                          rxtitlecur, ytitle,labellist_1001, colorlist, 'tfast_SP1001_smoothed8', folderpath, True, False, False)
+#
+#
+# errorPlot_general(rdif_IM_deconv_sp1010, rdif_IM_deconv_sp1010_err, Yp, [-20, 20], [1000,5],  '0910 Data Conv-Deconv (Current - iB0 Smoothed 8 secs) SP 1.0%-1.0',
+#                          rxtitlecur, ytitle,labellist_1010, colorlist, 'tfast_SP1010_smoothed8', folderpath, True, False, False)
 
 
 
 
+### now make rdif plots for some simulations
+
+# df1 = cuts0910(df1)
+# df2 = cuts0910(df2)
+# df3 = cuts0910(df3)
+# df4 = cuts0910(df4)
+
+dft1 =  df1[(df1.Sim == 161) & (df1.Team == 1)]
+dft2 =  df2[(df2.Sim == 161) & (df2.Team == 1)]
+dft3 =  df3[(df3.Sim == 161) & (df3.Team == 1)]
+dft4 =  df4[(df4.Sim == 161) & (df4.Team == 1)]
+
+
+dft1['rdif'] = 100 * (dft1['Ifast_minib0_deconv_sm8'] -  dft1['I_OPM_jma']) /  dft1['I_OPM_jma']
+dft2['rdif'] = 100 * (dft2['Ifast_minib0_deconv_sm8'] -  dft2['I_OPM_jma']) /  dft2['I_OPM_jma']
+# dft3['rdif'] = 100 * (dft3['Ifast_minib0_deconv_sm8'] -  dft3['I_OPM_jma']) /  dft3['I_OPM_jma']
+# dft4['rdif'] = 100 * (dft4['Ifast_minib0_deconv_sm8'] -  dft4['I_OPM_jma']) /  dft4['I_OPM_jma']
+
+
+fig, ax = plt.subplots()
+# plt.xlim(xra)
+# plt.ylim(yra)
+# plt.title(maintitle)
+# plt.xlabel(xtitle)
+# plt.ylabel(ytitle)
+plt.grid(True)
+
+# plt.yticks(np.arange(0, 7001, 1000))
+
+# reference line
+ax.axvline(x=0, color='grey', linestyle='--')
+plt.plot(dft1['rdif'] , dft1['Pair'], label = "10 secs" )
+plt.plot(dft2['rdif'] , dft2['Pair'], label = "15 secs" )
+ax.legend(loc='best', frameon=False, fontsize='small')
+
+plt.show()

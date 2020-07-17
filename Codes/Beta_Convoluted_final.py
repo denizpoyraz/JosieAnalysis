@@ -62,7 +62,7 @@ def filter(df):
 # clist =[ 'Tsim', 'Sim', 'Team', 'ENSCI', 'Sol', 'Buf', 'Pair','PO3', 'IM','TPint', 'PO3_OPM', 'I_OPM', 'I_OPM_jma',
 #          'I_conv_slow',  'PFcor', 'R1_Tstart', 'R1_Tstop', 'R2_Tstart', 'R2_Tstop']
 
-df1 = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut_tempfixed_paper.csv", low_memory=False)
+df1 = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut_1607.csv", low_memory=False)
 # df1 = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut_tempfixed_ml.csv", low_memory=False)
 
 
@@ -178,7 +178,7 @@ print('betas median', beta_en0505, beta_en1010, beta_sp0505, beta_sp1010)
 #
 # now use this beta values * 0.1 for the deconvolution of the signal and make a DF
 
-df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_Data_nocut_tempfixed_0907.csv", low_memory=False)
+df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut_1607.csv", low_memory=False)
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut.csv", low_memory=False)
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_Data_nocut.csv", low_memory=False)
 
@@ -249,13 +249,10 @@ for j in range(len(simlist)):
     dft[j] = df[(df.Sim == simlist[j]) & (df.Team == teamlist[j])]
     dft[j] = dft[j].reset_index()
 
-    # dft[j]['IM_sm8'] = dft[j]['IM'].rolling(window=4).mean()
-    # dft[j]['IM_sm20'] = dft[j]['IM'].rolling(window=10).mean()
-    # dft[j]['IM_sm40'] = dft[j]['IM'].rolling(window=20).mean()
-
-    # dft[j]['I_OPM_jma_sm8'] = dft[j]['I_OPM_jma'].rolling(window=4).mean()
-    # dft[j]['I_OPM_jma_sm20'] = dft[j]['I_OPM_jma'].rolling(window=10).mean()
-    # dft[j]['I_OPM_jma_sm40'] = dft[j]['I_OPM_jma'].rolling(window=20).mean()
+    ##only for 2017
+    # tfast = dft[j].loc[0,'RespTime_4_1p5_sec_p1']
+    # if tfast < 0: tfast = 20
+    # # print(j, title, tfast)
 
 
     size = len(dft[j])
@@ -271,6 +268,7 @@ for j in range(len(simlist)):
     for i in range(0, size-1):
         t1 = dft[j].at[i + 1, 'Tsim']
         t2 = dft[j].at[i, 'Tsim']
+
         Xs = np.exp(-(t1 - t2) / tslow)
         Xf = np.exp(-(t1 - t2) / tfast)
 
@@ -328,7 +326,7 @@ for j in range(len(simlist)):
 
 df_dc = pd.concat(list_data, ignore_index=True)
 
-df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv_beta0_tempfixed_0907.csv")
+df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_beta0.csv")
 
 # df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_beta.csv")
 

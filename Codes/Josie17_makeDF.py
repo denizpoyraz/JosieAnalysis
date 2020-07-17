@@ -24,7 +24,7 @@ p_en, p_sp = polyfit(df17)
 #######################################################################
 
 slow = 25 * 60  # 25 minutes in seconds
-fast = 25  # 25seconds
+fast = 20  # 20seconds
 
 # Read the metadata file
 dfmeta = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/JOSIE_Table_2017_summary.csv")
@@ -60,6 +60,12 @@ yref_pair = [1000, 850, 700, 550, 400, 350, 300, 200, 150, 100, 75, 50, 35, 25, 
 
 y_pair=  [925.0, 775.0, 625.0, 475.0, 375.0, 325.0, 250.0, 175.0, 125.0, 87.5, 62.5, 42.5, 30.0, 22.5, 17.5, 13.5, 11.0, 9.0, 7.0]
 
+Pval_komhyr = np.array([1000, 199, 59, 30, 20, 10, 7, 5])
+komhyr_sp_tmp = np.array([1, 1.007, 1.018, 1.022, 1.032, 1.055, 1.070, 1.092])
+komhyr_en_tmp = np.array([1, 1.007, 1.018, 1.029, 1.041, 1.066, 1.087, 1.124])
+
+komhyr_sp = [1/i for i in komhyr_sp_tmp]
+komhyr_en = [1/i for i in komhyr_en_tmp]
 
 # **********************************************
 # Main loop to merge all data sets
@@ -171,6 +177,28 @@ for filename in allFiles:
                     df.at[k, 'PFcor'] * JMA[14])
             df.at[k, 'JMA'] = JMA[14]
 
+        ## komhyr corrections
+        for p in range(len(komhyr_en) - 1):
+
+            if df.at[k, 'ENSCI'] == 1:
+                if (df.at[k, 'Pair'] >= Pval_komhyr[p + 1]) & (df.at[k, 'Pair'] < Pval_komhyr[p]):
+                    # print(p, Pval[p + 1], Pval[p ])
+                    df.at[k, 'I_OPM_komhyr'] = df.at[k, 'PO3_OPM'] * df.at[k, 'PFcor'] * komhyr_en[p] / \
+                                               (df.at[k, 'TPext'] * 0.043085)
+            if df.at[k, 'ENSCI'] == 0:
+                if (df.at[k, 'Pair'] >= Pval_komhyr[p + 1]) & (df.at[k, 'Pair'] < Pval_komhyr[p]):
+                    # print(p, Pval[p + 1], Pval[p ])
+                    df.at[k, 'I_OPM_komhyr'] = df.at[k, 'PO3_OPM'] * df.at[k, 'PFcor'] * komhyr_sp[p] / \
+                                               (df.at[k, 'TPext'] * 0.043085)
+
+        if (df.at[k, 'Pair'] <= Pval_komhyr[7]):
+
+            if df.at[k, 'ENSCI'] == 1:
+                df.at[k, 'I_OPM_komhyr'] = df.at[k, 'PO3_OPM'] * df.at[k, 'PFcor'] * komhyr_en[7] / \
+                                           (df.at[k, 'TPext'] * 0.043085)
+            if df.at[k, 'ENSCI'] == 0:
+                df.at[k, 'I_OPM_komhyr'] = df.at[k, 'PO3_OPM'] * df.at[k, 'PFcor'] * komhyr_sp[7] / \
+                                           (df.at[k, 'TPext'] * 0.043085)
 
         # if (df.at[k, 'Pw'] < df.at[k, 'Pair']):
         df.at[k, 'massloss'] = 0.0001 * 1000 * df.at[k, 'Pw'] / (461.52 * df.at[k, 'Tcell']) * df.at[k, 'JMA'] * \
@@ -184,8 +212,11 @@ for filename in allFiles:
 
     size = len(df)
     Ums_i = [0] * size
+    Ums_i_kom = [0] * size
+
     Ua_i = [0] * size
     Ums_i[0] = df.at[0, 'IM']
+    Ums_i_kom[0] = df.at[0, 'IM']
 
     ## only convolute slow part of the signal, which is needed for beta calculation
     for i in range(size - 1):
@@ -196,7 +227,15 @@ for filename in allFiles:
         Xf = np.exp(-(t1 - t2) / fast)
         Ums_i[i + 1] = Ua_i - (Ua_i - Ums_i[i]) * Xs
 
+        Ua_i = df.at[i + 1, 'I_OPM_komhyr']
+        t1 = df.at[i + 1, 'Tsim']
+        t2 = df.at[i, 'Tsim']
+        Xs = np.exp(-(t1 - t2) / slow)
+        Xf = np.exp(-(t1 - t2) / fast)
+        Ums_i_kom[i + 1] = Ua_i - (Ua_i - Ums_i[i]) * Xs
+
     df['I_conv_slow'] = Ums_i
+    df['I_conv_slow_komhyr'] = Ums_i_kom
 
     O3_tot = 0;
     O3_tot_opm = 0;
@@ -255,7 +294,7 @@ for s in simlist:
 calculate_O3frac17(df, simlist)
 
 
-df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_Data_nocut_tempfixed_0907.csv")
+df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_Data_nocut_1607.csv")
 # df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_Data_nocut.csv")
 #
 

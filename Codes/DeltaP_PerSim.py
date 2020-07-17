@@ -29,12 +29,12 @@ df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_n
 df['DeltaP'] = df['Pw'] - df['Pair']
 df = cuts0910(df)
 # df = df[df.Year == 2009]
-df = df[df.Year == 2010]
-df = df[df.Pair >= 0]
+# df = df[df.Year == 2010]
+dfp = df[df.Pair >= 0]
 
 # df = df.drop(df[(df.Sim == 166) & (df.Team == 1)].index)
 
-dfp = df[df.DeltaP > 0]
+# dfp = df[df.DeltaP > 0]
 # dfp = df
 
 #
@@ -131,9 +131,9 @@ for i in range(size):
 ax1.plot(avgprof_deltap_all[0], Yp, linewidth=1, label='EN 0.5%-0.5B', color = 'black')
 ax1.legend(loc='best', frameon=True, fontsize='x-small')
 
-plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Temperature_fixed/DeltaP_2010_DeltaPg0_EN0505.png')
-plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Temperature_fixed/DeltaP_2010_DeltaPg0_EN0505.pdf')
-plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Temperature_fixed/DeltaP_2010_DeltaPg0_EN0505.eps')
+# plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Temperature_fixed/DeltaP_2010_DeltaPg0_EN0505.png')
+# plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Temperature_fixed/DeltaP_2010_DeltaPg0_EN0505.pdf')
+# plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Temperature_fixed/DeltaP_2010_DeltaPg0_EN0505.eps')
 
 plt.show()
 
@@ -170,9 +170,9 @@ for i in range(size):
 ax2.plot(avgprof_deltap_all[1], Yp, linewidth=1, label='EN1.0%-1.0B', color = 'black')
 ax2.legend(loc='best', frameon=True, fontsize='x-small')
 
-plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Temperature_fixed/DeltaP_2010_DeltaPg0_EN1010.png')
-plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Temperature_fixed/DeltaP_2010_DeltaPg0_EN1010.pdf')
-plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Temperature_fixed/DeltaP_2010_DeltaPg0_EN1010.eps')
+# plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Temperature_fixed/DeltaP_2010_DeltaPg0_EN1010.png')
+# plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Temperature_fixed/DeltaP_2010_DeltaPg0_EN1010.pdf')
+# plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Temperature_fixed/DeltaP_2010_DeltaPg0_EN1010.eps')
 
 plt.show()
 
@@ -209,10 +209,10 @@ for i in range(size):
 
 ax3.plot(avgprof_deltap_all[2], Yp, linewidth=1, label='SP 0.5%-0.5B', color = 'black')
 ax3.legend(loc='best', frameon=True, fontsize='x-small')
-
-plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Temperature_fixed/DeltaP_2010_DeltaPg0_SP0505.png')
-plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Temperature_fixed/DeltaP_2010_DeltaPg0_SP0505.pdf')
-plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Temperature_fixed/DeltaP_2010_DeltaPg0_SP0505.eps')
+#
+# plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Temperature_fixed/DeltaP_2010_DeltaPg0_SP0505.png')
+# plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Temperature_fixed/DeltaP_2010_DeltaPg0_SP0505.pdf')
+# plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Temperature_fixed/DeltaP_2010_DeltaPg0_SP0505.eps')
 
 plt.show()
 
@@ -251,9 +251,9 @@ for i in range(size):
 ax4.plot(avgprof_deltap_all[3], Yp, linewidth=3, label='SP 1.0%-1.0B', color = 'black')
 ax4.legend(loc='best', frameon=True, fontsize='x-small')
 
-plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Temperature_fixed/DeltaP_2010_DeltaPg0_SP1010.png')
-plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Temperature_fixed/DeltaP_2010_DeltaPg0_SP1010.pdf')
-plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Temperature_fixed/DeltaP_2010_DeltaPg0_SP1010.eps')
+# plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Temperature_fixed/DeltaP_2010_DeltaPg0_SP1010.png')
+# plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Temperature_fixed/DeltaP_2010_DeltaPg0_SP1010.pdf')
+# plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Temperature_fixed/DeltaP_2010_DeltaPg0_SP1010.eps')
 
 plt.show()
 
