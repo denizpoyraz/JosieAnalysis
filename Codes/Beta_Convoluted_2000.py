@@ -178,9 +178,12 @@ print('betas median', beta_en0505, beta_en1010, beta_sp0505, beta_sp1010)
 #
 # now use this beta values * 0.1 for the deconvolution of the signal and make a DF
 
-df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut_1607.csv", low_memory=False)
+# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut_1607.csv", low_memory=False)
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut.csv", low_memory=False)
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_Data_nocut.csv", low_memory=False)
+# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2000_Data.csv", low_memory=False)
+
+
 
 
 simlist = np.asarray(df.drop_duplicates(['Sim', 'Team'])['Sim'])
@@ -197,6 +200,13 @@ list_data = []
 Pval = np.array([1000, 730, 535, 382, 267, 185, 126, 85, 58, 39, 26.5, 18.1, 12.1, 8.3, 6])
 JMA = np.array([0.999705941, 0.997216654, 0.995162562, 0.992733959, 0.989710199, 0.985943645, 0.981029252, 0.974634364,
                 0.966705137, 0.956132227, 0.942864263, 0.9260478, 0.903069813, 0.87528384, 0.84516337])
+
+Pval_komhyr = np.array([1000, 199, 59, 30, 20, 10, 7, 5])
+komhyr_sp_tmp = np.array([1, 1.007, 1.018, 1.022, 1.032, 1.055, 1.070, 1.092])
+komhyr_en_tmp = np.array([1, 1.007, 1.018, 1.029, 1.041, 1.066, 1.087, 1.124])
+
+komhyr_sp = [1/i for i in komhyr_sp_tmp]
+komhyr_en = [1/i for i in komhyr_en_tmp]
 
 for j in range(len(simlist)):
 
@@ -248,6 +258,21 @@ for j in range(len(simlist)):
 
     dft[j] = df[(df.Sim == simlist[j]) & (df.Team == teamlist[j])]
     dft[j] = dft[j].reset_index()
+    ## to make the data every 10 seconds
+    dft[j].drop('index', 1)
+    sec_series = np.array(dft[j]['Tsim'].tolist())
+
+    ts = np.zeros(len(sec_series))
+
+    for dj in range(len(dft[j])):
+        tmp = pd.Timestamp(sec_series[dj], unit='s')
+        #     print(tmp, type(tmp))
+        dft[j].at[dj, 'TS'] = tmp
+
+    dft[j] = dft[j].resample('5S', on='TS').mean()
+    dft[j] = dft[j].reset_index()
+
+    dft[j]['iB0'] = 0.014
 
     ##only for 2017
     # tfast = dft[j].loc[0,'RespTime_4_1p5_sec_p1']
@@ -260,40 +285,33 @@ for j in range(len(simlist)):
     Islow = [0] * size
     Islow_conv = [0] * size
     Ifast = [0] * size
-    Ifastminib0 = [0] * size
     Ifast_deconv = [0] * size
+    Ifastminib0 = [0] * size
     Ifastminib0_deconv = [0] * size
 
-    Ifast_deconv_hv = [0] * size
-    Ifastminib0_deconv_hv = [0] * size
-    Ifast_deconv_hs = [0] * size
-    Ifastminib0_deconv_hs = [0] * size
+    step = 1
 
-
-    for i in range(0, size-1):
-        t1 = dft[j].at[i + 1, 'Tsim']
+    for i in range(0, size-step):
+        t1 = dft[j].at[i + step, 'Tsim']
         t2 = dft[j].at[i, 'Tsim']
+        # print(t1, t2)
 
         Xs = np.exp(-(t1 - t2) / tslow)
         Xf = np.exp(-(t1 - t2) / tfast)
 
-        # ###########  for 0910 data
+        # ###########  for 2000 data
         # dft[j].at[i,'iB0'] = 0.014
 
         Islow[i] = beta * dft[j].at[i, 'I_OPM_jma']
-        Islow_conv[i + 1] = Islow[i+1] - (Islow[i+1] - Islow_conv[i]) * Xs
+        Islow_conv[i + step] = Islow[i] - (Islow[i] - Islow_conv[i]) * Xs
 
-        Ifast[i + 1] = af * (dft[j].at[i + 1, 'IM'] - Islow_conv[i + 1])
-        Ifastminib0[i + 1] = af * (dft[j].at[i + 1, 'IM'] - Islow_conv[i + 1] - dft[j].at[i + 1, 'iB0'] )
 
-        Ifast_deconv[i + 1] = (Ifast[i + 1] - Ifast[i] * Xf) / (1 - Xf)
-        Ifastminib0_deconv[i + 1] = (Ifastminib0[i + 1] - Ifastminib0[i] * Xf) / (1 - Xf)
+        Ifast[i + step] = af * (dft[j].at[i + step, 'IM'] - Islow_conv[i + step])
+        Ifastminib0[i + step] = af * (dft[j].at[i + step, 'IM'] - Islow_conv[i + step] - dft[j].at[i + step, 'iB0'] )
 
-        Ifast_deconv_hs[i + 1] = Ifast[i] + tfast/(t1-t2) * ( Ifast[i+1] - Ifast[i])
-        Ifastminib0_deconv_hs[i + 1] = Ifastminib0[i] + tfast/(t1-t2) * ( Ifastminib0[i+1] - Ifastminib0[i])
+        Ifast_deconv[i + step] = (Ifast[i + step] - Ifast[i] * Xf) / (1 - Xf)
 
-        Ifast_deconv_hv[i + 1] = Ifast[i+1] + tfast / (t1 - t2) * (Ifast[i + 1] - Ifast[i])
-        Ifastminib0_deconv_hv[i + 1] = Ifastminib0[i+1] + tfast / (t1 - t2) * (Ifastminib0[i + 1] - Ifastminib0[i])
+        Ifastminib0_deconv[i + step] = (Ifastminib0[i + step] - Ifastminib0[i] * Xf) / (1 - Xf)
 
 
 
@@ -304,54 +322,70 @@ for j in range(len(simlist)):
     dft[j]['Ifast_deconv'] = Ifast_deconv
     dft[j]['Ifast_minib0_deconv'] = Ifastminib0_deconv
 
-    dft[j]['Ifast_deconv_hs'] = Ifast_deconv_hs
-    dft[j]['Ifast_minib0_deconv_hs'] = Ifastminib0_deconv_hs
+    dft[j]['I_slow_sm8'] = dft[j]['I_slow'].rolling(window=4*step).mean()
+    dft[j]['I_slow_conv_sm8'] = dft[j]['I_slow_conv'].rolling(window=4*step).mean()
+    dft[j]['I_fast_sm8'] = dft[j]['I_fast'].rolling(window=4*step).mean()
+    dft[j]['Ifast_minib0_sm8'] = dft[j]['Ifast_minib0'].rolling(window=4*step).mean()
+    dft[j]['Ifast_deconv_sm8'] = dft[j]['Ifast_deconv'].rolling(window=4*step).mean()
+    dft[j]['Ifast_minib0_deconv_sm8'] = dft[j]['Ifast_minib0_deconv'].rolling(window=4*step).mean()
 
-    dft[j]['Ifast_deconv_hv'] = Ifast_deconv_hv
-    dft[j]['Ifast_minib0_deconv_hv'] = Ifastminib0_deconv_hv
-
-    dft[j]['I_slow_sm8'] = dft[j]['I_slow'].rolling(window=4).mean()
-    dft[j]['I_slow_conv_sm8'] = dft[j]['I_slow_conv'].rolling(window=4).mean()
-    dft[j]['I_fast_sm8'] = dft[j]['I_fast'].rolling(window=4).mean()
-    dft[j]['Ifast_minib0_sm8'] = dft[j]['Ifast_minib0'].rolling(window=4).mean()
-    dft[j]['Ifast_deconv_sm8'] = dft[j]['Ifast_deconv'].rolling(window=4).mean()
-    dft[j]['Ifast_minib0_deconv_sm8'] = dft[j]['Ifast_minib0_deconv'].rolling(window=4).mean()
-
-    dft[j]['Ifast_deconv_hv_sm8'] = dft[j]['Ifast_deconv_hv'].rolling(window=4).mean()
-    dft[j]['Ifast_minib0_deconv_hv_sm8'] = dft[j]['Ifast_minib0_deconv_hv'].rolling(window=4).mean()
-
-    dft[j]['Ifast_deconv_hs_sm8'] = dft[j]['Ifast_deconv_hs'].rolling(window=4).mean()
-    dft[j]['Ifast_minib0_deconv_hs_sm8'] = dft[j]['Ifast_minib0_deconv_hs'].rolling(window=4).mean()
+    ## now pressure
 
 
 
 
+    for k in range(len(dft[j])):
+        ## jma corrections
+        for p in range(len(JMA) - 1):
+            if (dft[j].at[k, 'Pair'] >= Pval[p + 1]) & (dft[j].at[k, 'Pair'] < Pval[p]):
+                dft[j].at[k, 'PO3_minib0_deconv_jma_sm8'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'Ifast_minib0_deconv_sm8'] / \
+                                                (dft[j].at[k, 'PFcor'] * JMA[p])
+                dft[j].at[k, 'PO3_minib0_deconv_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[
+                    k, 'Ifast_minib0_deconv'] / \
+                                                            (dft[j].at[k, 'PFcor'] * JMA[p])
 
-    # for k in range(len(dft[j])):
-    #     ## jma corrections
-    #     for p in range(len(JMA) - 1):
-    #         if (dft[j].at[k, 'Pair'] >= Pval[p + 1]) & (dft[j].at[k, 'Pair'] < Pval[p]):
-    #             # print(p, Pval[p + 1], Pval[p ])
-    #             dft[j].at[k, 'PO3_deconv_jma'] = 0.043085 * dft[j].at[k, 'TPext'] * dft[j].at[k, 'Ifast_deconv'] / \
-    #                                             (dft[j].at[k, 'PFcor'] * JMA[p])
-    #             dft[j].at[k, 'PO3_minib0_deconv'] = 0.043085 * dft[j].at[k, 'TPext'] * dft[j].at[k, 'Ifast_minib0_deconv'] / \
-    #                                             (dft[j].at[k, 'PFcor'] * JMA[p])
-    #
-    #
-    #     if (dft[j].at[k, 'Pair'] <= Pval[14]):
-    #         dft[j].at[k, 'PO3_deconv_jma'] = 0.043085 * dft[j].at[k, 'TPext'] * dft[j].at[k, 'Ifast_deconv'] / \
-    #                                         (dft[j].at[k, 'PFcor'] * JMA[14])
-    #         dft[j].at[k, 'PO3_minib0_deconv'] = 0.043085 * dft[j].at[k, 'TPext'] * dft[j].at[k, 'Ifast_minib0_deconv'] / \
-    #                                         (dft[j].at[k, 'PFcor'] * JMA[14])
+        if (dft[j].at[k, 'Pair'] <= Pval[14]):
+            dft[j].at[k, 'PO3_minib0_deconv_jma_sm8'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'Ifast_minib0_deconv_sm8'] / \
+                                            (dft[j].at[k, 'PFcor'] * JMA[14])
+            dft[j].at[k, 'PO3_minib0_deconv_jma'] = 0.043085 * dft[j].at[k, 'TPint'] * dft[j].at[k, 'Ifast_minib0_deconv'] / \
+                                                        (dft[j].at[k, 'PFcor'] * JMA[14])
 
+        ## komhyr corrections
+        for p in range(len(komhyr_en) - 1):
 
+            if dft[j].at[k, 'ENSCI'] == 1:
+                if (dft[j].at[k, 'Pair'] >= Pval_komhyr[p + 1]) & (dft[j].at[k, 'Pair'] < Pval_komhyr[p]):
+                    # print(p, Pval[p + 1], Pval[p ])
+                    dft[j].at[k, 'PO3_minib0_deconv_komhyr_sm8'] = (dft[j].at[k, 'TPint'] * 0.043085 * dft[j].at[k, 'Ifast_minib0_deconv_sm8'] )/  \
+                                                                (dft[j].at[k, 'PFcor'] * komhyr_en[p])
+                    dft[j].at[k, 'PO3_minib0_deconv_komhyr'] = (dft[j].at[k, 'TPint'] * 0.043085 * dft[j].at[k, 'Ifast_minib0_deconv']) / \
+                                                                   (dft[j].at[k, 'PFcor'] * komhyr_en[p])
+            if dft[j].at[k, 'ENSCI'] == 0:
+                if (dft[j].at[k, 'Pair'] >= Pval_komhyr[p + 1]) & (dft[j].at[k, 'Pair'] < Pval_komhyr[p]):
+                    # print(p, Pval[p + 1], Pval[p ])
+                    dft[j].at[k, 'PO3_minib0_deconv_komhyr_sm8'] = (dft[j].at[k, 'TPint'] * 0.043085 * dft[j].at[k, 'Ifast_minib0_deconv_sm8']) /\
+                                                                (dft[j].at[k, 'PFcor'] * komhyr_en[p])
+                    dft[j].at[k, 'PO3_minib0_deconv_komhyr'] = (dft[j].at[k, 'TPint'] * 0.043085 * dft[j].at[k, 'Ifast_minib0_deconv']) / \
+                                                                   (dft[j].at[k, 'PFcor'] * komhyr_en[p])
 
+        if (dft[j].at[k, 'Pair'] <= Pval_komhyr[7]):
+
+            if dft[j].at[k, 'ENSCI'] == 1:
+                dft[j].at[k, 'PO3_minib0_deconv_komhyr_sm8'] = (dft[j].at[k, 'TPint'] * 0.043085 * dft[j].at[k, 'Ifast_minib0_deconv_sm8']) / \
+                                                            (dft[j].at[k, 'PFcor'] * komhyr_en[7])
+                dft[j].at[k, 'PO3_minib0_deconv_komhyr'] = (dft[j].at[k, 'TPint'] * 0.043085 * dft[j].at[k, 'Ifast_minib0_deconv']) / \
+                                                               (dft[j].at[k, 'PFcor'] * komhyr_en[7])
+            if dft[j].at[k, 'ENSCI'] == 0:
+                dft[j].at[k, 'PO3_minib0_deconv_komhyr_sm8'] = (dft[j].at[k, 'TPint'] * 0.043085 * dft[j].at[k, 'Ifast_minib0_deconv_sm8']) / \
+                                                            (dft[j].at[k, 'PFcor'] * komhyr_sp[7])
+                dft[j].at[k, 'PO3_minib0_deconv_komhyr'] = (dft[j].at[k, 'TPint'] * 0.043085 * dft[j].at[k, 'Ifast_minib0_deconv']) / \
+                                                               (dft[j].at[k, 'PFcor'] * komhyr_sp[7])
 
     list_data.append(dft[j])
 
 df_dc = pd.concat(list_data, ignore_index=True)
 
-df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_new.csv")
+# df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2000_deconv_beta0_every5sec.csv")
 
 # df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_beta.csv")
 

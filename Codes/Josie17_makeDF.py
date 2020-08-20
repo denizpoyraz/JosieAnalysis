@@ -21,6 +21,7 @@ p_en, p_sp = polyfit(df17)
 
 
 
+
 #######################################################################
 
 slow = 25 * 60  # 25 minutes in seconds
@@ -59,6 +60,11 @@ yref_pair = [1000, 850, 700, 550, 400, 350, 300, 200, 150, 100, 75, 50, 35, 25, 
         12, 10, 8, 6]
 
 y_pair=  [925.0, 775.0, 625.0, 475.0, 375.0, 325.0, 250.0, 175.0, 125.0, 87.5, 62.5, 42.5, 30.0, 22.5, 17.5, 13.5, 11.0, 9.0, 7.0]
+print('ensci', np.array(p_en))
+print('sp', np.array(p_sp))
+print(len(y_pair), len(p_sp))
+print(p_en[y_pair[10]])
+
 
 Pval_komhyr = np.array([1000, 199, 59, 30, 20, 10, 7, 5])
 komhyr_sp_tmp = np.array([1, 1.007, 1.018, 1.022, 1.032, 1.055, 1.070, 1.092])
@@ -141,6 +147,7 @@ for filename in allFiles:
         for pi in range(len(yref_pair) -1):
 
             if (df.at[k, 'Pair'] >= yref_pair[pi + 1]) & (df.at[k, 'Pair'] < yref_pair[pi]) :
+                # print(pi, y_pair[pi], p_en(y_pair[pi]) )
                 if (df.at[k, 'ENSCI'] == 1): df.at[k, 'Tcell'] = df.at[k, 'TPext'] - p_en(y_pair[pi])
                 if (df.at[k, 'ENSCI'] == 0): df.at[k, 'Tcell'] = df.at[k, 'TPext'] - p_sp(y_pair[pi])
 
@@ -294,7 +301,7 @@ for s in simlist:
 calculate_O3frac17(df, simlist)
 
 
-df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_Data_nocut_1607.csv")
+# df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_Data_nocut_1607.csv")
 # df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_Data_nocut.csv")
 #
 

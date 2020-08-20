@@ -89,6 +89,6 @@ def polyfit(dfp):
     p_sp = np.poly1d(np.polyfit(Y, adifall_sp, 15))
 
     # print('Y', Y)
-    # print('p_en', p_en)
+    print('p_en', p_en)
 
     return p_en, p_sp

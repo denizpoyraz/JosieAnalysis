@@ -50,19 +50,18 @@ for j in range(len(simlist)):
     dft = dft.reset_index()
 
     fig, ax = plt.subplots()
-    ax.set_yscale('log')
     plt.title(title)
     plt.xlabel('Current')
-    plt.ylabel('Pair')
+    plt.ylabel('TSim')
     # plt.xlim([-50, 50])
     # plt.ylim([1000, 5])
-
+    ax.set_yscale('log')
 
     dft['rdifI'] = (dft['Ifast_minib0_deconv_sm8'] -  dft['IM'])/ dft['IM'] * 100
 
     plt.plot(dft.IM.rolling(window=4).mean(), dft.Tsim, label='IM')
     plt.plot(dft.I_slow_conv.rolling(window=4).mean(), dft.Tsim, label='Islow conv')
-    plt.plot(dft.Ifast_minib0_deconv_sm8.rolling(window=4).mean(), dft.Tsim, label = 'I fast - ib0 deconv')
+    plt.plot(dft.Ifast_minib0_deconv_sm8, dft.Tsim, label = 'I fast - ib0 deconv')
     plt.plot(dft.I_OPM_jma.rolling(window=4).mean(), dft.Tsim, label = 'I OPM jma')
     # plt.plot(dft.rdifI, dft.Tsim, label='(Ifast-ib0 deconv) - IM [%]')
 

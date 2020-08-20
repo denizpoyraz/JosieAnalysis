@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
 
-df1 = pd.read_csv('/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2009_Data_nocut_tempfixed_paper.csv')
-df2 = pd.read_csv('/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2010_Data_nocut_tempfixed_paper.csv')
+df1 = pd.read_csv('/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2009_Data_nocut_1607.csv')
+df2 = pd.read_csv('/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2010_Data_nocut_1607.csv')
 
 # df1 = pd.read_csv('/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2009_Data_nocut_tempfixed_ml.csv')
 # df2 = pd.read_csv('/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2010_Data_nocut_tempfixed_ml.csv')
@@ -16,7 +16,7 @@ frames = [df1,df2]
 dfall = pd.concat(frames)
 
 # dfall.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut_tempfixed_ml.csv")
-dfall.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut_tempfixed_paper.csv")
+dfall.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut_1607.csv")
 
 
 # df = pd.read_csv('/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie17_data_notimecut.csv')

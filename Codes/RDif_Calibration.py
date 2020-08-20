@@ -36,10 +36,13 @@ def cuts0910(dfm):
 
     return dfm
 
-folderpath = 'Dif_0910_0707'
+folderpath = 'Dif_0910_1607_tr'
 
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_beta.csv", low_memory=False)
-df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_beta0_tempfixed_paper.csv", low_memory=False)
+# df = pd.read_csv("/home/poyrade/n/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_1607.csv", low_memory=False)
+df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_beta0_timereversed.csv", low_memory=False)
+
+
 
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_final.csv", low_memory=False)
 
@@ -108,7 +111,7 @@ print(list(df))
 # ##################################################################################
 
 adif_PO3, adif_PO3_err, rdif_PO3, rdif_PO3_err, Yp = Calc_average_Dif(prof, 'PO3', 'PO3_OPM',  'pressure')
-adif_PO3_deconvjma, adif_PO3_deconvjma_err, rdif_PO3_deconvjma, rdif_PO3_deconvjma_err, Yp = Calc_average_Dif(prof, 'PO3_deconv_jma', 'PO3_OPM',  'pressure')
+# adif_PO3_deconvjma, adif_PO3_deconvjma_err, rdif_PO3_deconvjma, rdif_PO3_deconvjma_err, Yp = Calc_average_Dif(prof, 'PO3_deconv_jma', 'PO3_OPM',  'pressure')
 
 
 ytitle = 'Pressure (hPa)'
@@ -116,8 +119,8 @@ ytitlet = 'Time (sec.)'
 
 # ### Plotting
 
-axtitlecur = r'Sonde - OPM[JMA]  Difference ($\mu$A)'
-rxtitle = 'Sonde - OPM[JMA]  Difference (%)'
+axtitlecur = r'Sonde - OPM[JMA]Difference ($\mu$A)'
+rxtitle = 'Sonde - OPM[JMA]Difference (%)'
 
 ### Plotting
 axtitle_nojma = 'Sonde - OPM  Difference (mPa)'
@@ -126,9 +129,9 @@ axtitle = 'Sonde[JMA] - OPM  Difference (mPa)'
 rxtitle_nojma = 'Sonde - OPM  Difference (%)'
 rxtitle = 'Sonde[JMA] - OPM  Difference (%)'
 
-axtitlecur = r'Sonde - OPM[JMA]  Difference ($\mu$A)'
-rxtitlecur = 'Sonde - OPM[JMA]  Difference (%)'
-rxtitlecurb = 'Sonde - OPM[JMA] smoothed  Difference (%)'
+axtitlecur = r'Sonde - OPM[JMA]Difference ($\mu$A)'
+rxtitlecur = 'Sonde - OPM[JMA]Difference (%)'
+rxtitlecurb = 'Sonde - OPM[Komhyr]smoothed  Difference (%)'
 
 
 labellist = ['EN 0.5%-0.5B','EN 1.0%-1.0B', 'SP 0.5%-0.5B', 'SP 1.0%-1.0B']
@@ -164,32 +167,32 @@ adif_IM_deconv8, adif_IM_deconv8_err, rdif_IM_deconv8, rdif_IM_deconv8_err, Yp =
 adif_IM_deconv8_minib0, adif_IM_deconv8_minib0_err, rdif_IM_deconv8_minib0, rdif_IM_deconv8_minib0_err, Yp = \
     Calc_average_Dif(prof, 'Ifast_minib0_deconv_sm8', 'I_OPM_jma',  'pressure')
 
-# adif_IM_deconv8b, adif_IM_deconv8b_err, rdif_IM_deconv8b, rdif_IM_deconv8b_err, Yp = Calc_average_Dif(prof, 'Ifast_minib0_deconv_sm8', 'I_OPM_jma_sm8',  'pressure')
+# adif_IM_deconv8b, adif_IM_deconv8b_err, rdif_IM_deconv8b, rdif_IM_deconv8b_err, Yp = Calc_average_Dif(prof, 'Ifast_minib0_deconv_sm8', 'I_OPM_komhyr_sm8',  'pressure')
 
-# adif_IM_deconv20, adif_IM_deconv20_err, rdif_IM_deconv20, rdif_IM_deconv20_err, Yp = Calc_average_Dif(prof, 'Ifast_minib0_deconv_sm20', 'I_OPM_jma',  'pressure')
-# adif_IM_deconv20b, adif_IM_deconv20b_err, rdif_IM_deconv20b, rdif_IM_deconv20b_err, Yp = Calc_average_Dif(prof, 'Ifast_minib0_deconv_sm20', 'I_OPM_jma_sm20',  'pressure')
+# adif_IM_deconv20, adif_IM_deconv20_err, rdif_IM_deconv20, rdif_IM_deconv20_err, Yp = Calc_average_Dif(prof, 'Ifast_minib0_deconv_sm20', 'I_OPM_komhyr',  'pressure')
+# adif_IM_deconv20b, adif_IM_deconv20b_err, rdif_IM_deconv20b, rdif_IM_deconv20b_err, Yp = Calc_average_Dif(prof, 'Ifast_minib0_deconv_sm20', 'I_OPM_komhyr_sm20',  'pressure')
 #
-# adif_IM_deconv40, adif_IM_deconv40_err, rdif_IM_deconv40, rdif_IM_deconv40_err, Yp = Calc_average_Dif(prof, 'Ifast_minib0_deconv_sm40', 'I_OPM_jma',  'pressure')
-# adif_IM_deconv40b, adif_IM_deconv40b_err, rdif_IM_deconv40b, rdif_IM_deconv40b_err, Yp = Calc_average_Dif(prof, 'Ifast_minib0_deconv_sm40', 'I_OPM_jma_sm40',  'pressure')
+# adif_IM_deconv40, adif_IM_deconv40_err, rdif_IM_deconv40, rdif_IM_deconv40_err, Yp = Calc_average_Dif(prof, 'Ifast_minib0_deconv_sm40', 'I_OPM_komhyr',  'pressure')
+# adif_IM_deconv40b, adif_IM_deconv40b_err, rdif_IM_deconv40b, rdif_IM_deconv40b_err, Yp = Calc_average_Dif(prof, 'Ifast_minib0_deconv_sm40', 'I_OPM_komhyr_sm40',  'pressure')
 
 errorPlot_ARDif_withtext(adif_IM, adif_IM_err, Yp, [-1, 1], [1000,5],  '0910 Data  (Current)',
-                         axtitlecur, ytitle,labellist, o3list, dfnplist,'Current_ADif_IM', folderpath, True, True)
+                         axtitlecur, ytitle,labellist, o3list, dfnplist,'Current_ADif_IM_cc', folderpath, True, True)
 
 errorPlot_ARDif_withtext(rdif_IM, rdif_IM_err, Yp, [-40, 40], [1000,5],  '0910 Data  (Current)',
-                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'Current_RDif_IM_20rangw', folderpath, True, True)
+                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'Current_RDif_IM_cc', folderpath, True, True)
 
 errorPlot_ARDif_withtext(adif_IM_deconv8, adif_IM_deconv8_err, Yp, [-1, 1], [1000,5],  '0910 Data Conv-Deconv (Current Smoothed 8 secs, beta0)',
-                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'Current_ADif_Convoluted_0910_smoothed8_beta0_nojmaopm', folderpath, True, False)
+                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'Current_ADif_Convoluted_0910_smoothed8_beta0_cc', folderpath, True, False)
 
 errorPlot_ARDif_withtext(rdif_IM_deconv8, rdif_IM_deconv8_err, Yp, [-40, 40], [1000,5],  '0910 Data Conv-Deconv (Current Smoothed 8 secs, beta0)',
-                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'Current_RDif_Convoluted_0910_smoothed8_beta0_20range_nojmaopm', folderpath, True, False)
+                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'Current_RDif_Convoluted_0910_smoothed8_beta0_cc', folderpath, True, False)
 
 
 errorPlot_ARDif_withtext(adif_IM_deconv8_minib0, adif_IM_deconv8_minib0_err, Yp, [-1, 1], [1000,5],  '0910 Data Conv-Deconv (Current - iB0 Smoothed 8 secs, beta0)',
-                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'Current_ADif_Convoluted_0910_smoothed8_minib0_beta0_nojmaopm', folderpath, True, False)
+                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'Current_ADif_Convoluted_0910_smoothed8_minib0_beta0_cc', folderpath, True, False)
 
 errorPlot_ARDif_withtext(rdif_IM_deconv8_minib0, rdif_IM_deconv8_minib0_err, Yp, [-40, 40], [1000,5],  '0910 Data Conv-Deconv (Current - iB0 Smoothed 8 secs, beta0)',
-                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'Current_RDif_Convoluted_0910_smoothed8_minib0beta0_20range_nojmaopm', folderpath, True, False)
+                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'Current_RDif_Convoluted_0910_smoothed8_minib0beta0_cc', folderpath, True, False)
 
 # errorPlot_ARDif_withtext(rdif_IM_deconv8b, rdif_IM_deconv8b_err, Yp, [-20, 20], [1000,5],  '0910 Data Conv-Deconv (Current Smoothed 8 secs)',
 #                          rxtitlecurb, ytitle,labellist, o3list, dfnplist,'Current_RDif_Convoluted_0910_smoothed8b', folderpath, True, False)

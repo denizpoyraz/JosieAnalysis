@@ -56,7 +56,7 @@ def plothost(hostarr1, hostarr2, hostarr3, hostarr32, hostarr4, twinarr1, twinar
     # par1.set_xlabel("TPint - TCell/ TCell [%]")
     par1.set_xlabel("TBoil - TCell")
 
-    par1.set_xlim(-10,20)
+    par1.set_xlim(-20,10)
     # par2.set_xlabel("TPint - TPext")
     # par2.set_xlabel("TPint - TCell")
 
@@ -73,7 +73,7 @@ def plothost(hostarr1, hostarr2, hostarr3, hostarr32, hostarr4, twinarr1, twinar
     # p4, = par1.plot(twinarr1, Y, label="RDif")
     # p4, = par1.plot(twinarr1, Y, label="TBoil")
 
-    p5, = par1.plot(twinarr2, Y, label="TBoil - TCell")
+    p5, = par1.plot(twinarr2, Y, label="TCell - TBoil")
 
 
     p4, = par2.plot(twinarr1, Y, label="Pw - Pair")
@@ -220,7 +220,7 @@ for k in range(4):
     rdiferr[k] = [np.sqrt((ie * ie)/(i*i) + (je * je)/(j*j)) for ie, je, i, j
                   in zip(avgprof_tpintK_err[k], avgprof_tpextK_err[k], avgprof_tpintK[k], avgprof_tpextK[k])]
 
-    adif_cell[k] = [j - i for i, j in zip(avgprof_tpcell[k], avgprof_tpboil[k])]
+    adif_cell[k] = [i - j for i, j in zip(avgprof_tpcell[k], avgprof_tpboil[k])]
     adif_cellerr[k] = [np.sqrt(i * i + j * j) for i, j in zip(avgprof_tpcell_err[k], avgprof_tpboil_err[k])]
 
     rdif_cell[k] = [(j - i) / i * 100 for i, j in zip(avgprof_tpcellK[k], avgprof_tpboilK[k])]
@@ -233,11 +233,11 @@ for k in range(4):
 mtitle0 = '0910 EN 0.5%-0.5B'
 stitle0 = '0910_EN0505_RADif_sr'
 
-# mtitle1 = '0910 EN 1.0%-0.1B'
-# stitle1 = '0910_EN1001_RADif_sr'
+mtitle1 = '0910 EN 1.0%-0.1B'
+stitle1 = '0910_EN1001_RADif_sr'
 
-mtitle1 = '0910 EN 1.0%-1.0B'
-stitle1 = '0910_EN1010_RADif_sr'
+# mtitle1 = '0910 EN 1.0%-1.0B'
+# stitle1 = '0910_EN1010_RADif_sr'
 #
 mtitle2 = '0910 SP 0.5%-0.5B'
 stitle2 = '0910_SP0505_RADif_sr'

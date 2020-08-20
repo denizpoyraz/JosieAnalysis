@@ -35,10 +35,13 @@ def cuts2017(dfm):
 
     return dfm
 
-folderpath = 'Dif_2017'
+folderpath = 'Dif_2017_tfasteach'
 
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv_final.csv", low_memory=False)
-df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv_beta0_2_tempfixed_0907.csv", low_memory=False)
+# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv_beta0_2_tempfixed_0907.csv", low_memory=False)
+df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv_tfasteach.csv", low_memory=False)
+
+
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv_beta0.csv", low_memory=False)
 
 df = cuts2017(df)
@@ -145,46 +148,46 @@ adif_IM_deconv8b_minib0, adif_IM_deconv8b_minib0_err, rdif_IM_deconv8b_minib0, r
 # adif_IM_deconv40, adif_IM_deconv40_err, rdif_IM_deconv40, rdif_IM_deconv40_err, Yp = Calc_average_Dif(prof, 'Ifast_minib0_deconv_sm40', 'I_OPM_jma',  'pressure')
 # adif_IM_deconv40b, adif_IM_deconv40b_err, rdif_IM_deconv40b, rdif_IM_deconv40b_err, Yp = Calc_average_Dif(prof, 'Ifast_minib0_deconv_sm40', 'I_OPM_jma_sm40',  'pressure')
 
-errorPlot_ARDif_withtext(rdif_IM, rdif_IM_err, Yp, [-20, 20], [1000,5],  '2017 Data  (Current)',
-                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'09_07beta2__Current_RDif_IM', folderpath, True, True)
+errorPlot_ARDif_withtext(rdif_IM, rdif_IM_err, Yp, [-40, 40], [1000,5],  '2017 Data  (Current)',
+                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'Current_RDif_IM', folderpath, True, True)
 
 
 errorPlot_ARDif_withtext(adif_IM, adif_IM_err, Yp, [-1, 1], [1000,5],  '2017 Data  (Current)',
-                         axtitlecur, ytitle,labellist, o3list, dfnplist,'09_07beta2__Current_ADif_IM', folderpath, True, True)
+                         axtitlecur, ytitle,labellist, o3list, dfnplist,'Current_ADif_IM', folderpath, True, True)
 
 errorPlot_ARDif_withtext(adif_IM_deconv8, adif_IM_deconv8_err, Yp, [-1, 1], [1000,5],  '2017 Data Conv-Deconv (Current Smoothed 8 secs, beta0)',
-                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'09_07beta2__Current_ADif_Convoluted_2017_smoothed8_beta0', folderpath, True, True)
+                         axtitlecur, ytitle,labellist, o3list, dfnplist,'Current_ADif_Convoluted_2017_smoothed8_beta0', folderpath, True, True)
 
-errorPlot_ARDif_withtext(rdif_IM_deconv8, rdif_IM_deconv8_err, Yp, [-20, 20], [1000,5],  '2017 Data Conv-Deconv (Current Smoothed 8 secs, beta0)',
-                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'09_07beta2__Current_RDif_Convoluted_2017_smoothed8_beta0', folderpath, True, True)
+errorPlot_ARDif_withtext(rdif_IM_deconv8, rdif_IM_deconv8_err, Yp, [-40, 40], [1000,5],  '2017 Data Conv-Deconv (Current Smoothed 8 secs, beta0)',
+                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'Current_RDif_Convoluted_2017_smoothed8_beta0', folderpath, True, True)
 
 errorPlot_ARDif_withtext(adif_IM_deconv8_minib0, adif_IM_deconv8_minib0_err, Yp, [-1, 1], [1000,5],  '2017 Data Conv-Deconv (Current - iB0 Smoothed 8 secs, beta0)',
-                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'09_07beta2__Current_ADif_Convoluted_2017_smoothed8_beta0_minib0', folderpath, True, True)
+                         axtitlecur, ytitle,labellist, o3list, dfnplist,'Current_ADif_Convoluted_2017_smoothed8_beta0_minib0', folderpath, True, True)
 
-errorPlot_ARDif_withtext(rdif_IM_deconv8_minib0, rdif_IM_deconv8_minib0_err, Yp, [-20, 20], [1000,5],  '2017 Data Conv-Deconv (Current Smoothed 8 secs, beta0)',
-                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'09_07beta2__Current_RDif_Convoluted_2017_smoothed8_beta0_minib0', folderpath, True, True)
+errorPlot_ARDif_withtext(rdif_IM_deconv8_minib0, rdif_IM_deconv8_minib0_err, Yp, [-40, 40], [1000,5],  '2017 Data Conv-Deconv (Current Smoothed 8 secs, beta0)',
+                         rxtitlecur, ytitle,labellist, o3list, dfnplist,'Current_RDif_Convoluted_2017_smoothed8_beta0_minib0', folderpath, True, True)
 
 colorlist = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2']
 
-errorPlot_general(rdif_IM_deconv8_minib0, rdif_IM_deconv8_minib0_err, Yp, [-20, 20], [1000,5],  '2017 Data Conv-Deconv (Current - iB0 Smoothed 8 secs)',
+errorPlot_general(rdif_IM_deconv8_minib0, rdif_IM_deconv8_minib0_err, Yp, [-40, 40], [1000,5],  '2017 Data Conv-Deconv (Current - iB0 Smoothed 8 secs)',
                          rxtitlecur, ytitle,labellist, colorlist, 'testRDif', folderpath, True, False, False)
 
 #
-# errorPlot_ARDif_withtext(rdif_IM_deconv8b, rdif_IM_deconv8b_err, Yp, [-20, 20], [1000,5],  '2017 Data Conv-Deconv (Current Smoothed 8 secs)',
+# errorPlot_ARDif_withtext(rdif_IM_deconv8b, rdif_IM_deconv8b_err, Yp, [-40, 40], [1000,5],  '2017 Data Conv-Deconv (Current Smoothed 8 secs)',
 #                          rxtitlecurb, ytitle,labellist, o3list, dfnplist,'Current_RDif_Convoluted_2017_smoothed8b', folderpath, True, True)
 
 
-# errorPlot_ARDif_withtext(rdif_IM_deconv20, rdif_IM_deconv20_err, Yp, [-20, 20], [1000,5],  '2017 Data Conv-Deconv (Current Smoothed 20 secs)',
+# errorPlot_ARDif_withtext(rdif_IM_deconv20, rdif_IM_deconv20_err, Yp, [-40, 40], [1000,5],  '2017 Data Conv-Deconv (Current Smoothed 20 secs)',
 #                          rxtitlecur, ytitle,labellist, o3list, dfnplist,'Current_RDif_Convoluted_2017_smoothed20', folderpath, True, True)
 #
-# errorPlot_ARDif_withtext(rdif_IM_deconv20b, rdif_IM_deconv20b_err, Yp, [-20, 20], [1000,5],  '2017 Data Conv-Deconv (Current Smoothed 20 secs)',
+# errorPlot_ARDif_withtext(rdif_IM_deconv20b, rdif_IM_deconv20b_err, Yp, [-40, 40], [1000,5],  '2017 Data Conv-Deconv (Current Smoothed 20 secs)',
 #                          rxtitlecurb, ytitle,labellist, o3list, dfnplist,'Current_RDif_Convoluted_2017_smoothed20b', folderpath, True, True)
 #
 #
-# errorPlot_ARDif_withtext(rdif_IM_deconv40, rdif_IM_deconv40_err, Yp, [-20, 20], [1000,5],  '2017 Data Conv-Deconv (Current Smoothed 40 secs)',
+# errorPlot_ARDif_withtext(rdif_IM_deconv40, rdif_IM_deconv40_err, Yp, [-40, 40], [1000,5],  '2017 Data Conv-Deconv (Current Smoothed 40 secs)',
 #                          rxtitlecur, ytitle,labellist, o3list, dfnplist,'Current_RDif_Convoluted_2017_smoothed40', folderpath, True, True)
 #
-# errorPlot_ARDif_withtext(rdif_IM_deconv40b, rdif_IM_deconv40b_err, Yp, [-20, 20], [1000,5],  '2017 Data Conv-Deconv (Current Smoothed 40 secs)',
+# errorPlot_ARDif_withtext(rdif_IM_deconv40b, rdif_IM_deconv40b_err, Yp, [-40, 40], [1000,5],  '2017 Data Conv-Deconv (Current Smoothed 40 secs)',
 #                          rxtitlecurb, ytitle,labellist, o3list, dfnplist,'Current_RDif_Convoluted_2017_smoothed40b', folderpath, True, True)
 
 
@@ -213,7 +216,7 @@ errorPlot_general(rdif_IM_deconv8_minib0, rdif_IM_deconv8_minib0_err, Yp, [-20, 
 #
 # ndlist = [df.drop_duplicates(['Sim', 'Team']), df.drop_duplicates(['Sim', 'Team']), df.drop_duplicates(['Sim', 'Team'])]
 #
-# errorPlot_ARDif_withtext(rdif, rdif_err, Y, [-20, 20], [1000,5],  '2017 Data ',  rxtitle,
+# errorPlot_ARDif_withtext(rdif, rdif_err, Y, [-40, 40], [1000,5],  '2017 Data ',  rxtitle,
 #                          ytitle, labellistAll, o3list, ndlist, 'AllRDif_Pair_2017_Convoluted ', folderpath, True, True)
 #
 # # ##################################################################################

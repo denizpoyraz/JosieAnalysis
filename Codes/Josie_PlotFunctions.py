@@ -158,7 +158,7 @@ def errorPlot_general(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, ytitle,
           ax.fill_betweenx(Y, minus1[0], plus1[0], alpha=0.1, facecolor='k', edgecolor= 'lightblue')
 
 
-    ax.legend(loc='best', frameon=True, fontsize='large')
+    ax.legend(loc='best', frameon=True, fontsize='small')
 
 
     plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/' + path + '/' + plotname + '.png')
