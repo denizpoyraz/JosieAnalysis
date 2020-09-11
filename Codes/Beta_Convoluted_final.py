@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from Beta_Functions import ratiofunction_beta, ratiofunction_beta_9602
+from Convolution_Functions import convolution, convolution_test, smooth_and_convolute
+
 
 def mederr(med):
     err = (np.nanquantile(med, 0.75) - np.nanquantile(med, 0.25)) / (2 * 0.6745)
@@ -9,7 +11,7 @@ def mederr(med):
 
 
 tslow = 25 * 60
-tfast = 20
+tfast = 30
 
 
 def filter(df):
@@ -181,7 +183,14 @@ print('betas median', beta_en0505, beta_en1010, beta_sp0505, beta_sp1010)
 df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut_1607.csv", low_memory=False)
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut.csv", low_memory=False)
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_Data_nocut.csv", low_memory=False)
+df['TS'] = pd.to_datetime(df.Tsim, unit = 's')
 
+
+
+
+
+df['IM_sm12'] = df['IM'].rolling(window=6, center=True).mean()
+df['I_OPM_jma_sm12'] = df['I_OPM_jma'].rolling(window=6, center=True).mean()
 
 simlist = np.asarray(df.drop_duplicates(['Sim', 'Team'])['Sim'])
 teamlist = np.asarray(df.drop_duplicates(['Sim', 'Team'])['Team'])
@@ -197,6 +206,11 @@ list_data = []
 Pval = np.array([1000, 730, 535, 382, 267, 185, 126, 85, 58, 39, 26.5, 18.1, 12.1, 8.3, 6])
 JMA = np.array([0.999705941, 0.997216654, 0.995162562, 0.992733959, 0.989710199, 0.985943645, 0.981029252, 0.974634364,
                 0.966705137, 0.956132227, 0.942864263, 0.9260478, 0.903069813, 0.87528384, 0.84516337])
+
+
+##now try to use a different dataset: data every 12 seconds
+
+
 
 for j in range(len(simlist)):
 
@@ -247,6 +261,9 @@ for j in range(len(simlist)):
     print(title)
 
     dft[j] = df[(df.Sim == simlist[j]) & (df.Team == teamlist[j])]
+    ### for data of every 12 seconds
+    dft[j] = dft[j].resample('12S', on='TS').mean().interpolate()
+    # df = df.reset_index()
     dft[j] = dft[j].reset_index()
 
     ##only for 2017
@@ -254,49 +271,16 @@ for j in range(len(simlist)):
     # if tfast < 0: tfast = 20
     # # print(j, title, tfast)
 
-
-    size = len(dft[j])
-
-    Islow = [0] * size
-    Islow_conv = [0] * size
-    Ifast = [0] * size
-    Ifastminib0 = [0] * size
-    Ifast_deconv = [0] * size
-    Ifastminib0_deconv = [0] * size
-
-    Ifast_deconv_hv = [0] * size
-    Ifastminib0_deconv_hv = [0] * size
-    Ifast_deconv_hs = [0] * size
-    Ifastminib0_deconv_hs = [0] * size
-
-
-    for i in range(0, size-1):
-        t1 = dft[j].at[i + 1, 'Tsim']
-        t2 = dft[j].at[i, 'Tsim']
-
-        Xs = np.exp(-(t1 - t2) / tslow)
-        Xf = np.exp(-(t1 - t2) / tfast)
-
-        # ###########  for 0910 data
-        # dft[j].at[i,'iB0'] = 0.014
-
-        Islow[i] = beta * dft[j].at[i, 'I_OPM_jma']
-        Islow_conv[i + 1] = Islow[i+1] - (Islow[i+1] - Islow_conv[i]) * Xs
-
-        Ifast[i + 1] = af * (dft[j].at[i + 1, 'IM'] - Islow_conv[i + 1])
-        Ifastminib0[i + 1] = af * (dft[j].at[i + 1, 'IM'] - Islow_conv[i + 1] - dft[j].at[i + 1, 'iB0'] )
-
-        Ifast_deconv[i + 1] = (Ifast[i + 1] - Ifast[i] * Xf) / (1 - Xf)
-        Ifastminib0_deconv[i + 1] = (Ifastminib0[i + 1] - Ifastminib0[i] * Xf) / (1 - Xf)
-
-        Ifast_deconv_hs[i + 1] = Ifast[i] + tfast/(t1-t2) * ( Ifast[i+1] - Ifast[i])
-        Ifastminib0_deconv_hs[i + 1] = Ifastminib0[i] + tfast/(t1-t2) * ( Ifastminib0[i+1] - Ifastminib0[i])
-
-        Ifast_deconv_hv[i + 1] = Ifast[i+1] + tfast / (t1 - t2) * (Ifast[i + 1] - Ifast[i])
-        Ifastminib0_deconv_hv[i + 1] = Ifastminib0[i+1] + tfast / (t1 - t2) * (Ifastminib0[i + 1] - Ifastminib0[i])
+    # dft[j]['IM_sm12'] = dft[j]['IM'].rolling(window=6, center=True).mean()
+    # dft[j]['I_OPM_jma_sm12'] = dft[j]['I_OPM_jma'].rolling(window=6, center=True).mean()
 
 
 
+    Islow, Islow_conv, Ifast, Ifast_deconv, Ifastminib0, Ifastminib0_deconv = convolution(dft[j], 'I_OPM_jma', 'IM', 'Tsim', beta, 1)
+    Islow_sm, Islow_conv_sm, Ifast_sm, Ifast_deconv_sm, Ifastminib0_sm, Ifastminib0_deconv_sm = convolution(dft[j], 'I_OPM_jma_sm12', 'IM_sm12', 'Tsim', beta, 1)
+
+
+    print(Ifastminib0_deconv_sm)
     dft[j]['I_slow'] = Islow
     dft[j]['I_slow_conv'] = Islow_conv
     dft[j]['I_fast'] = Ifast
@@ -304,26 +288,13 @@ for j in range(len(simlist)):
     dft[j]['Ifast_deconv'] = Ifast_deconv
     dft[j]['Ifast_minib0_deconv'] = Ifastminib0_deconv
 
-    dft[j]['Ifast_deconv_hs'] = Ifast_deconv_hs
-    dft[j]['Ifast_minib0_deconv_hs'] = Ifastminib0_deconv_hs
 
-    dft[j]['Ifast_deconv_hv'] = Ifast_deconv_hv
-    dft[j]['Ifast_minib0_deconv_hv'] = Ifastminib0_deconv_hv
-
-    dft[j]['I_slow_sm8'] = dft[j]['I_slow'].rolling(window=4).mean()
-    dft[j]['I_slow_conv_sm8'] = dft[j]['I_slow_conv'].rolling(window=4).mean()
-    dft[j]['I_fast_sm8'] = dft[j]['I_fast'].rolling(window=4).mean()
-    dft[j]['Ifast_minib0_sm8'] = dft[j]['Ifast_minib0'].rolling(window=4).mean()
-    dft[j]['Ifast_deconv_sm8'] = dft[j]['Ifast_deconv'].rolling(window=4).mean()
-    dft[j]['Ifast_minib0_deconv_sm8'] = dft[j]['Ifast_minib0_deconv'].rolling(window=4).mean()
-
-    dft[j]['Ifast_deconv_hv_sm8'] = dft[j]['Ifast_deconv_hv'].rolling(window=4).mean()
-    dft[j]['Ifast_minib0_deconv_hv_sm8'] = dft[j]['Ifast_minib0_deconv_hv'].rolling(window=4).mean()
-
-    dft[j]['Ifast_deconv_hs_sm8'] = dft[j]['Ifast_deconv_hs'].rolling(window=4).mean()
-    dft[j]['Ifast_minib0_deconv_hs_sm8'] = dft[j]['Ifast_minib0_deconv_hs'].rolling(window=4).mean()
-
-
+    dft[j]['I_slow_sm12'] = Islow_sm
+    dft[j]['I_slow_conv_sm12'] = Islow_conv_sm
+    dft[j]['I_fast_sm12'] = Ifast_sm
+    dft[j]['Ifast_minib0_sm12'] = Ifastminib0_sm
+    dft[j]['Ifast_deconv_sm12'] = Ifast_deconv_sm
+    dft[j]['Ifast_minib0_deconv_sm12'] = Ifastminib0_deconv_sm
 
 
 
@@ -351,10 +322,48 @@ for j in range(len(simlist)):
 
 df_dc = pd.concat(list_data, ignore_index=True)
 
-df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_new.csv")
+# df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv.csv")
 
-# df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_beta.csv")
+df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_every12secondsdata.csv")
 
 # df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_final.csv")
 
 ## naming beta2:  used all data for betas, also en0505 and spc0505 in 9602 data
+
+#
+# Islow = [0] * size
+# Islow_conv = [0] * size
+# Ifast = [0] * size
+# Ifastminib0 = [0] * size
+# Ifast_deconv = [0] * size
+# Ifastminib0_deconv = [0] * size
+#
+# Ifast_deconv_hv = [0] * size
+# Ifastminib0_deconv_hv = [0] * size
+# Ifast_deconv_hs = [0] * size
+# Ifastminib0_deconv_hs = [0] * size
+#
+# for i in range(0, size - 1):
+#     t1 = dft[j].at[i + 1, 'Tsim']
+#     t2 = dft[j].at[i, 'Tsim']
+#
+#     Xs = np.exp(-(t1 - t2) / tslow)
+#     Xf = np.exp(-(t1 - t2) / tfast)
+#
+#     # ###########  for 0910 data
+#     # dft[j].at[i,'iB0'] = 0.014
+#
+#     Islow[i] = beta * dft[j].at[i, 'I_OPM_jma']
+#     Islow_conv[i + 1] = Islow[i + 1] - (Islow[i + 1] - Islow_conv[i]) * Xs
+#
+#     Ifast[i + 1] = af * (dft[j].at[i + 1, 'IM'] - Islow_conv[i + 1])
+#     Ifastminib0[i + 1] = af * (dft[j].at[i + 1, 'IM'] - Islow_conv[i + 1] - dft[j].at[i + 1, 'iB0'])
+#
+#     Ifast_deconv[i + 1] = (Ifast[i + 1] - Ifast[i] * Xf) / (1 - Xf)
+#     Ifastminib0_deconv[i + 1] = (Ifastminib0[i + 1] - Ifastminib0[i] * Xf) / (1 - Xf)
+#
+#     Ifast_deconv_hs[i + 1] = Ifast[i] + tfast / (t1 - t2) * (Ifast[i + 1] - Ifast[i])
+#     Ifastminib0_deconv_hs[i + 1] = Ifastminib0[i] + tfast / (t1 - t2) * (Ifastminib0[i + 1] - Ifastminib0[i])
+#
+#     Ifast_deconv_hv[i + 1] = Ifast[i + 1] + tfast / (t1 - t2) * (Ifast[i + 1] - Ifast[i])
+#     Ifastminib0_deconv_hv[i + 1] = Ifastminib0[i + 1] + tfast / (t1 - t2) * (Ifastminib0[i + 1] - Ifastminib0[i])

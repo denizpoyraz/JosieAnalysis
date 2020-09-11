@@ -8,9 +8,9 @@ from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,AutoMinorLoca
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2000_deconv_beta0_every5sec.csv", low_memory=False)
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut.csv", low_memory=False)
 
-# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_beta2ib0.csv", low_memory=False)
-# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_new.csv", low_memory=False)
-df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie9602_Data.csv", low_memory=False)
+df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_every12secondsdata.csv", low_memory=False)
+# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_sm.csv", low_memory=False)
+# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie9602_Data.csv", low_memory=False)
 
 # Josie9602_Data.csv
 
@@ -33,7 +33,7 @@ df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie9602_Data.c
 # df = df[df.ADX == 0]
 ## apply cuts here
 
-# df = df[(df.Sim == 136) & (df.Team == 1)]
+df = df[(df.Sim == 136) & (df.Team == 1)]
 
 
 simlist = np.asarray(df.drop_duplicates(['Sim', 'Team'])['Sim'])
@@ -92,20 +92,44 @@ for j in range(len(simlist)):
     gs = gridspec.GridSpec(3, 1)
     #
     if not rdifbool:
-        ax2 = plt.subplot(gs[:, :])  # create the first subplot that will ALWAYS be there
+        # ax2 = plt.subplot(gs[:, :])  # create the first subplot that will ALWAYS be there
+        fig, ax2 = plt.subplots()
+
         ax2.set_ylabel(r'Current ($\mu$A)')
         ax2.set_xlabel('Tsim (mins)')
 
-        # plt.plot(dft[j].TsimMin, dft[j].I_OPM_jma, label='I OPM JMA')
-        plt.plot(dft[j].TsimMin, dft[j].I_OPM_komhyr, label='I OPM Komhyr')
+        plt.plot(dft[j].TsimMin, dft[j].I_OPM_jma, label='I OPM JMA')
+        plt.plot(dft[j].TsimMin, dft[j].I_OPM_jma_sm12, label='I OPM JMA sm12')
         plt.plot(dft[j].TsimMin, dft[j].IM, label='I ECC')
-        plt.plot(dft[j].TsimMin, dft[j].Ifast_deconv_sm8, label='Ifast deconv. sm8')
-        plt.plot(dft[j].TsimMin, dft[j].Ifast_deconv_hv_sm8, label='Ifast deconv. HV sm8')
-        plt.plot(dft[j].TsimMin, dft[j].Ifast_deconv_hs_sm8, label='Ifast deconv. HS sm8')
+        plt.plot(dft[j].TsimMin, dft[j].IM_sm12, label='I ECC sm12')
 
+
+        plt.plot(dft[j].TsimMin, dft[j].Ifast_minib0_deconv.rolling(window=6, center=True).mean(), label='Ifast minib0 deconv. sm12')
+        plt.plot(dft[j].TsimMin, dft[j].Ifast_minib0_deconv_sm12, label='Ifast minib0 sm12 deconv')
+
+        # plt.plot(dft[j].TsimMin, dft[j].I_OPM_jma.rolling(window=5, center=True).mean(), label='I OPM JMA sm10')
+        # plt.plot(dft[j].TsimMin, dft[j].IM.rolling(window=5, center=True).mean(), label='I ECC sm 10')
+        # plt.plot(dft[j].TsimMin, dft[j].Ifast_minib0_deconv_f.rolling(window=10, center=True).mean(),
+        #          label='Ifast minib0 deconv. sm20')
 
         plt.title(ptitle)
         plt.legend(loc='upper left', fontsize='small')
+        # plt.show()
+
+        # fig, ax3 = plt.subplots()
+        #
+        # ax3 = plt.subplot()  # create the first subplot that will ALWAYS be there
+        # ax3.set_ylabel(r'Current ($\mu$A)')
+        # ax3.set_xlabel('Tsim (mins)')
+        #
+        #
+        # plt.plot(dft[j].TsimMin, dft[j].I_OPM_jma.rolling(window=5, center=True).mean(), label='I OPM JMA sm10')
+        # plt.plot(dft[j].TsimMin, dft[j].IM.rolling(window=5, center=True).mean(), label='I ECC sm 10')
+        # plt.plot(dft[j].TsimMin, dft[j].Ifast_minib0_deconv_f.rolling(window=10, center=True).mean(),
+        #          label='Ifast minib0 deconv. sm20')
+        #
+        # plt.title(ptitle)
+        # plt.legend(loc='upper left', fontsize='small')
         plt.show()
 
 
