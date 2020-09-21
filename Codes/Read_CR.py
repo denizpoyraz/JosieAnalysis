@@ -48,7 +48,7 @@ df = df.reset_index()
 #
 df['TS'] = pd.to_datetime(df.Time, unit = 's')
 
-dfr = df.resample('10S', on='TS').mean().interpolate()
+dfr = df.resample('4S', on='TS').mean().interpolate()
 dfo = dfr.reset_index()
 
 dfo['nTime'] = (dfo['TS'] - datetime.datetime(1970,1,1)).dt.total_seconds()
@@ -105,6 +105,7 @@ plt.plot(dfo.Ifast_f, dfo.GeopAlt,  label=' Fast ', linewidth=2.5)
 # plt.plot(dfo.Ifast_deconv_f.rolling(window=1, center=True, win_type='gaussian').mean(std=0.5), dfo.GeopAlt,  label=' Fast gaus. smoothed',  linewidth=2.5)
 plt.plot(dfo.Ifast_deconv_f.rolling(window=1, center=True).mean(), dfo.GeopAlt,  label=' Fast deconv. no extra. smoothing')
 # plt.plot(dfo.Ifastminib0_deconv_f.rolling(window=3, center=True, win_type='gaussian').mean(std=1), dfo.GeopAlt,  label=' Fast miniB0 deconv. gaus. smoothed')
+plt.plot(dfo.Islow_conv_f, dfo.GeopAlt,  label=' Fast ', linewidth=2.5)
 
 # plt.plot(dfo.Ifast_deconv_f.rolling(window=6, center=True).mean(), dfo.GeopAlt,  label=' Fast deconv smoothed')
 
@@ -146,8 +147,8 @@ plt.legend(loc='left top', fontsize='small')
 
 #
 
-plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Costa_Rica/' + title + '.eps')
-plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Costa_Rica/' + title + '.png')
+# plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Costa_Rica/' + title + '.eps')
+# plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Costa_Rica/' + title + '.png')
 plt.show()
 
 

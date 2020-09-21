@@ -102,8 +102,6 @@ def convolution(df, variable1, variable2, tvariable, beta, boolib0):
             Ifastminib0_deconv[i + 1] = (Ifastminib0[i + 1] - Ifastminib0[i] * Xf) / (1 - Xf)
 
 
-
-
     if boolib0:
         return Islow, Islow_conv, Ifast, Ifast_deconv, Ifastminib0, Ifastminib0_deconv
     else:
@@ -137,7 +135,7 @@ def smooth_and_convolute(df, variable, tvariable, windowlen,  beta, boolib0):
 
         Ifast_deconv[i + 1] = (Ifast[i + 1] - Ifast[i] * Xf) / (1 - Xf)
 
-        print(i, Ifast_deconv[i+1])
+        # print(i, Ifast_deconv[i+1])
 
         if boolib0 == True:
             Ifastminib0[i] = af * (df.at[i, 'variable_smoothed'] - Islow_conv[i] - df.at[i, 'iB0'])
@@ -147,3 +145,91 @@ def smooth_and_convolute(df, variable, tvariable, windowlen,  beta, boolib0):
 
 
     return Islow, Islow_conv, Ifast, Ifast_deconv, Ifastminib0, Ifastminib0_deconv
+
+
+def convolution_pre(df, I0_var, variable1, variable2, tvariable, beta, boolib0):
+
+    size = len(df)
+    Islow = [0]*size; Islow_conv = [0]*size; Ifast = [0]*size; Ifastminib0 = [0]*size; Ifast_deconv = [0]*size; Ifastminib0_deconv=[0]*size
+
+
+    for i in range(size - 1):
+
+        t1 = df.at[i + 1, tvariable]
+        t2 = df.at[i, tvariable]
+
+        Xs = np.exp(-(t1 - t2) / tslow)
+        Xf = np.exp(-(t1 - t2) / tfast)
+
+        #
+        # print('test1 ', df.at[i, variable1])
+        # print('test2 ', I0_var)
+        #       # * np.exp(-(t2)/tslow))
+        # Islow[i] = beta * df.at[i, variable1] + I0_var * np.exp(-(t2) / tslow)
+        Islow[i] = beta * df.at[0, variable1] + I0_var
+
+        Islow[i + 1] = beta * df.at[i + 1, variable1] + I0_var
+
+        # print(i, t1, t2, Islow[i], Islow[i+1])
+
+        Islow_conv[i + 1] = (Islow[i + 1] - (Islow[i + 1] - Islow_conv[i]) * Xs)
+
+        Ifast[i + 1] = af * (df.at[i + 1, variable2] - Islow_conv[i + 1])
+        Ifast[i] = af * (df.at[i, variable2] - Islow_conv[i])
+
+        Ifast_deconv[i + 1] = (Ifast[i + 1] - Ifast[i] * Xf) / (1 - Xf)
+
+        if boolib0 == True:
+            Ifastminib0[i] = af * (df.at[i, variable2] - Islow_conv[i] - df.at[i, 'iB0'])
+            Ifastminib0[i + 1] = af * (df.at[i + 1, variable2] - Islow_conv[i + 1] - df.at[i + 1, 'iB0'])
+            Ifastminib0_deconv[i + 1] = (Ifastminib0[i + 1] - Ifastminib0[i] * Xf) / (1 - Xf)
+
+
+    if boolib0:
+        return Islow, Islow_conv, Ifast, Ifast_deconv, Ifastminib0, Ifastminib0_deconv
+    else:
+        return Islow, Islow_conv, Ifast, Ifast_deconv
+
+def convolution_hs(df, I0_var, variable1, variable2, tvariable, beta, boolib0):
+
+    size = len(df)
+    Islow = [0]*size; Islow_conv = [0]*size; Ifast = [0]*size; Ifastminib0 = [0]*size; Ifast_deconv = [0]*size; Ifastminib0_deconv=[0]*size
+
+    # Islow_conv[0] = I0_var
+
+    for i in range(size - 1):
+
+        t1 = df.at[i + 1, tvariable]
+        t2 = df.at[i, tvariable]
+
+        Xs = np.exp(-(t1 - t2) / tslow)
+        Xf = np.exp(-(t1 - t2) / tfast)
+
+        #
+        # print('test1 ', df.at[i, variable1])
+        # print('test2 ', I0_var)
+        #       # * np.exp(-(t2)/tslow))
+        Islow[i] = beta * df.at[i, variable1] + I0_var
+        # Islow[0] = beta * df.at[0, variable1] + I0_var
+
+        Islow[i + 1] = beta * df.at[i + 1, variable1]
+        # print(i, t1, t2, Islow[i], Islow[i+1])
+        Islow_conv[0] = I0_var
+
+        Islow_conv[i + 1] = Islow[i + 1] - (Islow[i + 1] - Islow_conv[i]) * Xs
+
+        Ifast[i + 1] = af * (df.at[i + 1, variable2] - Islow_conv[i + 1])
+        Ifast[i] = af * (df.at[i, variable2] - Islow_conv[i])
+
+        Ifast_deconv[i + 1] = (Ifast[i + 1] - Ifast[i] * Xf) / (1 - Xf)
+
+        if boolib0 == True:
+            Ifastminib0[i] = af * (df.at[i, variable2] - Islow_conv[i] - df.at[i, 'iB0'])
+            Ifastminib0[i + 1] = af * (df.at[i + 1, variable2] - Islow_conv[i + 1] - df.at[i + 1, 'iB0'])
+            Ifastminib0_deconv[i + 1] = (Ifastminib0[i + 1] - Ifastminib0[i] * Xf) / (1 - Xf)
+
+
+    if boolib0:
+        return Islow, Islow_conv, Ifast, Ifast_deconv, Ifastminib0, Ifastminib0_deconv
+    else:
+        return Islow, Islow_conv, Ifast, Ifast_deconv
