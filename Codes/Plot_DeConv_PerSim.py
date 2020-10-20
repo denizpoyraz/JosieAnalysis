@@ -2,23 +2,24 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import matplotlib.gridspec as gridspec
-import pickle
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,AutoMinorLocator)
+from scipy.ndimage import gaussian_filter1d
+import scipy.signal
 
-# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2000_deconv_beta0_every5sec.csv", low_memory=False)
-# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut.csv", low_memory=False)
+# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Deconv_preparationadded_all_test.csv", low_memory=False)
+df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut.csv", low_memory=False)
 
-df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Deconv_preparationadded_min.csv", low_memory=False)
-# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_sm.csv", low_memory=False)
+# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv.csv", low_memory=False)
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie9602_Data.csv", low_memory=False)
+# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Deconv_preparationadded_min_t.csv", low_memory=False)
 
-dfo = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Deconv_preparationadded_mino.csv", low_memory=False)
-
-
-# df = df[(df.Sim == 136) & (df.Team == 3)]
+# df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Deconv_preparationadded_all_test.csv")
+# df_o.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Deconv_preparationadded_simulation_test.csv")
 #
-# dfo = dfo[(dfo.Sim == 136) & (dfo.Team == 3)]
+# dfo = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Deconv_preparationadded_mino_t.csv", low_memory=False)
 
+df = df[(df.Sim == 140) | (df.Sim == 138) | (df.Sim == 158) |  (df.Sim == 166)]
+# dfo = dfo[(dfo.Sim == 136) & (dfo.Team == 3)]
 
 simlist = np.asarray(df.drop_duplicates(['Sim', 'Team'])['Sim'])
 teamlist = np.asarray(df.drop_duplicates(['Sim', 'Team'])['Team'])
@@ -27,16 +28,12 @@ sol = np.asarray(df.drop_duplicates(['Sim', 'Team'])['Sol'].tolist())
 buff = np.asarray(df.drop_duplicates(['Sim', 'Team'])['Buf'])
 ensci = np.asarray(df.drop_duplicates(['Sim', 'Team'])['ENSCI'])
 
-
 dft = {}
-
 dfto = {}
 
-# simlist = [92, 92, 92, 92]
-# teamlist = [1 ,2 ,3 ,4]
+print(simlist, teamlist)
 
 for j in range(len(simlist)):
-
 
     if ensci[j] == 0:
         sondestr = 'SPC'
@@ -64,22 +61,45 @@ for j in range(len(simlist)):
     ######
 
     dft[j] = df[(df.Sim == simlist[j]) & (df.Team == teamlist[j])]
-    dfto[j] = dfo[(dfo.Sim == simlist[j]) & (dfo.Team == teamlist[j])]
+    # dfto[j] = dfo[(dfo.Sim == simlist[j]) & (dfo.Team == teamlist[j])]
 
-    dft[j] = dft[j].reset_index()
-    dfto[j] = dfto[j].reset_index()
+    # dft[j] = dft[j].reset_index()
+    # dfto[j] = dfto[j].reset_index()
 
-    dft[j].TsimMin = dft[j].Tsim / 1
-    dfto[j].TsimMin = dfto[j].Tsim / 1
+    dft[j].TsimMin = dft[j].Tsim / 60
+    # dfto[j].TsimMin = dfto[j].Tsim / 60
 
     ## 9602
     # t1_stop = dft[j].iloc[0]['R1_Tstop']
     # t2_stop = dft[j].iloc[0]['R2_Tstop']
-
+    #
+    # dftest = dft[j][(dft[j].Tsim_original >= 0)]
+    # dftest.TsimMin = dftest.Tsim / 60
     ## Plotting
     rdifbool = 0
 
-    gs = gridspec.GridSpec(3, 1)
+    # dft[j].loc[dft[j]['TimeBool'] == 0, 'Adif_sim'] = 0
+    # dft[j].loc[dft[j]['Tsim_original'] >= 0, 'Adif_sim'] = (dfto[j].I_slow_convo - dftest.I_slow_conv)
+    #
+    # Adif_sim = np.array(dfto[j].I_slow_convo.tolist()) - np.array(dftest.I_slow_conv.tolist())
+    # Adif_exp = np.array(dfto[j].I_slow_conv_tesths.tolist()) - np.array(dftest.I_slow_conv.tolist())
+    # Adif_ib1decay = np.array(dfto[j].I_slow_conv_ib1_decay.tolist()) - np.array(dftest.I_slow_conv.tolist())
+    # Adif_ib1 = np.array(dfto[j].I_slow_conv_testib1.tolist()) - np.array(dftest.I_slow_conv.tolist())
+    # Adif_ib2 = np.array(dfto[j].I_slow_conv_testib2.tolist()) - np.array(dftest.I_slow_conv.tolist())
+    #
+    # Rdif_sim = 100 * (np.array(dfto[j].I_slow_convo.tolist()) - np.array(dftest.I_slow_conv.tolist())) / np.array(dftest.I_slow_conv.tolist())
+    # Rdif_exp = 100 * (np.array(dfto[j].I_slow_conv_tesths.tolist()) - np.array(dftest.I_slow_conv.tolist())) / np.array(dftest.I_slow_conv.tolist())
+    # Rdif_ib1decay = 100 * (np.array(dfto[j].I_slow_conv_ib1_decay.tolist()) - np.array(dftest.I_slow_conv.tolist())) / np.array(dftest.I_slow_conv.tolist())
+    # Rdif_ib1 = 100 * (np.array(dfto[j].I_slow_conv_testib1.tolist()) - np.array(dftest.I_slow_conv.tolist())) / np.array(dftest.I_slow_conv.tolist())
+    # Rdif_ib2 = 100 * (np.array(dfto[j].I_slow_conv_testib2.tolist()) - np.array(dftest.I_slow_conv.tolist())) / np.array(dftest.I_slow_conv.tolist())
+
+    # ifast_gaussian_1 = gaussian_filter1d(np.array(dft[j].Ifast_minib0_deconv.tolist()), 1)
+    # ifast_gaussian_3 = gaussian_filter1d(np.array(dft[j].Ifast_minib0_deconv.tolist()), 3)
+    #
+    # ifast_savgol_51 = scipy.signal.savgol_filter(np.array(dft[j].Ifast_minib0_deconv.tolist()), 9, 3, mode='nearest')  # window size 51, polynomial order 3
+    # ifast_savgol_53 = scipy.signal.savgol_filter(np.array(dft[j].Ifast_minib0_deconv.tolist()), 9, 5, mode='nearest')  # window size 51, polynomial order 3
+
+    gs = gridspec.GridSpec(4, 1)
     #
     if not rdifbool:
         ax2 = plt.subplot(gs[:, :])  # create the first subplot that will ALWAYS be there
@@ -88,199 +108,133 @@ for j in range(len(simlist)):
         ax2.set_ylabel(r'Current ($\mu$A)')
         ax2.set_xlabel('Tsim (mins)')
 
-        plt.ylim(0.0001, 8)
-        # plt.xlim(66, 72)
-        ax2.set_yscale('log')
+        # plt.ylim(0.0001, 8)
+        # plt.xlim(0, 120)
+        ax2.xaxis.set_major_locator(MultipleLocator(10))
+        ax2.xaxis.set_major_formatter(FormatStrFormatter('%d'))
+        ax2.xaxis.set_minor_locator(AutoMinorLocator())
+        # ax2.set_yscale('log')
 
-        #
-        # plt.plot(dft[j].TsimMin, dft[j].I_OPM_jma, label='I OPM JMA')
-        # # plt.plot(dft[j].TsimMin, dft[j].I_OPM_jma_sm12, label='I OPM JMA sm12')
         plt.plot(dft[j].TsimMin, dft[j].IM - dft[j]['iB0'], label='I - iB0 ECC')
-        plt.plot(dft[j].TsimMin, dft[j].I_slow_conv, label='Islow(beta * IM) conv (allrange)')
-        plt.plot(dfto[j].TsimMin, dfto[j].I_slow_convo, label='Islow(beta * IM) conv  (simulation range)')
-        # # plt.plot(dfto[j].TsimMin , dfto[j].I_slow_conv_testpre, label='Islow(beta * IM + IM_lastpre - iB0) conv')
-        plt.plot(dfto[j].TsimMin , dfto[j].I_slow_conv_tesths, label='Islow(beta * IM) [I slow conv[0] = IM_last_pre - iBo] conv')
-        # # plt.plot(dft[j].TsimMin , dft[j].I_slow_conv_test, label='Islow(beta *(IM-iB0)) conv')
-        plt.plot(dft[j].TsimMin, dft[j]['iB2'] - dft[j]['iB0'], label='iB2 - iB0')
-        plt.plot(dft[j].TsimMin, dft[j]['iB1'] - dft[j]['iB0'], label='iB1 - iB0')
-
-        print(dft[j]['iB2'] , dft[j]['iB0'])
+        plt.plot(dft[j].TsimMin, dft[j].I_OPM_jma, label='I OPM JMA')
+        # plt.plot(dft[j].TsimMin, dft[j].Ifast_deconv.rolling(window = 9, center = True).mean(), label='I fast deconv. sm9')
+        # plt.plot(dft[j].TsimMin, dft[j].Ifast_minib0_deconv.rolling(window = 9, center = True).mean(), label='I fast min ibo deconv. sm9')
+        # plt.plot(dft[j].TsimMin,ifast_gaussian_1, label='I fast min ibo deconv. gaus1d sigma1')
+        # plt.plot(dft[j].TsimMin,ifast_gaussian_3, label='I fast min ibo deconv. gaus1d sigma3')
+        # plt.plot(dft[j].TsimMin,ifast_savgol_51, label='I fast min ibo deconv. savgol filter 1')
+        # plt.plot(dft[j].TsimMin,ifast_savgol_53, label='I fast min ibo deconv. savgol filter 3')
 
 
-        # plt.plot(dft[j].TsimMin, dft[j].I_OPM_jma, label='I OPM JMA')
-        # # plt.plot(dft[j].TsimMin, dft[j].I_OPM_jma_sm12, label='I OPM JMA sm12')
-        # plt.plot(dft[j].TsimMin, dft[j].IM - dft[j]['iB0'], label='I - iB0 ECC')
-        # plt.plot(dft[j].TsimMin, dft[j].Ifast_minib0_deconv.rolling(window=5, center=True).mean(), label='Ifast (beta * IM) deconv (allrange)')
-        # plt.plot(dfto[j].TsimMin, dfto[j].Ifast_minib0_deconvo.rolling(window=5, center=True).mean(), label='Ifast (beta * IM) deconv  (simulation range)')
-        # # plt.plot(dfto[j].TsimMin , dfto[j].I_slow_conv_testpre, label='Islow(beta * IM + IM_lastpre - iB0) conv')
-        # plt.plot(dfto[j].TsimMin , dfto[j].Ifast_minib0_deconv_tesths.rolling(window=5, center=True).mean(), label='Ifast (beta * IM) [I slow conv[0] = IM_last_pre - iBo] conv')
-        # # plt.plot(dft[j].TsimMin , dft[j].I_slow_conv_test, label='Islow(beta *(IM-iB0)) conv')
 
-        # plt.plot(dfto[j].TsimMin , dfto[j].Ifast_minib0_tesths.rolling(window=5, center=True).mean(), label='Ifast (beta * IM) [I slow conv[0] = IM_last_pre - iBo] conv')
-        # plt.plot(dft[j].TsimMin, dft[j].Ifast_minib0_deconv.rolling(window=5, center=True).mean(), label='Ifast (beta * IM) deconv (allrange)')
-
-
-        # plt.plot(dft[j].TsimMin, dft[j].I_OPM_jma, label='I OPM JMA')
-        # # plt.plot(dft[j].TsimMin, dft[j].I_OPM_jma_sm12, label='I OPM JMA sm12')
-        # plt.plot(dft[j].TsimMin, dft[j].IM - dft[j]['iB0'], label='I - iB0 ECC')
-        # plt.plot(dft[j].TsimMin, dft[j].Ifast_deconv.rolling(window=5, center=True).mean(),
-        #          label='Ifast (beta * IM) deconv (allrange)')
-        # plt.plot(dfto[j].TsimMin, dfto[j].Ifast_deconvo.rolling(window=5, center=True).mean(),
-        #          label='Ifast (beta * IM) deconv  (simulation range)')
-        # # plt.plot(dfto[j].TsimMin , dfto[j].I_slow_conv_testpre, label='Islow(beta * IM + IM_lastpre - iB0) conv')
-        # plt.plot(dfto[j].TsimMin, dfto[j].Ifast_deconv_tesths.rolling(window=5, center=True).mean(),
-        #          label='Ifast (beta * IM) [I slow conv[0] = IM_last_pre - iBo] conv')
-        # # plt.plot(dft[j].TsimMin , dft[j].I_slow_conv_test, label='Islow(beta *(IM-iB0)) conv')
-
-        ################################
-        # plt.plot(dft[j].TsimMin, dft[j].IM, label='I ECC')
-        # plt.plot(dft[j].TsimMin, dft[j].Ifast_deconv.rolling(window=5, center=True).mean(), label='[IM - Islow(beta * IM)] deconv (allrange)')
-        # plt.plot(dfto[j].TsimMin, dfto[j].Ifast_deconvo.rolling(window=5, center=True).mean(), label='[IM - Islow(beta * IM)] deconv  (simulation range)')
-        # plt.plot(dfto[j].TsimMin, dfto[j].Ifast_deconv_testpre.rolling(window=5, center=True).mean(),label='[IM - Islow(beta * IM + IM_lastpre * exp(-t/tslow)] deconv')
-        # plt.plot(dfto[j].TsimMin, dfto[j].Ifast_deconv_tesths.rolling(window=5, center=True).mean(), label='[IM - Islow(beta * IM)], [I slow conv[0] = IM_last_pre] deconv')
-        ################################
-        # plt.plot(dft[j].TsimMin, dft[j].IM, label='I ECC')
-        # plt.plot(dft[j].TsimMin, dft[j].Ifast_minib0_deconv.rolling(window=5, center=True).mean(),
-        #          label='[IM - Islow(beta * IM) - iB0] deconv (allrange)')
-        # plt.plot(dfto[j].TsimMin, dfto[j].Ifast_minib0_deconvo.rolling(window=5, center=True).mean(),
-        #          label='[IM - Islow(beta * IM) - iB0] deconv  (simulation range)')
-        # plt.plot(dfto[j].TsimMin, dfto[j].Ifast_minib0_deconv_testpre.rolling(window=5, center=True).mean(),
-        #          label='[IM - Islow(beta * IM + IM_lastpre * exp(-t/tslow)) - iB0] deconv')
-        # plt.plot(dfto[j].TsimMin, dfto[j].Ifast_minib0_deconv_tesths.rolling(window=5, center=True).mean(),
-        #          label='[IM - Islow(beta * IM) - iB0], [I slow conv[0] = IM_last_pre] deconv')
-
-
+        # plt.plot(dft[j].TsimMin, dft[j].I_slow_conv, label='Islow conv, allrange')
+        # plt.plot(dfto[j].TsimMin, dfto[j].I_slow_convo, label='Islow conv, sim. range')
+        # plt.plot(dfto[j].TsimMin, dfto[j].I_slow_conv_tesths,
+        #          label='[Islow conv (I_atIB1-iB0)*exp decay]')
+        # plt.plot(dfto[j].TsimMin, dfto[j].I_slow_conv_ib1_decay,
+        #          label='Islow conv (iB1-iB0)*exp decay]', linewidth = '2.0')
+        # plt.plot(dfto[j].TsimMin, dfto[j].I_slow_conv_testib1,
+        #          label='Islow conv [iB1-iB0]')
+        # plt.plot(dfto[j].TsimMin, dfto[j].I_slow_conv_testib2,
+        #          label='Islow conv [iB2-iB0]', linestyle='dashed', linewidth = '2.0')
+        # plt.plot(dft[j].TsimMin, dft[j]['i_at_timeib1'] - dft[j]['iB0'], label='I_atIB1-iB0')
+        # plt.plot(dft[j].TsimMin, dft[j]['iB1'] - dft[j]['iB0'], label='iB1 - iB0')
+        # plt.plot(dfto[j].TsimMin, dfto[j]['iB2'] - dfto[j]['iB0'], label='iB2 - iB0')
+        # plt.plot(dft[j].TsimMin, dft[j]['I0_var'], label='I0_var=(I_atIB1-iB0)*exp decay]')
+        #
+        # ax2.axvline(x= dft[j].at[dft[j].first_valid_index(),'time_ib1'], color='red', linestyle='--', label = 'time iB1')
 
         plt.title(ptitle)
-        plt.legend(loc='upper left', fontsize='x-small')
-        # plt.show()
-
-        # fig, ax3 = plt.subplots()
-        #
-        # ax3 = plt.subplot()  # create the first subplot that will ALWAYS be there
-        # ax3.set_ylabel(r'Current ($\mu$A)')
-        # ax3.set_xlabel('Tsim (mins)')
-        #
-        #
-        # plt.plot(dft[j].TsimMin, dft[j].I_OPM_jma.rolling(window=5, center=True).mean(), label='I OPM JMA sm10')
-        # plt.plot(dft[j].TsimMin, dft[j].IM.rolling(window=5, center=True).mean(), label='I ECC sm 10')
-        # plt.plot(dft[j].TsimMin, dft[j].Ifast_minib0_deconv_f.rolling(window=10, center=True).mean(),
-        #          label='Ifast minib0 deconv. sm20')
-        #
-        # plt.title(ptitle)
-        # plt.legend(loc='upper left', fontsize='small')
+        plt.legend(loc='upper right', fontsize='xx-small')
+        # plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Josie_sm/Ifast_' + title + '.eps')
+        # plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Josie_sm/Ifast_' + title + '.png')
         plt.show()
-
-
     else:
-        ax1 = plt.subplot(gs[:2, :])
+        ax1 = plt.subplot(gs[:3, :])
         ax1.set_ylabel(r'Current ($\mu$A)')
         # ax1.set_ylabel(r'PO3 (mPa)')
-
         ax1.set_xticklabels([])
 
-        # plt.plot(dft[j].TsimMin, dft[j].I_OPM_jma, label='I OPM JMA')
-        # # plt.plot(dft[j].TsimMin, dft[j].I_OPM_jma_sm12, label='I OPM JMA sm12')
-        # plt.plot(dft[j].TsimMin, dft[j].IM - dft[j]['iB0'], label='I - iB0 ECC')
-        # plt.plot(dft[j].TsimMin, dft[j].I_slow_conv, label='Islow(beta * IM) conv (allrange)')
-        # plt.plot(dfto[j].TsimMin, dfto[j].I_slow_convo, label='Islow(beta * IM) conv  (simulation range)')
-        # # plt.plot(dfto[j].TsimMin , dfto[j].I_slow_conv_testpre, label='Islow(beta * IM + IM_lastpre - iB0) conv')
-        # plt.plot(dfto[j].TsimMin , dfto[j].I_slow_conv_tesths, label='Islow(beta * IM) [I slow conv[0] = IM_last_pre - iBo] conv')
-        # # plt.plot(dft[j].TsimMin , dft[j].I_slow_conv_test, label='Islow(beta *(IM-iB0)) conv')
+        plt.ylim(0.0001, 8)
+        plt.xlim(0, 150)
 
-        # ax1.set_xlabel('Tsim (secs)')
-        plt.plot(dft[j].TsimMin, dft[j].I_OPM_jma, label='I OPM JMA')
+        if ((simlist[j] == 139) | (simlist[j] == 140) | (simlist[j] == 145) | (simlist[j] == 158) | (
+                simlist[j] == 160) | (simlist[j] == 163) | (simlist[j] == 166)):
+            plt.xlim(0, 250)
+        ax1.set_yscale('log')
+
         plt.plot(dft[j].TsimMin, dft[j].IM - dft[j]['iB0'], label='I - iB0 ECC')
-        plt.plot(dft[j].TsimMin, dft[j].Ifast_minib0_deconv.rolling(window=5, center=True).mean(), label='Ifast (beta * IM) deconv (allrange)')
-        plt.plot(dfto[j].TsimMin, dfto[j].Ifast_minib0_deconvo.rolling(window=5, center=True).mean(), label='Ifast (beta * IM) deconv  (simulation range)')
-        plt.plot(dfto[j].TsimMin , dfto[j].Ifast_minib0_deconv_tesths.rolling(window=5, center=True).mean(), label='Ifast (beta * IM) [I slow conv[0] = IM_last_pre - iBo] conv')
+        plt.plot(dft[j].TsimMin, dft[j].I_slow_conv, label='Islow conv, allrange')
+        plt.plot(dfto[j].TsimMin, dfto[j].I_slow_convo, label='Islow conv, sim. range')
+        plt.plot(dfto[j].TsimMin, dfto[j].I_slow_conv_tesths,
+                 label='[Islow conv (I_atIB1-iB0)*exp decay]')
+        plt.plot(dfto[j].TsimMin, dfto[j].I_slow_conv_ib1_decay,
+                 label='Islow conv (iB1-iB0)*exp decay]', linewidth='2.0')
+        plt.plot(dfto[j].TsimMin, dfto[j].I_slow_conv_testib1,
+                 label='Islow conv [iB1-iB0]')
+        plt.plot(dfto[j].TsimMin, dfto[j].I_slow_conv_testib2,
+                 label='Islow conv [iB2-iB0]', linestyle='dashed', linewidth='2.0')
+        plt.plot(dft[j].TsimMin, dft[j]['i_at_timeib1'] - dft[j]['iB0'], label='I_atIB1-iB0')
+        plt.plot(dft[j].TsimMin, dft[j]['iB1'] - dft[j]['iB0'], label='iB1 - iB0')
+        plt.plot(dfto[j].TsimMin, dfto[j]['iB2'] - dfto[j]['iB0'], label='iB2 - iB0')
+        plt.plot(dft[j].TsimMin, dft[j]['I0_var'], label='I0_var=(I_atIB1-iB0)*exp decay]')
 
+        ax1.axvline(x=dft[j].at[dft[j].first_valid_index(), 'time_ib1'], color='red', linestyle='--')
+
+        plt.title(ptitle)
+        plt.legend(loc='upper right', fontsize='xx-small')
         #
         plt.title(ptitle)
-        plt.legend(loc='best', fontsize='x-small')
-        plt.ylim(0,10)
         # plt.xlim(66, 72)
         # plt.xlim(53, 59)
         ax1.yaxis.set_major_locator(MultipleLocator(5))
         ax1.yaxis.set_major_formatter(FormatStrFormatter('%d'))
         ax1.yaxis.set_minor_locator(AutoMinorLocator())
 
-        # plt.yticks(np.arange(0, 21, step = 0.5))
-
-
-
-        # dft[j]['RDif_I'] = 100 * (dft[j].Ifast_deconv_sm8 - dft[j].I_OPM_jma) / dft[j].I_OPM_jma
-        # dft[j]['Adif'] = dft[j].IM - dft[j]['iB0'] - dft[j].I_OPM_jma
-        #
-        # dft[j]['Adif_all'] =  dft[j].Ifast_minib0_deconv.rolling(window=5, center=True).mean() - dft[j].I_OPM_jma
-        # dfto[j]['Adif_sim'] = dfto[j].Ifast_minib0_deconvo.rolling(window=5, center=True).mean()  - dfto[j].I_OPM_jma
-        # dfto[j]['Adif_hs'] =   dfto[j].Ifast_minib0_deconv_tesths.rolling(window=5, center=True).mean() - dfto[j].I_OPM_jma
-        # dft[j]['Adif_Pcor_jma'] = dft[j].PO3_minib0_deconv_jma - dft[j].PO3_OPM
-        # dft[j]['Adif_Pcor_komhyr'] = dft[j].PO3_minib0_deconv_komhyr - dft[j].PO3_OPM
-
-        dft[j]['Adif'] = 100 * (dft[j].IM - dft[j]['iB0'] - dft[j].I_OPM_jma) / dft[j].I_OPM_jma
-
-        dft[j]['Adif_all'] = 100 * ( dft[j].Ifast_minib0_deconv.rolling(window=5, center=True).mean() - dft[j].I_OPM_jma) / dft[j].I_OPM_jma
-        dfto[j]['Adif_sim'] = 100 * (dfto[j].Ifast_minib0_deconvo.rolling(window=5, center=True).mean() - dfto[j].I_OPM_jma) / dft[j].I_OPM_jma
-        dfto[j]['Adif_hs'] = 100 * (dfto[j].Ifast_minib0_deconv_tesths.rolling(window=5, center=True).mean() - dfto[
-            j].I_OPM_jma) / dft[j].I_OPM_jma
-
-        ax2 = plt.subplot(gs[2, :])  # create the second subplot, that MIGHT be there
+        ax2 = plt.subplot(gs[3, :])  # create the second subplot, that MIGHT be there
         ax2.set_xlabel('Tsim (min)')
-        ax2.set_ylabel(r'ADif')
+        # ax2.set_ylabel(r'ADif($\mu$A)')
+        ax2.set_ylabel(r'RDif(%)')
+
         # plt.xlim(66, 72)
         # plt.xlim(53, 59)
-        ax2.yaxis.set_major_locator(MultipleLocator(2))
-        ax2.yaxis.set_major_formatter(FormatStrFormatter('%d'))
-        ax2.yaxis.set_minor_locator(AutoMinorLocator(10))
+        # ax2.yaxis.set_major_locator(MultipleLocator(2))
+        # ax2.yaxis.set_major_formatter(FormatStrFormatter('%d'))
+        # ax2.yaxis.set_minor_locator(AutoMinorLocator(10))
 
         # plt.yticks(np.arange(-2, 2, 200))
-        plt.ylim(-2, 2)
+        # plt.ylim(-0.005, 0.005)
 
+        plt.xlim(0, 150)
+        # plt.ylim(-100, 100)
 
+        if ((simlist[j] == 139) | (simlist[j] == 140 ) | (simlist[j] == 145) | (simlist[j] == 158) | (simlist[j] == 160) | (simlist[j] == 163) | (simlist[j] == 166)):
+            plt.xlim(0, 250)
+            plt.tick_params(axis='x', labelsize=6)
+
+        ax2.xaxis.set_major_locator(MultipleLocator(10))
+        ax2.xaxis.set_major_formatter(FormatStrFormatter('%d'))
+        ax2.xaxis.set_minor_locator(AutoMinorLocator())
         # plt.xlim(0, 8100)
-        plt.plot(dft[j].TsimMin, dft[j].Adif, linestyle="--", color='orange', label = 'I - iB0')
+        plt.plot(dftest.TsimMin, Adif_sim, color='#2ca02cff', label = 'sim_range')
+        plt.plot(dftest.TsimMin, Adif_exp, color='#d62728ff', label = 'I_atiB1_expdecay')
+        plt.plot(dftest.TsimMin, Adif_ib1decay, color='#9467bdff', label = 'ib1 expdecay')
+        plt.plot(dftest.TsimMin, Adif_ib1, color='#8c564bff', label = 'ib1')
+        plt.plot(dftest.TsimMin, Adif_ib2, linestyle="--", color='#e377c2ff', label = 'ib2')
 
-        plt.plot(dft[j].TsimMin, dft[j].Adif_all.rolling(window=5, center=True).mean(), linestyle="--", color='green', label = 'all range')
-        plt.plot(dfto[j].TsimMin, dfto[j].Adif_sim.rolling(window=5, center=True).mean(), linestyle="--", color='red', label = 'simulation range')
-        plt.plot(dfto[j].TsimMin, dfto[j].Adif_hs.rolling(window=5, center=True).mean(), linestyle="--", color='purple', label = 'I_slow_conv[0] = IM_lastpre - iB0')
-
-        plt.legend(loc='best', fontsize='x-small')
+        plt.legend(loc='upper left ', fontsize='xx-small')
 
         #
         # ax2.axhline(y=10, color='grey', linestyle='--')
-        ax2.axhline(y=0, color='grey', linestyle='--')
+        # ax2.axhline(y=0, color='grey', linestyle='--')
         # ax2.axhline(y=-10, color='grey', linestyle='--')
-
+        ax2.axhline(y=0,  color='grey', linestyle='--')
 
         # plt.show()
-        # plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/HV_compare/5sec_PO3_' + title + '.eps')
-        # plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/HV_compare/5sec_PO3_' + title + '.png')
+        # plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Josie_Islow/ADif_' + title + '.eps')
+        # plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/Josie_Islow/ADif_' + title + '.png')
         plt.show()
 
         # new_colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
-
         # blue, orange, green, red, purple, brown, pinkish, greyish, yellowish, bluish
 
 
-
-# Josie9602_Data.csv
-
-# Josie0910_deconv_beta0_timereversed
-# df = df.drop(df[(df.Sim == 179) & (df.Team == 4)].index)
-# df = df.drop(df[(df.Sim == 172) & (df.Team == 1)].index)
-# df = df.drop(df[(df.Sim == 178) & (df.Team == 3)].index)
-# df = df.drop(df[((df.Sim == 175))].index)
-#
-#
-# df = df.drop(df[(df.Sim == 179) & (df.Team == 4) & (df.Tsim > 4000)].index)
-# df = df.drop(df[(df.Sim == 172) & (df.Tsim < 500)].index)
-# df = df.drop(df[(df.Sim == 172) & (df.Team == 1) & (df.Tsim > 5000) & (df.Tsim < 5800)].index)
-# df = df.drop(df[(df.Sim == 178) & (df.Team == 3) & (df.Tsim > 1700) & (df.Tsim < 2100)].index)
-# df = df.drop(df[(df.Sim == 178) & (df.Team == 3) & (df.Tsim > 2500) & (df.Tsim < 3000)].index)
-#
-# df = df.drop(df[((df.Sim == 186) &  (df.Tsim > 5000))].index)
-# df = df.drop(df[((df.Tsim > 7000))].index)
-
-# df = df[df.ADX == 0]
-## apply cuts here

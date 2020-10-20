@@ -94,6 +94,8 @@ def ratiofunction_beta(df, sim, team, categorystr, boolibo, slow, fast):
             Xf = np.exp(-(t1 - t2) / fast)
             Ums_i[i + 1] = Ua_i - (Ua_i - Ums_i[i]) * Xs
 
+            # Islow_conv[i + 1] = (Islow[i + 1] - (Islow[i + 1] - Islow_conv[i]) * Xs)
+
             # Islow_conv[i + 1] = Islow[i + 1] - (Islow[i + 1] - Islow_conv[i]) * Xs
 
         dft[j]['I_conv_slow_jma'] = Ums_i

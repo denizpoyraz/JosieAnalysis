@@ -36,11 +36,11 @@ def cuts0910(dfm):
 
     return dfm
 
-folderpath = 'Dif_0910_1607_tr'
+folderpath = 'Dif_0910_0110'
 
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_beta.csv", low_memory=False)
-# df = pd.read_csv("/home/poyrade/n/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_1607.csv", low_memory=False)
-df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_beta0_timereversed.csv", low_memory=False)
+df = pd.read_csv("/home/poyrade/n/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_1607.csv", low_memory=False)
+# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_beta0_timereversed.csv", low_memory=False)
 
 
 

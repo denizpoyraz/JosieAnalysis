@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from Beta_Functions import ratiofunction_beta, ratiofunction_beta_9602
-from Convolution_Functions import convolution, convolution_hs, smooth_and_convolute, convolution_pre
+from Convolution_Functions import convolution, convolution_islow0, smooth_and_convolute, convolution_pre
 
 ## updated version of Beta_Convoluted_final to consider I slow = I prep(Tprep_end)
 
@@ -12,7 +12,7 @@ def mederr(med):
 
 
 tslow = 25 * 60
-tfast = 30
+tfast = 20
 
 
 def filter(df):
@@ -189,13 +189,19 @@ beta_sp1010 = 0.5063263074879945
 #
 # now use this beta values * 0.1 for the deconvolution of the signal and make a DF
 
-df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_preparationadded.csv", low_memory=False)
+df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_preparationadded_updated.csv", low_memory=False)
+# df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_preparationadded_test.csv", low_memory=False)
+
+
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut.csv", low_memory=False)
 # df = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_Data_nocut.csv", low_memory=False)
 df['TS'] = pd.to_datetime(df.Tsim, unit = 's')
 
+df = df.drop(df[(df.Sim == 158) & (df.Team == 2)].index)
+df = df.drop(df[(df.Sim == 160) & (df.Team == 4)].index)
 
-df = df[(df.Sim == 136)]
+# df = df[(df.Sim == 160) ]
+# | (df.Sim == 158) | (df.Sim == 160) | (df.Sim == 163) | (df.Sim == 166)
 
 simlist = np.asarray(df.drop_duplicates(['Sim', 'Team'])['Sim'])
 teamlist = np.asarray(df.drop_duplicates(['Sim', 'Team'])['Team'])
@@ -204,6 +210,9 @@ sol = np.asarray(df.drop_duplicates(['Sim', 'Team'])['Sol'].tolist())
 buff = np.asarray(df.drop_duplicates(['Sim', 'Team'])['Buf'])
 ensci = np.asarray(df.drop_duplicates(['Sim', 'Team'])['ENSCI'])
 
+# teamlist = [1,2,3,4]
+
+print(simlist, teamlist)
 
 dft = {}
 list_data = []
@@ -258,10 +267,10 @@ for j in range(len(simlist)):
     type = sondestr + ' ' + str(sol[j]) + '\% - ' + str(buff[j]) + 'B'
     sp = str(simlist[j]) + '-' + str(teamlist[j])
     ptitle = sp + ' ' + sondestr + ' ' + str(sol[j]) + '% - ' + str(buff[j]) + 'B'
-    print(title)
+    # print(title)
 
     dft[j] = df[(df.Sim == simlist[j]) & (df.Team == teamlist[j])]
-    dfto[j] = df[(df.Sim == simlist[j]) & (df.Team == teamlist[j]) & (df.TimeBool ==1) ]
+    dfto[j] = df[(df.Sim == simlist[j]) & (df.Team == teamlist[j]) & (df.TimeTag == 'Sim') ]
 
     ### for data of every 12 seconds
     # dft[j] = dft[j].resample('12S', on='TS').mean().interpolate()
@@ -283,16 +292,81 @@ for j in range(len(simlist)):
 
     Islow, Islow_conv, Ifast, Ifast_deconv, Ifastminib0, Ifastminib0_deconv = convolution(dft[j], 'IMminusIB0', 'IM', 'Tsim', beta, 1)
     Islowo, Islow_convo, Ifasto, Ifast_deconvo, Ifastminib0o, Ifastminib0_deconvo = convolution(dfto[j], 'IMminusIB0', 'IM', 'Tsim_original', beta, 1)
-
-    Islow_testpre, Islow_conv_testpre, Ifast_testpre, Ifast_deconv_testpre, Ifastminib0_testpre, Ifastminib0_deconv_testpre = \
-        convolution_pre(dfto[j],  0.029304 - 0.02,'IMminusIB0', 'IM', 'Tsim_original', beta, 1)
-
-    Islow_tesths, Islow_conv_tesths, Ifast_tesths, Ifast_deconv_tesths, Ifastminib0_tesths, Ifastminib0_deconv_tesths = \
-        convolution_hs(dfto[j],  0.029304 - 0.02,'IMminusIB0', 'IM', 'Tsim_original', beta, 1)
-
     Islow_test, Islow_conv_test, Ifast_test, Ifast_deconv_test, Ifastminib0_test, Ifastminib0_deconv_test = \
         convolution(dft[j], 'IMminusIB0', 'IM', 'Tsim', beta, 1)
 
+    # Islow_testpre, Islow_conv_testpre, Ifast_testpre, Ifast_deconv_testpre, Ifastminib0_testpre, Ifastminib0_deconv_testpre = \
+    #     convolution_pre(dfto[j],  0.029304 - 0.02,'IMminusIB0', 'IM', 'Tsim_original', beta, 1)
+
+    dft[j]['Tsim_min'] = dft[j].Tsim /60
+    iprep_max = dft[j][dft[j].Tsim_min < 40 ].IM.max()
+    iprep_max_index = dft[j][dft[j].IM == iprep_max].index.values
+    time_iprep_max =  dft[j][dft[j].IM == iprep_max]['Tsim_min'].tolist()[0]
+    time_ib1 = time_iprep_max + 10
+    i_at_timeib1 = np.median(dft[j][(dft[j].Tsim_min < time_ib1 + 0.1) & (dft[j].Tsim_min > time_ib1 - 0.1)]['IM'].tolist())
+    simbegin_time = dft[j][dft[j].Tsim_original == 10]['Tsim'].tolist()[0]
+    #
+    # imax begin flight
+    if(simlist[j] != 140):
+        print(simlist[j], teamlist[j])
+
+        imax_bf = dfto[j][(dfto[j].Tsim_original < 900) & (dfto[j].Tsim_original > 500) & (dfto[j].IM > 0.1) & (dfto[j].IM < 0.4)].IM.tolist()
+        imax_bf = np.min(imax_bf)
+        imax_bf_time = dfto[j][(dfto[j].IM == imax_bf) & (dfto[j].Tsim_original < 900) & (dfto[j].Tsim_original > 500) ]['Tsim_original'].tolist()[0]
+        bf_time = imax_bf_time - 6
+
+    if(simlist[j] == 140):
+        imax_bf = dfto[j][(dfto[j].Tsim_original < 1100) & (dfto[j].Tsim_original > 975) & (dfto[j].IM > 0.1) & (
+                    dfto[j].IM < 0.4)].IM.tolist()
+        imax_bf = np.min(imax_bf)
+        imax_bf_time = dfto[j][(dfto[j].IM == imax_bf) & (dfto[j].Tsim_original < 1100) & (dfto[j].Tsim_original > 975)][
+            'Tsim_original'].tolist()[0]
+
+        bf_time = imax_bf_time - 6
+
+    # print(simlist[j], teamlist[j], 'imax_bf', imax_bf, 'imax_bf_time', imax_bf_time)
+    # print(simlist[j], teamlist[j])
+    # plt.plot(dfto[j].Tsim_original, dfto[j].IM)
+    # # plt.axvline(x=imax_bf_time, color = 'red')
+    # # plt.axvline(x=bf_time, color = 'green')
+    # plt.xlim(500, 1200)
+    #
+    # plt.show()
+    # plt.close()
+    # bf_time = 0
+
+
+    decay_time = simbegin_time - time_ib1*60
+    # print('simbegin_time', simbegin_time, 'time_ib1', time_ib1*60, 'simbegin_time - time_ib1', decay_time)
+
+    # print(iprep_max, iprep_max_index, time_iprep_max, i_at_timeib1, 'decay time', decay_time)
+
+    I0_var = (i_at_timeib1 - dft[j].at[0,'iB0']) * np.exp(-decay_time/(25 * 60))
+    iB1_var = (dft[j].at[0,'iB1'] - dft[j].at[0,'iB0']) * np.exp(-decay_time/(25 * 60))
+
+    # print(i_at_timeib1, i_at_timeib1 - dft[j].at[0,'iB0'],  I0_var)
+
+    Islow_tesths, Islow_conv_tesths, Ifast_tesths, Ifast_deconv_tesths, Ifastminib0_tesths, Ifastminib0_deconv_tesths = \
+        convolution_islow0(dfto[j], I0_var ,'IMminusIB0', 'IM', 'Tsim_original', beta, 1)
+    Islow_ib1_decay, Islow_conv_ib1_decay, Ifast_ib1_decay, Ifast_deconv_ib1_decay, Ifastminib0_ib1_decay, Ifastminib0_deconv_ib1_decay = \
+        convolution_islow0(dfto[j], iB1_var, 'IMminusIB0', 'IM', 'Tsim', beta, 1)
+    Islow_testib1, Islow_conv_testib1, Ifast_testib1, Ifast_deconv_testib1, Ifastminib0_testib1, Ifastminib0_deconv_testib1 = \
+        convolution_islow0(dfto[j], dft[j].at[0, 'iB1'] - dft[j].at[0, 'iB0'], 'IMminusIB0', 'IM', 'Tsim', beta, 1)
+    Islow_testib2, Islow_conv_testib2, Ifast_testib2, Ifast_deconv_testib2, Ifastminib0_testib2, Ifastminib0_deconv_testib2 = \
+        convolution_islow0(dfto[j], dft[j].at[0,'iB2'] - dft[j].at[0,'iB0'] ,'IMminusIB0', 'IM', 'Tsim', beta, 1)
+
+
+    dft[j]['i_at_timeib1'] = i_at_timeib1
+    dft[j]['I0_var'] = I0_var
+    dft[j]['time_ib1'] = time_ib1
+    dft[j]['decay_time'] = decay_time
+    dft[j]['start_flight'] = bf_time
+
+    dfto[j]['i_at_timeib1'] = i_at_timeib1
+    dfto[j]['I0_var'] = I0_var
+    dfto[j]['time_ib1'] = time_ib1
+    dfto[j]['decay_time'] = decay_time
+    dfto[j]['start_flight'] = bf_time
 
     dft[j]['I_slow'] = Islow
     dft[j]['I_slow_conv'] = Islow_conv
@@ -317,12 +391,12 @@ for j in range(len(simlist)):
     dft[j]['Ifast_minib0_deconv_test'] = Ifastminib0_deconv_test
 
     #
-    dfto[j]['I_slow_testpre'] = Islow_testpre
-    dfto[j]['I_slow_conv_testpre'] = Islow_conv_testpre
-    dfto[j]['I_fast_testpre'] = Ifast_testpre
-    dfto[j]['Ifast_minib0_testpre'] = Ifastminib0_testpre
-    dfto[j]['Ifast_deconv_testpre'] = Ifast_deconv_testpre
-    dfto[j]['Ifast_minib0_deconv_testpre'] = Ifastminib0_deconv_testpre
+    # dfto[j]['I_slow_testpre'] = Islow_testpre
+    # dfto[j]['I_slow_conv_testpre'] = Islow_conv_testpre
+    # dfto[j]['I_fast_testpre'] = Ifast_testpre
+    # dfto[j]['Ifast_minib0_testpre'] = Ifastminib0_testpre
+    # dfto[j]['Ifast_deconv_testpre'] = Ifast_deconv_testpre
+    # dfto[j]['Ifast_minib0_deconv_testpre'] = Ifastminib0_deconv_testpre
 
     dfto[j]['I_slow_tesths'] = Islow_tesths
     dfto[j]['I_slow_conv_tesths'] = Islow_conv_tesths
@@ -331,8 +405,26 @@ for j in range(len(simlist)):
     dfto[j]['Ifast_deconv_tesths'] = Ifast_deconv_tesths
     dfto[j]['Ifast_minib0_deconv_tesths'] = Ifastminib0_deconv_tesths
 
+    dfto[j]['I_slow_testib2'] = Islow_testib2
+    dfto[j]['I_slow_conv_testib2'] = Islow_conv_testib2
+    dfto[j]['I_fast_testib2'] = Ifast_testib2
+    dfto[j]['Ifast_minib0_testib2'] = Ifastminib0_testib2
+    dfto[j]['Ifast_deconv_testib2'] = Ifast_deconv_testib2
+    dfto[j]['Ifast_minib0_deconv_testib2'] = Ifastminib0_deconv_testib2
 
+    dfto[j]['I_slow_testib1'] = Islow_testib1
+    dfto[j]['I_slow_conv_testib1'] = Islow_conv_testib1
+    dfto[j]['I_fast_testib1'] = Ifast_testib1
+    dfto[j]['Ifast_minib0_testib1'] = Ifastminib0_testib1
+    dfto[j]['Ifast_deconv_testib1'] = Ifast_deconv_testib1
+    dfto[j]['Ifast_minib0_deconv_testib1'] = Ifastminib0_deconv_testib1
 
+    dfto[j]['I_slow_ib1_decay'] = Islow_ib1_decay
+    dfto[j]['I_slow_conv_ib1_decay'] = Islow_conv_ib1_decay
+    dfto[j]['I_fast_ib1_decay'] = Ifast_ib1_decay
+    dfto[j]['Ifast_minib0_ib1_decay'] = Ifastminib0_ib1_decay
+    dfto[j]['Ifast_deconv_ib1_decay'] = Ifast_deconv_ib1_decay
+    dfto[j]['Ifast_minib0_deconv_ib1_decay'] = Ifastminib0_deconv_ib1_decay
 
     # for k in range(len(dft[j])):
     #     ## jma corrections
@@ -359,9 +451,12 @@ df_dc = pd.concat(list_data, ignore_index=True)
 df_o = pd.concat(list_data_original, ignore_index=True)
 
 # df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie2017_deconv.csv")
-
-df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Deconv_preparationadded_min.csv")
-df_o.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Deconv_preparationadded_mino.csv")
+#
+df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Deconv_preparationadded_all_ft.csv")
+df_o.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Deconv_preparationadded_simulation_ft.csv")
+#
+# df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Deconv_preparationadded_all_test.csv")
+# df_o.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Deconv_preparationadded_simulation_test.csv")
 
 # df_dc.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_deconv_final.csv")
 

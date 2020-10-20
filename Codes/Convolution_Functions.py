@@ -10,9 +10,6 @@ tfast = 20
 af = 1
 
 def convolution_test(df, variable, tvariable, beta, boolib0, boolreconv, hv_hs):
-    ''
-
-    ''
 
     size = len(df)
     print(size)
@@ -166,7 +163,7 @@ def convolution_pre(df, I0_var, variable1, variable2, tvariable, beta, boolib0):
         # print('test2 ', I0_var)
         #       # * np.exp(-(t2)/tslow))
         # Islow[i] = beta * df.at[i, variable1] + I0_var * np.exp(-(t2) / tslow)
-        Islow[i] = beta * df.at[0, variable1] + I0_var
+        Islow[i] = beta * df.at[i, variable1] + I0_var
 
         Islow[i + 1] = beta * df.at[i + 1, variable1] + I0_var
 
@@ -190,7 +187,7 @@ def convolution_pre(df, I0_var, variable1, variable2, tvariable, beta, boolib0):
     else:
         return Islow, Islow_conv, Ifast, Ifast_deconv
 
-def convolution_hs(df, I0_var, variable1, variable2, tvariable, beta, boolib0):
+def convolution_islow0(df, I0_var, variable1, variable2, tvariable, beta, boolib0):
 
     size = len(df)
     Islow = [0]*size; Islow_conv = [0]*size; Ifast = [0]*size; Ifastminib0 = [0]*size; Ifast_deconv = [0]*size; Ifastminib0_deconv=[0]*size
@@ -233,3 +230,4 @@ def convolution_hs(df, I0_var, variable1, variable2, tvariable, beta, boolib0):
         return Islow, Islow_conv, Ifast, Ifast_deconv, Ifastminib0, Ifastminib0_deconv
     else:
         return Islow, Islow_conv, Ifast, Ifast_deconv
+

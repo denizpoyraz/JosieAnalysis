@@ -23,7 +23,12 @@ df = pd.concat(list_data, ignore_index=True)
 
 df.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_preparation.csv")
 
+df = df[(df.Sim == 140) | (df.Sim == 138) | (df.Sim == 158)]
+
 dfs = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_Data_nocut_1607.csv", low_memory=False)
+
+dfs = dfs[(dfs.Sim == 140) | (dfs.Sim == 138) | (dfs.Sim == 158)]
+
 
 dfs['timeall'] = pd.to_datetime(dfs['Tact'], format='%H:%M:%S').dt.time
 # .dt.time
@@ -35,27 +40,50 @@ dfs['Tact'] = dfs['pctime_seconds']
 
 dfs = dfs.drop(['Unnamed: 0', 'Unnamed: 0.1', 'Tair', 'I_Pump', 'VMRO3', 'VMRO3_OPM', 'ADif_PO3S', 'RDif_PO3S', 'Z', 'Header_Team',
         'Header_Sim', 'Header_PFunc', 'Header_PFcor', 'Header_IB1',  'Code', 'Flow', 'IB1', 'Cor', 'Simib', 'Teamib', 'Yearib', 'Simm', 'Teamm', 'Mspre', 'Mspost', 'Diff',
-         'Pw', 'JMA', 'I_OPM_komhyr', 'massloss', 'Tboil', 'total_massloss', 'I_conv_slow', 'I_conv_slow_komhyr', 'O3S', 'OPM', 'ADif', 'RDif', 'frac', 'hour', 'minute', 'second', 'timeall','Tinlet', 'TPint', 'Tcell',
- 'TcellC', 'pctime_seconds', 'TPextC', 'PO3_jma', 'PO3_OPM', 'Pair', 'TPext', 'PFcor', 'PO3', 'Year'], axis = 1)
+         'Pw', 'JMA', 'I_OPM_komhyr', 'massloss', 'Tboil', 'total_massloss', 'I_conv_slow', 'I_conv_slow_komhyr', 'O3S', 'OPM', 'ADif', 'RDif',  'hour', 'minute', 'second', 'timeall','Tinlet', 'TPint', 'Tcell',
+ 'TcellC', 'pctime_seconds', 'TPextC', 'PO3_jma',  'TPext', 'PFcor'], axis = 1)
 
-simlist =  dfs.drop_duplicates(['Sim','Team'])['Sim'].tolist()
-teamlist =  dfs.drop_duplicates(['Sim','Team'])['Team'].tolist()
+# simlist =  dfs.drop_duplicates(['Sim','Team'])['Sim'].tolist()
+# teamlist =  dfs.drop_duplicates(['Sim','Team'])['Team'].tolist()
+# print('one', len(simlist))
 
-listdata = []
+simlist2 = df.drop_duplicates(['Sim'])['Sim'].tolist()
+print('simlist2', simlist2)
+
+# print(simlist2)
+s = len(simlist2)
+
+simlist = simlist2 + simlist2 + simlist2 + simlist2
+
+t1 = [1] * s
+t2 = [2] * s
+t3 = [3] * s
+t4 = [4] * s
+
+teamlist = t1 + t2 + t3 + t4
+
+print(len(simlist), len(teamlist))
+
+
+listdata_all = []
 
 for j in range(len(simlist)):
 
-    df3 = dfs[(dfs.Sim == simlist[j]) & (dfs.Team == teamlist[j])]
-    df1 = df[df.Sim == simlist[j]]
-
-    df1['Tact'] = df1.Tact.astype(int)
-    df3['Tact'] = df3.Tact.astype(int)
+    df3 = dfs[(dfs.Sim == simlist[j]) & (dfs.Team == teamlist[j])] # simulation data
+    df1 = df[df.Sim == simlist[j]] #preparation data
 
     df3['TimeBool'] = 1
+    df1['TimeBool'] = 0
+
+    df3['TimeTag'] = 'Sim'
+    df1['TimeTag'] = 'Prep'
+
     #     print(simlist[j], len(df1))
     if len(df1) == 0: continue
+    if len(df3) == 0: continue
 
     if (teamlist[j] == 1):
+        # print(teamlist[j])
         df1 = df1.drop(['Temp_TMC_Offset', 'Temp_TMC_Ist_7', 'I_2', 'I_3', 'I_4'], axis=1)
         df1['IM'] = df1['I_1']
         df1['Team'] = 1
@@ -76,12 +104,15 @@ for j in range(len(simlist)):
         df1 = df1.drop(['I_4'], axis=1)
         df1['Team'] = 4
 
+
     eind1 = df1.last_valid_index()
     bind3 = df3.first_valid_index()
-    #     print(simlist[j], eind1)
-    end1 = df1.at[eind1, 'Tact']
-    begin3 = df3.at[bind3, 'Tact']
-    #     print(end1, begin3)
+    # print(simlist[j], eind1, type(eind1), teamlist[j])
+    df1['Tact'] = df1.Tact.astype(int)
+    df3['Tact'] = df3.Tact.astype(int)
+
+    end1 = df1.at[df1.last_valid_index(), 'Tact']
+    begin3 = df3.at[df3.first_valid_index(), 'Tact']
 
     df2 = pd.DataFrame()
 
@@ -100,16 +131,16 @@ for j in range(len(simlist)):
     df2['Buf'] = df3.at[bind3,'Buf']
     df2['ADX'] = df3.at[bind3,'ADX']
     df2['TimeBool'] = 0
+    df2['TimeTag'] = 'Between'
 
 
     df1['I_OPM'] = 0
     df1['I_OPM_jma'] = 0
-    df1['Sim'] = simlist[j]
-    df1['Team'] = teamlist[j]
+    # df1['Sim'] = simlist[j]
+    # df1['Team'] = teamlist[j]
     df1['iB0'] = df3.at[bind3, 'iB0']
     df1['iB1'] = df3.at[bind3, 'iB1']
     df1['iB2'] = df3.at[bind3, 'iB2']
-    df1['TimeBool'] = 0
     df1['ENSCI'] = df3.at[bind3, 'ENSCI']
     df1['Sol'] = df3.at[bind3, 'Sol']
     df1['Buf'] = df3.at[bind3, 'Buf']
@@ -119,20 +150,69 @@ for j in range(len(simlist)):
     frame = [df1, df2, df3]
     dffinal = pd.concat(frame)
 
-    if ((simlist[j] == 138) | (simlist[j] == 140)):
+    if ((simlist[j] == 138) | (simlist[j] == 140) | ((simlist[j] == 158))):
         start = dffinal.at[dffinal.first_valid_index(), 'Tact']
         maxt = dffinal.Tact.max()
         dif = maxt - start
+        print(simlist[j], start, maxt, dif)
+
         dffinal['Tact'] = dffinal['Tact'].apply(lambda x: x - start if (x >= start) else x + dif)
 
-    list_data.append(dffinal)
+    dffinal = dffinal.reset_index()
 
-dfall = pd.concat(list_data, ignore_index=True)
+
+    zero = pd.Timestamp(dffinal.at[0, 'Tact'], unit='s')
+
+    for i in range(len(dffinal)):
+        dffinal.at[i, 'Time_ts'] = pd.Timestamp(dffinal.at[i, 'Tact'], unit='s')
+        #     one = pd.Timestamp(dft.at[i, 'Tsim'], unit ='s')
+        two = pd.Timestamp(dffinal.at[i, 'Tact'], unit='s')
+        dffinal.at[i, 'Time_all'] = (two - zero).total_seconds()
+
+    listdata_all.append(dffinal)
+
+dfall = pd.concat(listdata_all, ignore_index=True)
 
 dfall['Tsim_original'] = dfall['Tsim']
-dfall['Tsim'] = dfall['Tact']
+dfall['Tsim_pctime'] = dfall['Tact']
+dfall['Tsim'] = dfall['Time_all']
 
-dfall = dfall.drop(['Temp_TMC_Offset', 'Temp_TMC_Ist_7', 'I_1', 'I_2', 'I_3', 'I_4'], axis = 1)
+# dfall = dfall.drop(['Temp_TMC_Offset', 'Temp_TMC_Ist_7', 'I_1', 'I_2', 'I_3', 'I_4'], axis = 1)
 
 
-dfall.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_preparationadded.csv")
+dfall.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_preparationadded_test.csv")
+
+## duplicate but cant fidnt he problem
+
+# dfall = pd.read_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_preparationadded.csv", low_memory=False)
+#
+#
+# siml =  dfall.drop_duplicates(['Sim','Team'])['Sim'].tolist()
+# teaml =  dfall.drop_duplicates(['Sim','Team'])['Team'].tolist()
+# list_data_upd = []
+#
+# print(siml)
+# print(teaml)
+#
+# for j in range(len(siml)):
+#
+#     dft = dfall[(dfall.Sim == siml[j]) & (dfall.Team == teaml[j])]
+#     print('len', len(dft))
+#
+#     dft = dft.reset_index()
+#     print(dft.index)
+#
+#     zero = pd.Timestamp(dft.at[0, 'Tact'], unit='s')
+#
+#     for i in range(len(dft)):
+#         dft.at[i, 'Time_ts'] = pd.Timestamp(dft.at[i, 'Tact'], unit='s')
+#         #     one = pd.Timestamp(dft.at[i, 'Tsim'], unit ='s')
+#         two = pd.Timestamp(dft.at[i, 'Tact'], unit='s')
+#         dft.at[i, 'Time_all'] = (two - zero).total_seconds()
+#
+#     list_data_upd.append(dft)
+#
+# dfupd = pd.concat(list_data_upd, ignore_index=True)
+#
+# dfall.to_csv("/home/poyraden/Analysis/JOSIEfiles/Proccessed/Josie0910_preparationadded_upd.csv")
+

@@ -39,7 +39,7 @@ def errorPlot_ARDif_withtext(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, 
     labell = [''] * d
     textl = [''] * d
     tl = [''] * d
-    colorl = ['black', 'red', 'blue', 'green']
+    colorl = ['black', 'red', 'blue', 'green','orange']
 
     ## y locations of the extra text which is drawn for the total O3 values
     texty = [0.23, 0.16, 0.09, 0.02]
@@ -60,13 +60,13 @@ def errorPlot_ARDif_withtext(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, 
     if logbool: ax.set_yscale('log')
 
     for i in range(d):
-        n[i] = len(dfnoduplist[i])
-        labell[i] = labelist[i] + ' ( n =' + str(n[i]) + ')'
+        # n[i] = len(dfnoduplist[i])
+        labell[i] = labelist[i]
+        # \
+                    # + ' ( n =' + str(n[i]) + ')'
         # textl[i] = 'tot O3 ratio: ' + str(round(O3valuelist[0], 2))
-
-        ax.errorbar(xlist[i], Y, xerr=xerrorlist[i], label=labell[i], color=colorl[i], linewidth=1, elinewidth=0.5,
-                    capsize=1,
-                    capthick=0.5)
+        # print(xerrorlist[i])
+        ax.errorbar(xlist[i], Y, xerr=xerrorlist[i], label=labell[i], color=colorl[i], linewidth=1, elinewidth=0.5, capsize=1, capthick=0.5)
 
         if textbool: tl[i] = ax.text(0.05, texty[i], textl[i], color=colorl[i], transform=ax.transAxes)
 
@@ -78,13 +78,13 @@ def errorPlot_ARDif_withtext(xlist, xerrorlist, Y, xra, yra, maintitle, xtitle, 
     # ax.xaxis.set_minor_locator(AutoMinorLocator(10))
     # ax.legend(loc='lower right', frameon=True, fontsize='small')
 
-    ax.legend(loc='lower left', frameon=False, fontsize='small')
-
-    # plt.show()
-
+    ax.legend(loc='upper right', frameon=False, fontsize='small')
+    #
     plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/' + path + '/' + plotname + '.png')
     plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/' + path + '/' + plotname + '.eps')
     plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/' + path + '/' + plotname + '.pdf')
+
+    # plt.show()
 
 
     plt.close()
@@ -294,7 +294,8 @@ def Plot_Profile_PlotsPair(ind, teaml, prof_X, prof_Xerr, OPM_X, OPM_Xerr, Y, xr
     plt.savefig('/home/poyraden/Analysis/Josie_Analysis/Plots/ProfilePlots_withtimecut_v2/' + plotname + '.pdf')
     plt.savefig('/home/poyraden/Analysis/Josie_Analysis/Plots/ProfilePlots_withtimecut_v2/' + plotname + '.eps')
 
-def Plot_Simulation_PlotsTime(ind, teaml, X, Y, OPM, xra, yra, xtit, ytit, mtitle, plotname, keyword):
+# def Plot_Simulation_PlotsTime(ind, teaml, X, Y, OPM, xra, yra, xtit, ytit, mtitle, plotname, keyword):
+def Plot_Simulation_PlotsTime(ind, teaml, X,X2, Y, xra, yra, xtit, ytit, mtitle, plotname, keyword):
 
     plt.close('all')
     fig, ax = plt.subplots()
@@ -304,10 +305,24 @@ def Plot_Simulation_PlotsTime(ind, teaml, X, Y, OPM, xra, yra, xtit, ytit, mtitl
     plt.ylabel(ytit)
     plt.title(mtitle)
 
+    if keyword == 'two' :
+        # ax.plot(X[ind[0]], OPM[ind[0]], label="OPM", color = 'black')
+        ax.plot(X[ind[0]], Y[ind[0]], label="# " + str(teaml[ind[0]]), color='green')
+        ax.plot(X[ind[1]], Y[ind[1]], label="# " + str(teaml[ind[1]]), color='cyan')
+        ax.plot(X[ind[2]], Y[ind[2]], label="# " + str(teaml[ind[2]]), color='tomato')
+        ax.plot(X[ind[3]], Y[ind[3]], label="# " + str(teaml[ind[3]]), color='blue')
+
+        ax.plot(X2[ind[0]], Y[ind[0]], linestyle = ':',  color='green')
+        ax.plot(X2[ind[1]], Y[ind[1]], linestyle = ':',  color='cyan')
+        ax.plot(X2[ind[2]], Y[ind[2]], linestyle = ':',   color='tomato')
+        ax.plot(X2[ind[3]], Y[ind[3]], linestyle = ':',  color='blue')
+
+
+
     if (keyword == 'standard'):
         if (len(ind) == 4):
 
-            ax.plot(X[ind[0]], OPM[ind[0]], label="OPM", color = 'black')
+            # ax.plot(X[ind[0]], OPM[ind[0]], label="OPM", color = 'black')
             ax.plot(X[ind[0]], Y[ind[0]], label="Team " +  str(teaml[ind[0]]), color = 'green')
             ax.plot(X[ind[1]], Y[ind[1]], label="Team " +  str(teaml[ind[1]]),color = 'cyan')
             ax.plot(X[ind[2]], Y[ind[2]], label="Team " +  str(teaml[ind[2]]), color = 'tomato')
@@ -315,22 +330,22 @@ def Plot_Simulation_PlotsTime(ind, teaml, X, Y, OPM, xra, yra, xtit, ytit, mtitl
 
 
         if (len(ind) == 3):
-            ax.plot(X[ind[0]], OPM[ind[0]], label="OPM", color = 'black')
+            # ax.plot(X[ind[0]], OPM[ind[0]], label="OPM", color = 'black')
             ax.plot(X[ind[0]], Y[ind[0]], label="Team " + str(teaml[ind[0]]), color='green')
             ax.plot(X[ind[1]], Y[ind[1]], label="Team " + str(teaml[ind[1]]), color='cyan')
             ax.plot(X[ind[2]], Y[ind[2]], label="Team " + str(teaml[ind[2]]), color='tomato')
 
         if (len(ind) == 2):
-            ax.plot(X[ind[0]], OPM[ind[0]], label="OPM", color = 'black')
+            # ax.plot(X[ind[0]], OPM[ind[0]], label="OPM", color = 'black')
             ax.plot(X[ind[0]], Y[ind[0]], label="Team " + str(teaml[ind[0]]), color='green')
             ax.plot(X[ind[1]], Y[ind[1]], label="Team " + str(teaml[ind[1]]), color='cyan')
 
-    ax.legend(loc='lower right', frameon=True, fontsize='small')
+    ax.legend(loc='lower left', frameon=True, fontsize='small')
 
     # plt.show()
     #
-    plt.savefig('/home/poyraden/Analysis/Josie_Analysis/Plots/SimulationPlots_0910_v2_pair/' + plotname + '.pdf')
-    plt.savefig('/home/poyraden/Analysis/Josie_Analysis/Plots/SimulationPlots_0910_v2_pair/' + plotname + '.eps')
+    plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/ENSCI_DropOff/' + plotname + '.png')
+    plt.savefig('/home/poyraden/Analysis/JosieAnalysis/Plots/ENSCI_DropOff/' + plotname + '.eps')
 
 
 def Plot_Simulation_PlotsPair(ind, teaml, X, Y, OPM, xra, yra, xtit, ytit, mtitle, plotname, keyword):
@@ -348,7 +363,7 @@ def Plot_Simulation_PlotsPair(ind, teaml, X, Y, OPM, xra, yra, xtit, ytit, mtitl
     if (keyword == 'standard'):
         if (len(ind) == 4):
 
-            ax.plot(X[ind[0]], OPM[ind[0]], label="OPM", color = 'black')
+            # ax.plot(X[ind[0]], OPM[ind[0]], label="OPM", color = 'black')
             ax.plot(X[ind[0]], Y[ind[0]], label="Team " +  str(teaml[ind[0]]), color = 'green')
             ax.plot(X[ind[1]], Y[ind[1]], label="Team " +  str(teaml[ind[1]]),color = 'cyan')
             ax.plot(X[ind[2]], Y[ind[2]], label="Team " +  str(teaml[ind[2]]), color = 'tomato')
