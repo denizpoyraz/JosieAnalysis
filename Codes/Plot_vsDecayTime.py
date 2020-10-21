@@ -38,6 +38,7 @@ Y6 = np.zeros(len(simlist));
 Y5mY6 = np.zeros(len(simlist))
 t_decay = np.zeros(len(simlist))
 t3 = np.zeros(len(simlist))
+Y2epmY2bs = np.zeros(len(simlist))
 
 for j in range(len(simlist)):
 
@@ -82,6 +83,7 @@ for j in range(len(simlist)):
     Y1[j] = iB1[j] - iB0[j]
     Y2ep[j] = dft[j][dft[j].Tsim == t_prep_end].I_slow_conv.tolist()[0]
     Y2bs[j] = dft[j][dft[j].Tsim == t_sim_begin].I_slow_conv.tolist()[0]
+    Y2epmY2bs[j] = Y2ep[j] - Y2bs[j]
     Y2mY1[j] = Y2ep[j] - Y1[j]
     Y3[j] = (Y1[j]) * np.exp(-t3[j] / (25 * 60))
     Y3D[j] = (Y1[j]) * np.exp(-t_decay[j] / (25 * 60))
@@ -100,18 +102,18 @@ for j in range(len(simlist)):
 fig, ax = plt.subplots()
 # fig,ax = plt.figure()
 # ax=fig.add_axes([0,0,1,1])
-ax.scatter(decaytime, difarr, color='r', label = r'Islow$_{reference}$ - Islow$_{ib1decay}$' )
-ax.scatter(decaytime, difarr, color='r', label = r'Islow$_{reference}$ - Islow$_{ib1decay}$' )
+# ax.scatter(decaytime, difarr, color='r', label = r'Islow$_{reference}$ - Islow$_{ib1decay}$' )
+# ax.scatter(decaytime, Y3D, color='blue', label = r'Y1$e^{-td/t}$' )
+
+ax.scatter(t3/60, Y2epmY2bs, color='r', label = r'Y2(ep)-Y2(bs)$' )
+ax.scatter(t3/60, Y3, color='blue', label = r'Y1$e^{-tb/t}$' )
+ax.scatter(t3/60, Y4mY3, color='green', label = r'Y4-Y3$' )
 
 # ax.set_ylabel(r'Islow$_{reference}$ - Islow$_{ib1decay}$')
-ax.set_xlabel('Decay Time (mins)')
+# ax.set_xlabel('Decay Time (mins)')
+ax.set_xlabel('Time between prep. and sim. (mins)')
 
-# fig, ax2 = plt.subplots()
-# # fig,ax = plt.figure()
-# # ax=fig.add_axes([0,0,1,1])
-# ax2.scatter(decaytime, difarr, color='r')
-# ax2.set_ylabel(r'Islow$_{reference}$ - Islow$_{ib1decay}$')
-# ax2.set_xlabel('Decay Time (mins)')
+ax.legend(loc='upper right', frameon=False, fontsize='small')
 
-# plt.plot(decaytime, difarr)
+
 plt.show()
